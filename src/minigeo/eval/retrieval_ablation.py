@@ -28,10 +28,11 @@ def run_retrieval_ablation(
     corpus_rows: list[dict[str, Any]],
     top_k: int = 10,
     embedder: Embedder | None = None,
+    reranker: Any | None = None,
 ) -> dict[str, dict[str, float]]:
     bm25 = BM25Retriever(corpus_rows)
     dense = DenseRetriever(corpus_rows, embedder=embedder)
-    reranker = LexicalReranker()
+    reranker = reranker or LexicalReranker()
 
     outputs = {
         "bm25": _ids_by_query(
@@ -59,4 +60,3 @@ def run_retrieval_ablation(
         name: evaluate_retriever_outputs(benchmark_rows, retrieved)
         for name, retrieved in outputs.items()
     }
-

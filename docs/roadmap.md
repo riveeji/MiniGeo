@@ -139,8 +139,10 @@ BM25 retrieval
 
 - `src/minigeo/rag/bm25.py`
 - `src/minigeo/rag/dense.py`
+- `src/minigeo/rag/embedding_service.py`
 - `src/minigeo/rag/hybrid.py`
 - `src/minigeo/rag/reranker.py`
+- `src/minigeo/rag/reranker_service.py`
 - `src/minigeo/rag/pipeline.py`
 - `src/minigeo/rag/model_rag.py`
 - `src/minigeo/llm/openai_compatible.py`
@@ -154,6 +156,7 @@ BM25 retrieval
 - 每个回答包含 source chunk id。
 - RAG 的 citation hit rate 高于 no-RAG。
 - BM25、dense、hybrid、hybrid+rerank 可以在同一 benchmark 上做消融评测。
+- 加 `--use-services` 后可以接入真实 embedding 和 reranker 服务。
 
 ## Phase 4：MiniGeo-Verifier
 

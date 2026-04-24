@@ -31,3 +31,24 @@ def test_run_retrieval_ablation_returns_all_systems() -> None:
     assert set(results) == {"bm25", "dense", "hybrid", "hybrid_rerank"}
     assert results["hybrid"]["recall@5"] == 1.0
 
+
+def test_run_retrieval_ablation_accepts_custom_reranker() -> None:
+    class ReverseReranker:
+        def rerank(self, query, candidates, top_k=5):
+            return list(reversed(candidates))[:top_k]
+
+    bench = [{"id": "q1", "question": "石英", "evidence": ["calcite"]}]
+    corpus = [
+        {"chunk_id": "quartz", "text": "石英 二氧化硅"},
+        {"chunk_id": "calcite", "text": "方解石 碳酸盐"},
+    ]
+
+    results = run_retrieval_ablation(
+        bench,
+        corpus,
+        top_k=2,
+        embedder=HashingEmbedder(dimensions=64),
+        reranker=ReverseReranker(),
+    )
+
+    assert "hybrid_rerank" in results

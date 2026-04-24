@@ -16,6 +16,7 @@
 - OpenAI-compatible Qwen 客户端。
 - 模型 RAG 链路：`src/minigeo/rag/model_rag.py`。
 - Dense retrieval / hybrid retrieval / reranker 本地接口。
+- Embedding 服务客户端和 Reranker 服务客户端。
 - 检索消融脚本：`scripts/evaluate_retrieval_ablation.py`。
 - 简单 Verifier。
 - SQLite demo SQL 工具。
@@ -135,9 +136,18 @@ python scripts/evaluate_retrieval.py
 当前基础：
 
 - `src/minigeo/rag/dense.py`
+- `src/minigeo/rag/embedding_service.py`
 - `src/minigeo/rag/hybrid.py`
 - `src/minigeo/rag/reranker.py`
+- `src/minigeo/rag/reranker_service.py`
 - `scripts/evaluate_retrieval_ablation.py`
+
+服务模式运行：
+
+```powershell
+$env:PYTHONPATH="src"
+python scripts/evaluate_retrieval_ablation.py --use-services
+```
 
 指标：
 
