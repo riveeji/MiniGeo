@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.sqlite
+*.db
+data/processed/*.sqlite
+checkpoints/*
+!checkpoints/.gitkeep
+results/generated/
+data/raw/*
+!data/raw/.gitkeep
+tmp/

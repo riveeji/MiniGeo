@@ -1,0 +1,18 @@
+model:
+  base_model: Qwen/Qwen3.5-2B
+  output_dir: checkpoints/MiniGeo-Qwen3.5-2B-SFT
+training:
+  method: qlora
+  quantization: 4bit
+  lora_rank: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  epochs: 1
+  learning_rate: 0.0002
+data:
+  train_path: data/processed/sft_corpus.jsonl
+  eval_path: data/benchmark/minigeo_bench.jsonl
+notes:
+  - Do not train directly on MiniGeo-Bench reference answers.
+  - Run a small smoke training job before full training.
+
