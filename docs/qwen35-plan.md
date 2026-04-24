@@ -1,75 +1,74 @@
-# Qwen3.5-Based MiniGeo Plan
+# 基于 Qwen3.5 的 MiniGeo 方案
 
-## Model Selection
+## 模型选择
 
-MiniGeo should use Qwen3.5-2B as the main model.
+MiniGeo 默认使用 Qwen3.5-2B 作为主模型。
 
-Model roles:
-
-| Role | Model |
+| 角色 | 模型 |
 |---|---|
-| Main model | Qwen3.5-2B |
-| Lightweight baseline | Qwen3.5-0.8B |
-| Strong baseline | Qwen3.5-4B |
-| Teacher | Qwen3.5-27B or Qwen3.5-35B-A3B |
+| 主模型 | Qwen3.5-2B |
+| 轻量基线 | Qwen3.5-0.8B |
+| 强基线 | Qwen3.5-4B |
+| 教师模型 | Qwen3.5-27B 或 Qwen3.5-35B-A3B |
 | Embedding | Qwen3-Embedding-0.6B |
-| Reranker | Qwen3-Reranker-0.6B or bge-reranker |
+| Reranker | Qwen3-Reranker-0.6B 或 bge-reranker |
 
-## Why Qwen3.5-2B
+## 为什么先用 Qwen3.5-2B
 
-Qwen3.5-2B is the best first main model because:
+Qwen3.5-2B 适合作为第一阶段主模型：
 
-- It is more capable than 0.8B.
-- It is easier to run than 4B or 9B.
-- It is suitable for Colab Pro.
-- It can support LoRA / QLoRA fine-tuning.
-- It leaves room to show that RAG and verifier improve reliability beyond raw model scale.
+- 能力强于 0.8B。
+- 比 4B 或 9B 更容易运行。
+- 更适合 Colab Pro。
+- 支持 LoRA / QLoRA 微调。
+- 有利于展示 RAG 和 Verifier 对可靠性的提升，而不是只依赖模型规模。
 
-## Development Order
+## 开发顺序
 
-1. Use Qwen3.5-2B without fine-tuning.
-2. Build RAG.
-3. Build MiniGeo-Bench.
-4. Add verifier.
-5. Run evaluation.
-6. Fine-tune Qwen3.5-2B with LoRA / QLoRA.
-7. Evaluate Qwen3.5-4B as a strong baseline.
-8. Add Agent tools.
+1. 不微调，先接入 Qwen3.5-2B 推理。
+2. 构建 MiniGeo-Bench。
+3. 构建 BM25 RAG baseline。
+4. 加入模型 RAG 生成链路。
+5. 加入 Verifier。
+6. 运行评测。
+7. 使用 LoRA / QLoRA 微调 Qwen3.5-2B。
+8. 使用 Qwen3.5-4B 作为强基线。
+9. 加入 Agent 工具。
 
-## LoRA / QLoRA Plan
+## LoRA / QLoRA 计划
 
-First fine-tuning run:
+第一轮微调配置：
 
-| Setting | Value |
+| 设置 | 值 |
 |---|---|
 | Base model | Qwen3.5-2B |
 | Method | QLoRA |
 | Quantization | 4-bit |
 | LoRA rank | 16 |
 | Epochs | 1-3 |
-| Data | Evidence-grounded QA, refusal, SQL-format examples |
+| Data | 证据问答、拒答、SQL 格式样本 |
 
-Training objectives:
+训练目标：
 
-- Answer with citations.
-- Refuse when evidence is insufficient.
-- Follow output schemas.
-- Generate SQL in controlled format.
-- Avoid unsupported factual claims.
+- 带引用回答。
+- 证据不足时拒答。
+- 遵循 JSON 输出 schema。
+- 以受控格式生成 SQL。
+- 减少无证据事实 claim。
 
-## Evaluation Hypotheses
+## 评测假设
 
-The project should test these hypotheses:
+项目应验证以下假设：
 
-1. Qwen3.5-2B + RAG outperforms Qwen3.5-2B on citation-grounded QA.
-2. MiniGeo-SFT improves refusal and answer formatting.
-3. Verifier reduces unsupported claim rate.
-4. Qwen3.5-2B + RAG + Verifier can approach or exceed Qwen3.5-4B without RAG on reliability metrics.
-5. Agent workflows improve database-backed questions over pure RAG.
+1. Qwen3.5-2B + RAG 在引用问答上优于 Qwen3.5-2B。
+2. MiniGeo-SFT 改善拒答和回答格式。
+3. Verifier 降低 unsupported claim rate。
+4. Qwen3.5-2B + RAG + Verifier 在可靠性指标上可接近或超过无 RAG 的 Qwen3.5-4B。
+5. Agent 工作流在数据库支撑问题上优于纯 RAG。
 
-## Main Result Table
+## 主结果表
 
-| System | Acc | Citation Hit | Unsupported Claim | Abstention | SQL Exec | Latency |
+| 系统 | Acc | Citation Hit | Unsupported Claim | Abstention | SQL Exec | Latency |
 |---|---:|---:|---:|---:|---:|---:|
 | Qwen3.5-0.8B | | | | | - | |
 | Qwen3.5-2B | | | | | - | |
@@ -80,9 +79,9 @@ The project should test these hypotheses:
 | Qwen3.5-4B + RAG | | | | | - | |
 | MiniGeo-Agent | | | | | | |
 
-## Resume Claim
+## 简历表述
 
-Use this project claim after the system is implemented and evaluated:
+完成实现和评测后可使用：
 
-> Built MiniGeo, a Qwen3.5-based geoscience trustworthy QA and data analysis agent system. Constructed MiniGeo-Bench, implemented hybrid RAG and citation verification, fine-tuned Qwen3.5-2B with LoRA, and evaluated answer accuracy, citation hit rate, hallucination rate, abstention accuracy, and SQL execution accuracy.
+> 构建 MiniGeo，一个基于 Qwen3.5 的地学可信问答与数据分析 Agent 系统；构建 MiniGeo-Bench，实现混合 RAG、引用验证、Qwen3.5-2B LoRA 微调，并评测答案准确率、引用命中率、幻觉率、拒答准确率和 SQL 执行准确率。
 

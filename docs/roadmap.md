@@ -1,32 +1,32 @@
-# MiniGeo Roadmap
+# MiniGeo 路线图
 
-## Goal
+## 目标
 
-Build MiniGeo as a Qwen3.5-based geoscience trustworthy QA and data analysis system. The final system should combine RAG, evidence verification, LoRA fine-tuning, benchmark evaluation, and an agent layer for SQL-backed analysis.
+构建一个基于 Qwen3.5 的地学可信问答与数据分析系统。最终系统应结合 RAG、证据验证、LoRA/QLoRA 微调、benchmark 评测，以及 SQL 支撑的 Agent 分析层。
 
-## Guiding Principle
+## 指导原则
 
-The project should not compete on model size. It should compete on:
+MiniGeo 不以模型规模作为主要竞争点，而以以下能力作为核心贡献：
 
-- Domain benchmark quality.
-- Evidence-grounded generation.
-- Refusal behavior when evidence is insufficient.
-- Structured and unstructured data integration.
-- Clear evaluation and ablation results.
+- 高质量领域 benchmark。
+- 基于证据的回答生成。
+- 证据不足时的拒答行为。
+- 非结构化文档和结构化数据库的结合。
+- 清晰的评测和消融结果。
 
-## Phase 0: Project Setup
+## Phase 0：项目基础
 
-Duration: 1 day.
+周期：1 天。
 
-Deliverables:
+产出：
 
-- Git repository.
-- Python environment.
-- Basic directories.
-- README and docs.
-- First Colab notebook template.
+- Git 仓库。
+- Python 环境。
+- 基本目录结构。
+- README 和 docs。
+- Colab notebook 模板。
 
-Recommended dependencies:
+推荐依赖：
 
 ```text
 torch
@@ -38,6 +38,7 @@ accelerate
 sentence-transformers
 faiss-cpu
 rank-bm25
+jieba
 pandas
 numpy
 scikit-learn
@@ -46,259 +47,247 @@ pyyaml
 fastapi
 uvicorn
 gradio
+pytest
+openai
 ```
 
-## Phase 1: MiniGeo-Bench
+## Phase 1：MiniGeo-Bench
 
-Duration: 3-5 days.
+周期：3-5 天。
 
-Purpose: Build the project evaluation foundation before implementing complicated modeling.
+目的：先建立评测基础，再实现复杂模型链路。
 
-Target size:
+规模目标：
 
-- MVP: 50 questions.
-- Resume-ready version: 150-300 questions.
-- Strong version: 300+ questions with evidence labels.
+- MVP：50 题。
+- 简历可展示版：150-300 题。
+- 强版本：300+ 题，并尽量带 evidence label。
 
-Question types:
+题型：
 
-| Type | Description |
+| 类型 | 说明 |
 |---|---|
-| concept | Basic geoscience concepts |
-| mineral_property | Mineral physical and chemical properties |
-| spectroscopy | Raman, infrared, or spectral characteristics |
-| evidence | Questions requiring citation from documents |
-| multi_hop | Questions requiring multiple evidence chunks |
-| unanswerable | Questions with insufficient evidence |
-| false_premise | Questions containing incorrect assumptions |
-| sql | Questions requiring structured database queries |
+| `concept` | 地学基础概念 |
+| `mineral_property` | 矿物物理和化学性质 |
+| `spectroscopy` | Raman、红外或其他光谱特征 |
+| `evidence` | 需要文档引用的问题 |
+| `multi_hop` | 需要多个证据 chunk 的问题 |
+| `unanswerable` | 当前证据不足的问题 |
+| `false_premise` | 问题包含错误前提 |
+| `sql` | 需要结构化数据库查询的问题 |
 
-Deliverables:
+当前产出：
 
 - `data/benchmark/minigeo_bench.jsonl`
 - `docs/benchmark.md`
 - `scripts/evaluate_bench.py`
 
-## Phase 2: Data Pipeline
+## Phase 2：数据管线
 
-Duration: 4-7 days.
+周期：4-7 天。
 
-Purpose: Turn raw geoscience documents into RAG chunks and SFT training examples.
+目的：把公开地学资料转为 RAG chunk 和 SFT 样本。
 
-Pipeline:
+流程：
 
 ```text
-raw documents
--> parsing
--> cleaning
--> deduplication
--> chunking
--> metadata tagging
--> train / validation / test split
--> RAG corpus and SFT corpus
+公开资料
+-> 解析
+-> 清洗
+-> 去重
+-> chunk
+-> 元数据标注
+-> train / validation / test 切分
+-> RAG corpus 和 SFT corpus
 ```
 
-Deliverables:
+产出：
 
 - `scripts/prepare_data.py`
 - `data/processed/rag_corpus.jsonl`
 - `data/processed/sft_corpus.jsonl`
 - `docs/data-card.md`
 
-## Phase 3: Qwen3.5-2B RAG MVP
+## Phase 3：Qwen3.5-2B RAG MVP
 
-Duration: 5-7 days.
+周期：5-7 天。
 
-Purpose: Build the first usable MiniGeo system before fine-tuning.
+目的：在微调前先做出可用系统。
 
-Pipeline:
+流程：
 
 ```text
 question
 -> BM25 retrieval
--> embedding retrieval
--> hybrid merge
--> rerank
 -> evidence prompt construction
 -> Qwen3.5-2B generation
+-> JSON answer parsing
+-> citation filtering
 -> cited answer
 ```
 
-Deliverables:
+后续增强：
 
-- `src/minigeo/rag/chunker.py`
-- `src/minigeo/rag/indexer.py`
-- `src/minigeo/rag/retriever.py`
-- `src/minigeo/rag/reranker.py`
+```text
+BM25 retrieval
+-> embedding retrieval
+-> hybrid merge
+-> rerank
+```
+
+当前产出：
+
+- `src/minigeo/rag/bm25.py`
 - `src/minigeo/rag/pipeline.py`
-- `scripts/build_index.py`
+- `src/minigeo/rag/model_rag.py`
+- `src/minigeo/llm/openai_compatible.py`
 - `scripts/rag_demo.py`
+- `scripts/model_rag_demo.py`
 
-Success criteria:
+成功标准：
 
-- The demo can answer at least 20 benchmark questions.
-- Each answer includes source chunk ids.
-- RAG improves citation hit rate over Qwen3.5-2B without retrieval.
+- demo 能回答 benchmark 中至少 20 个问题。
+- 每个回答包含 source chunk id。
+- RAG 的 citation hit rate 高于 no-RAG。
 
-## Phase 4: MiniGeo-Verifier
+## Phase 4：MiniGeo-Verifier
 
-Duration: 5-7 days.
+周期：5-7 天。
 
-Purpose: Make MiniGeo different from ordinary RAG by checking evidence support.
+目的：通过证据支持性检查，让 MiniGeo 区别于普通 RAG。
 
-Verifier workflow:
+流程：
 
 ```text
 answer
 -> claim extraction
 -> evidence matching
 -> support classification
--> rewrite or abstain when unsupported
+-> rewrite or abstain
 ```
 
-Labels:
+标签：
 
 - `supported`
 - `contradicted`
 - `insufficient`
 
-Deliverables:
+产出：
 
-- `src/minigeo/verifier/claim_extractor.py`
-- `src/minigeo/verifier/evidence_matcher.py`
-- `src/minigeo/verifier/verifier.py`
+- `src/minigeo/verifier/`
 - `scripts/evaluate_verifier.py`
 - `results/verifier_eval.md`
 
-Success criteria:
+成功标准：
 
-- Unsupported claim rate is measurable.
-- Unanswerable questions trigger refusals.
-- The verifier can explain which evidence supports or fails to support a claim.
+- Unsupported claim rate 可测。
+- unanswerable 问题触发拒答。
+- Verifier 能说明每个 claim 的支持证据或证据不足原因。
 
-## Phase 5: Qwen3.5-2B LoRA / QLoRA
+## Phase 5：Qwen3.5-2B LoRA / QLoRA
 
-Duration: 7-10 days.
+周期：7-10 天。
 
-Purpose: Create `MiniGeo-Qwen3.5-2B-SFT`.
+目的：训练 `MiniGeo-Qwen3.5-2B-SFT`，但不让微调成为项目成败单点。
 
-Training data:
+训练数据：
 
-- Geoscience QA.
-- Evidence-grounded answers.
-- Refusal samples.
-- SQL generation samples.
-- Reasoning distillation samples.
+- 地学问答。
+- 基于证据的回答。
+- 拒答样本。
+- SQL 格式样本。
+- 少量 reasoning distillation 样本。
 
-Training strategy:
+策略：
 
-- Use QLoRA first.
-- Compare LoRA rank 8, 16, and 32 if time allows.
-- Keep the first run small and reproducible.
+- 先使用 QLoRA。
+- 默认 LoRA rank 16。
+- 先跑小样本 smoke run，再完整训练。
 
-Deliverables:
+产出：
 
 - `configs/qwen35_2b_lora.yaml`
 - `scripts/train_lora.py`
 - `src/minigeo/finetune/`
 - `results/sft_eval.md`
 
-Success criteria:
+## Phase 6：Qwen3.5-4B 强基线
 
-- SFT improves domain answer style or refusal behavior.
-- RAG + Verifier remains the strongest reliability configuration.
+周期：3-5 天。
 
-## Phase 6: Qwen3.5-4B Strong Baseline
+目的：比较“小模型 + RAG + Verifier”是否能在可靠性指标上接近或超过更大的无 RAG 基线。
 
-Duration: 3-5 days.
+评测组：
 
-Purpose: Show whether a smaller model with RAG and verification can approach or outperform a larger no-RAG baseline.
+- Qwen3.5-2B。
+- Qwen3.5-2B + RAG。
+- MiniGeo-Qwen3.5-2B-SFT + RAG。
+- MiniGeo-Qwen3.5-2B-SFT + RAG + Verifier。
+- Qwen3.5-4B。
+- Qwen3.5-4B + RAG。
 
-Evaluation groups:
-
-- Qwen3.5-2B.
-- Qwen3.5-2B + RAG.
-- MiniGeo-Qwen3.5-2B-SFT + RAG.
-- MiniGeo-Qwen3.5-2B-SFT + RAG + Verifier.
-- Qwen3.5-4B.
-- Qwen3.5-4B + RAG.
-
-Deliverable:
+产出：
 
 - `results/main_results.md`
 
-## Phase 7: MiniGeo-Agent
+## Phase 7：MiniGeo-Agent
 
-Duration: 7-14 days.
+周期：7-14 天。
 
-Purpose: Upgrade from trustworthy QA to data analysis.
+目的：从可信 QA 升级为数据分析 Agent。
 
-Agent tools:
+工具：
 
-| Tool | Purpose |
+| 工具 | 用途 |
 |---|---|
-| `search_docs` | Search geoscience documents |
-| `retrieve_evidence` | Return evidence chunks |
-| `generate_sql` | Generate SQL from natural language |
-| `execute_sql` | Execute SQL against demo database |
-| `repair_sql` | Repair failed SQL using error messages and schema |
-| `verify_answer` | Check final answer support |
-| `write_report` | Summarize evidence-backed analysis |
+| `search_docs` | 搜索地学文档 |
+| `retrieve_evidence` | 返回证据 chunk |
+| `generate_sql` | 从自然语言生成 SQL |
+| `execute_sql` | 执行 SQL |
+| `repair_sql` | 根据错误信息和 schema 修复 SQL |
+| `verify_answer` | 检查最终回答证据支持性 |
+| `write_report` | 生成证据支持的分析报告 |
 
-Deliverables:
+产出：
 
 - `src/minigeo/agent/`
 - `scripts/init_demo_db.py`
 - `scripts/agent_demo.py`
 - `docs/agent-design.md`
 
-Success criteria:
+## Phase 8：可选 MiniGeo-Tiny
 
-- The agent can answer mixed document and database questions.
-- SQL execution accuracy is measurable.
-- Failed SQL can be repaired in simple cases.
-- Final answers include evidence and verification results.
+周期：7-10 天。
 
-## Phase 8: Optional MiniGeo-Tiny
+目的：展示对 LLM 训练链条的理解，不作为主贡献。
 
-Duration: 7-10 days.
+可包含：
 
-Purpose: Demonstrate understanding of the LLM training chain.
+- Tokenizer 训练。
+- Decoder-only Transformer。
+- RoPE。
+- RMSNorm。
+- SwiGLU。
+- KV cache。
+- Pretraining。
+- SFT。
 
-This is not the main project contribution.
+## Phase 9：打包展示
 
-Features:
+周期：3-5 天。
 
-- Tokenizer training.
-- Decoder-only Transformer.
-- RoPE.
-- RMSNorm.
-- SwiGLU.
-- KV cache.
-- Pretraining.
-- SFT.
+最终产物：
 
-Expected size:
+- README。
+- 架构图。
+- MiniGeo-Bench 文档。
+- Data card。
+- 主结果表。
+- 失败案例分析。
+- Colab notebook。
+- 简历 bullet。
 
-- Tiny: 10M-30M parameters.
-- Base: 50M-150M parameters.
+推荐简历表述：
 
-## Phase 9: Packaging
-
-Duration: 3-5 days.
-
-Final artifacts:
-
-- README.
-- Architecture diagram.
-- MiniGeo-Bench documentation.
-- Data card.
-- Main result table.
-- Failure case analysis.
-- Colab notebook.
-- Resume bullet.
-
-Final resume positioning:
-
-> MiniGeo: Built a Qwen3.5-based geoscience trustworthy QA and data analysis agent system, including domain benchmark construction, hybrid RAG, citation verification, LoRA fine-tuning, and Text-to-SQL agent workflows.
+> MiniGeo：构建基于 Qwen3.5 的地学可信问答与数据分析 Agent 系统，包含领域 benchmark 构建、混合 RAG、引用验证、LoRA 微调和 Text-to-SQL Agent 工作流。
 

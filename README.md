@@ -1,32 +1,34 @@
 # MiniGeo
 
-MiniGeo is a Qwen3.5-based geoscience trustworthy QA and data analysis agent project. The contribution is not a new foundation model; it is a measurable domain system that combines MiniGeo-Bench, retrieval-augmented generation, evidence verification, QLoRA-ready adaptation, and SQL-backed agent workflows.
+MiniGeo 是一个基于 Qwen3.5 的地学可信问答与数据分析 Agent 项目。项目目标不是训练新的基础模型，而是构建一个可评测的地学领域系统：包含 MiniGeo-Bench、RAG 检索增强生成、证据验证、QLoRA 微调准备，以及 SQL 支撑的数据分析 Agent 工作流。
 
-## Current Status
+## 当前状态
 
-Implemented locally:
+已在本地实现：
 
-- Python package skeleton under `src/minigeo`.
-- 150-item UTF-8 MiniGeo-Bench seed benchmark.
-- 42-chunk curated seed RAG corpus with stable `chunk_id` values.
-- Chinese-aware tokenizer with optional `jieba` and fallback character bigrams.
-- Pure-Python BM25 retriever.
-- Retrieval metrics: `recall@k`, `MRR`, `citation_hit_rate`.
-- Simple verifier contract and heuristic verifier.
-- SQLite demo database and SQL execution tool.
-- Minimal Agent report interface.
-- QLoRA config placeholder for Colab Pro training.
+- `src/minigeo` 下的 Python 包结构。
+- 150 条 UTF-8 中文 MiniGeo-Bench 种子评测集。
+- 42 个稳定 `chunk_id` 的种子 RAG 语料 chunk。
+- 中文可用 tokenizer：优先使用 `jieba`，无依赖时回退到字符和 bigram。
+- 纯 Python BM25 检索器。
+- 检索指标：`recall@k`、`MRR`、`citation_hit_rate`。
+- 简单 Verifier 数据契约和启发式验证器。
+- SQLite 演示数据库和 SQL 执行工具。
+- 最小 Agent 报告接口。
+- OpenAI-compatible Qwen 推理客户端。
+- 基于模型服务的 RAG 生成链路。
+- 面向 Colab Pro 的 QLoRA 配置占位。
 
-Not implemented locally:
+尚未在本地完成：
 
-- Real Qwen3.5 model inference.
-- Dense retrieval and reranker inference.
-- QLoRA training.
-- Full model-backed evaluation table.
+- 真实 Qwen3.5 模型推理结果。
+- Dense retrieval 和 reranker 推理。
+- QLoRA 训练。
+- 完整模型评测结果表。
 
-Those stages require Colab Pro or a running model service.
+这些阶段需要 Colab Pro、本机 GPU，或可访问的 OpenAI-compatible 模型服务。
 
-## Quick Start
+## 快速开始
 
 ```powershell
 python -m venv .venv
@@ -37,9 +39,9 @@ $env:PYTHONPATH="src"
 pytest -q
 ```
 
-If you only want to run the standard-library parts, `pytest` works without installing the heavy model dependencies.
+如果只运行标准库覆盖的部分，`pytest` 不需要安装完整模型依赖。
 
-## Useful Commands
+## 常用命令
 
 ```powershell
 $env:PYTHONPATH="src"
@@ -54,7 +56,7 @@ python scripts/sql_demo.py
 python scripts/agent_demo.py
 ```
 
-`scripts/model_rag_demo.py` requires an OpenAI-compatible Qwen service:
+`scripts/model_rag_demo.py` 需要一个 OpenAI-compatible 的 Qwen 服务：
 
 ```powershell
 $env:OPENAI_BASE_URL="http://localhost:8000/v1"
@@ -64,11 +66,11 @@ $env:PYTHONPATH="src"
 python scripts/model_rag_demo.py
 ```
 
-See `configs/model_service.example.env` for the environment variables.
+环境变量示例见 `configs/model_service.example.env`。
 
-## Core Interfaces
+## 核心接口
 
-Benchmark item:
+Benchmark 条目：
 
 ```json
 {
@@ -85,25 +87,25 @@ Benchmark item:
 }
 ```
 
-RAG answer:
+RAG 回答：
 
 ```json
 {
-  "answer": "...",
+  "answer": "根据证据生成的回答。",
   "citations": ["doc_quartz#chunk_001"],
   "abstained": false,
   "confidence": 0.7
 }
 ```
 
-Verifier report:
+Verifier 报告：
 
 ```json
 {
   "verdict": "supported",
   "claims": [
     {
-      "claim": "...",
+      "claim": "石英的主要成分是二氧化硅。",
       "status": "supported",
       "evidence": ["doc_quartz#chunk_001"],
       "confidence": 0.8
@@ -112,17 +114,18 @@ Verifier report:
 }
 ```
 
-## Roadmap
+## 路线图
 
-1. Expand MiniGeo-Bench from 150 to 300+ items.
-2. Replace or strengthen the curated seed corpus with more documented public geoscience sources.
-3. Run Qwen3.5-2B model-backed RAG through the OpenAI-compatible endpoint.
-4. Add Qwen3-Embedding-0.6B dense retrieval and Qwen3-Reranker-0.6B reranking.
-5. Improve verifier with model-backed claim extraction and support classification.
-6. Run QLoRA SFT in Colab Pro using `configs/qwen35_2b_lora.yaml`.
-7. Expand SQL evaluation and MiniGeo-Agent.
-8. Fill `results/main_results.md` and `results/failure_cases.md`.
+1. 将 MiniGeo-Bench 从 150 条扩展到 300+ 条。
+2. 用更多可追踪公开地学资料增强当前种子 corpus。
+3. 通过 OpenAI-compatible endpoint 跑通 Qwen3.5-2B 模型 RAG。
+4. 加入 Qwen3-Embedding-0.6B dense retrieval 和 Qwen3-Reranker-0.6B reranking。
+5. 用模型增强 claim extraction 和 support classification。
+6. 在 Colab Pro 上基于 `configs/qwen35_2b_lora.yaml` 运行 QLoRA SFT。
+7. 扩展 SQL 评测和 MiniGeo-Agent。
+8. 填充 `results/main_results.md` 和 `results/failure_cases.md`。
 
-## Project Claim
+## 项目定位
 
-MiniGeo studies whether a lightweight Qwen3.5-based system can improve geoscience QA reliability through domain RAG, citation verification, and agentic data analysis, rather than relying only on model scale.
+MiniGeo 研究的是：轻量 Qwen3.5 系统能否通过领域 RAG、引用验证和 Agent 数据分析提高地学问答可靠性，而不是单纯依赖模型规模。
+

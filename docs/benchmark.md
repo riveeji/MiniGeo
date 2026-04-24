@@ -1,21 +1,26 @@
 # MiniGeo-Bench
 
-## Purpose
+## 目的
 
-MiniGeo-Bench is the evaluation foundation of MiniGeo. It measures whether the system can answer geoscience questions with evidence, refuse unsupported questions, and execute database-backed analysis tasks.
+MiniGeo-Bench 是 MiniGeo 的评测基础。它用于衡量系统是否能：
 
-## Current Seed Benchmark
+- 基于证据回答地学问题。
+- 在证据不足时拒答。
+- 处理错误前提问题。
+- 执行数据库支撑的分析任务。
 
-The current MVP is `data/benchmark/minigeo_bench.jsonl`.
+## 当前种子评测集
 
-- Items: 150
-- Answerable items: 133
-- Unanswerable items: 17
-- False-premise items: 19
-- SQL-backed items: 30
-- Evidence-labeled items: 105
+当前文件：`data/benchmark/minigeo_bench.jsonl`。
 
-Run:
+- 总题数：150
+- 可回答题：133
+- 不可回答题：17
+- 错误前提题：19
+- SQL 支撑题：30
+- 带 evidence label 的题：105
+
+运行：
 
 ```powershell
 $env:PYTHONPATH="src"
@@ -23,9 +28,9 @@ python scripts/evaluate_bench.py
 python scripts/expand_seed_data.py
 ```
 
-## Dataset Format
+## 数据格式
 
-Each item is one JSON Lines record:
+每条题目是一行 JSON Lines 记录：
 
 ```json
 {
@@ -42,35 +47,36 @@ Each item is one JSON Lines record:
 }
 ```
 
-## Question Types
+## 题型
 
-| Type | Purpose |
+| 类型 | 目的 |
 |---|---|
-| `concept` | Basic geoscience concepts |
-| `mineral_property` | Mineral physical or chemical properties |
-| `spectroscopy` | Raman, infrared, or spectral characteristics |
-| `evidence` | Questions that require cited document evidence |
-| `multi_hop` | Questions requiring multiple evidence chunks |
-| `unanswerable` | Questions with insufficient evidence |
-| `false_premise` | Questions containing incorrect assumptions |
-| `sql` | Questions requiring structured database queries |
+| `concept` | 地学基础概念 |
+| `mineral_property` | 矿物物理或化学性质 |
+| `spectroscopy` | Raman、红外或其他光谱特征 |
+| `evidence` | 需要引用文档证据的问题 |
+| `multi_hop` | 需要多个证据 chunk 的问题 |
+| `unanswerable` | 当前证据不足的问题 |
+| `false_premise` | 问题包含错误前提 |
+| `sql` | 需要结构化数据库查询的问题 |
 
-## Annotation Rules
+## 标注规则
 
-- Use concise reference answers.
-- Use real `chunk_id` values for evidence-labeled questions.
-- Set `answerable=false` when the correct behavior is refusal.
-- For SQL questions, include `expected_sql_intent` and an `expected_result` object.
-- Do not use MiniGeo-Bench reference answers as SFT output.
-- Use `scripts/expand_seed_data.py` only for deterministic seed expansion; hand-review new benchmark records before making research claims.
+- 参考答案应简洁。
+- 带证据题必须使用真实存在的 `chunk_id`。
+- 当正确行为是拒答时，设置 `answerable=false`。
+- SQL 题需要包含 `expected_sql_intent` 和 `expected_result`。
+- 不要把 MiniGeo-Bench 的 reference answer 直接作为 SFT 输出训练。
+- `scripts/expand_seed_data.py` 只用于确定性种子扩展；用于研究结论前必须人工复查新增题目。
 
-## Metrics
+## 指标
 
-| Metric | Definition |
+| 指标 | 定义 |
 |---|---|
-| `accuracy` | Whether the final answer matches the reference answer |
-| `citation_hit_rate` | Whether cited chunks overlap gold evidence chunks |
-| `unsupported_claim_rate` | Fraction of extracted claims not supported by evidence |
-| `abstention_accuracy` | Whether unanswerable items trigger refusal |
-| `sql_exec_accuracy` | Whether SQL executes and returns the expected result |
-| `latency` | End-to-end response time |
+| `accuracy` | 最终回答是否匹配参考答案 |
+| `citation_hit_rate` | 引用 chunk 是否覆盖 gold evidence |
+| `unsupported_claim_rate` | 抽取 claim 中缺少证据支持的比例 |
+| `abstention_accuracy` | 不可回答题是否触发拒答 |
+| `sql_exec_accuracy` | SQL 是否执行成功并返回预期结果 |
+| `latency` | 端到端响应时间 |
+

@@ -1,19 +1,19 @@
 # MiniGeo Data Card
 
-## Purpose
+## 目的
 
-This document records data sources, processing rules, and known risks for MiniGeo. It should be updated whenever raw documents, benchmark items, RAG chunks, or SFT examples are added.
+本文档记录 MiniGeo 的数据来源、处理规则和已知风险。每次新增原始文档、benchmark 题目、RAG chunk 或 SFT 样本后，都应更新本文件。
 
-## Current Data Assets
+## 当前数据资产
 
-| File | Purpose |
+| 文件 | 用途 |
 |---|---|
-| `data/benchmark/minigeo_bench.jsonl` | 150-item MiniGeo-Bench seed benchmark |
-| `data/processed/rag_corpus.jsonl` | 42 curated evidence chunks for local RAG tests |
-| `data/processed/source_manifest.jsonl` | Source URL and license notes for curated seed expansion |
-| `data/processed/minigeo_demo.sqlite` | Generated demo database, created by `scripts/init_demo_db.py` |
+| `data/benchmark/minigeo_bench.jsonl` | 150 条 MiniGeo-Bench 种子评测集 |
+| `data/processed/rag_corpus.jsonl` | 42 个本地 RAG 测试用证据 chunk |
+| `data/processed/source_manifest.jsonl` | 种子扩展使用的来源 URL 和 license 备注 |
+| `data/processed/minigeo_demo.sqlite` | 由 `scripts/init_demo_db.py` 生成的演示数据库 |
 
-The current corpus is a curated seed corpus for pipeline validation. It includes source URLs and license notes, but it is still not enough for final research claims. Before reporting model results, expand it with more documented public sources and manually review source alignment.
+当前 corpus 是用于管线验证的种子语料。它包含来源 URL 和 license 备注，但仍不足以支撑最终研究结论。报告模型结果前，应继续扩展更多可追踪公开资料，并人工复核来源和内容对应关系。
 
 ## RAG Corpus Schema
 
@@ -43,36 +43,37 @@ The current corpus is a curated seed corpus for pipeline validation. It includes
 }
 ```
 
-## Processing Pipeline
+## 处理流程
 
 ```text
-public source metadata
--> parse or manually curate
--> clean UTF-8 text
--> remove empty and duplicate chunks
--> assign stable chunk ids
--> add source, url, topic, mineral, license
--> export JSONL
--> run corpus validation and retrieval evaluation
+公开来源元数据
+-> 解析或人工整理
+-> 清洗 UTF-8 文本
+-> 删除空 chunk 和重复 chunk
+-> 分配稳定 chunk id
+-> 添加 source、url、topic、mineral、license
+-> 导出 JSONL
+-> 运行 corpus 校验和检索评测
 ```
 
-## Data Quality Checks
+## 数据质量检查
 
-- All text files must be UTF-8.
-- Remove exact duplicate chunks.
-- Remove empty or very short chunks.
-- Track source URL and license where available.
-- Keep benchmark reference answers out of SFT outputs.
-- Report corpus size and topic distribution after each update.
+- 所有文本文件使用 UTF-8。
+- 删除完全重复的 chunk。
+- 删除空 chunk 或过短 chunk。
+- 尽量记录来源 URL 和 license。
+- Benchmark reference answer 不进入 SFT 输出。
+- 每次更新后记录 corpus 规模和 topic 分布。
 
-## Leakage Control
+## 泄漏控制
 
-- Do not train directly on MiniGeo-Bench reference answers.
-- Evidence chunks may be available for open-book RAG evaluation, but answer text should not be reused as training output.
-- Keep closed-book generation, open-book RAG, and SFT evaluation clearly separated.
+- 不直接用 MiniGeo-Bench reference answer 训练。
+- Open-book RAG 评测可以访问 evidence chunk，但不能把答案文本复用为训练输出。
+- 明确区分 closed-book generation、open-book RAG 和 SFT evaluation。
 
-## Licensing Notes
+## 版权说明
 
-- Commit public metadata and processing scripts.
-- Do not commit raw files whose redistribution status is unclear.
-- For every non-curated source, record source name, URL, license, and redistribution status.
+- 可以提交公开元数据和处理脚本。
+- 不提交再分发权限不明确的原始文件。
+- 每个非人工整理来源都应记录 source name、URL、license 和再分发状态。
+

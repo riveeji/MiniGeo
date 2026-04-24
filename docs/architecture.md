@@ -1,114 +1,110 @@
-# MiniGeo Architecture
+# MiniGeo 架构
 
-## System Overview
+## 系统总览
 
-MiniGeo is organized as a layered system:
+MiniGeo 按分层系统组织：
 
 ```text
-User Question
+用户问题
   |
   v
-Task Router / Agent Planner
+任务路由 / Agent 规划
   |
-  +--> Document RAG
-  |      +--> Chunk index
-  |      +--> BM25 retriever
-  |      +--> Embedding retriever
-  |      +--> Reranker
+  +--> 文档 RAG
+  |      +--> Chunk 索引
+  |      +--> BM25 检索
+  |      +--> Embedding 检索
+  |      +--> Reranker 重排
   |
-  +--> SQL Tooling
-  |      +--> Schema reader
-  |      +--> SQL generator
-  |      +--> SQL executor
-  |      +--> SQL repair
+  +--> SQL 工具
+  |      +--> Schema 读取
+  |      +--> SQL 生成
+  |      +--> SQL 执行
+  |      +--> SQL 修复
   |
-  +--> Qwen3.5 Generator
+  +--> Qwen3.5 生成器
   |
-  +--> Citation Verifier
-         +--> Claim extraction
-         +--> Evidence matching
-         +--> Support classification
-         +--> Rewrite or abstain
+  +--> 引用验证器
+         +--> Claim 抽取
+         +--> 证据匹配
+         +--> 支持性分类
+         +--> 改写或拒答
 ```
 
-## Layer 1: Model Layer
+## 模型层
 
-Main model:
+默认模型角色：
 
-- Qwen3.5-2B.
+- 主生成模型：Qwen3.5-2B。
+- 轻量基线：Qwen3.5-0.8B。
+- 强基线：Qwen3.5-4B。
+- 教师模型：Qwen3.5-27B 或 Qwen3.5-35B-A3B。
 
-Baselines:
+模型职责：
 
-- Qwen3.5-0.8B.
-- Qwen3.5-4B.
+- 理解地学问题。
+- 基于证据生成回答。
+- 在需要时生成 SQL。
+- 输出简短推理或结构化结果。
+- 在 Agent 层支持工具调用格式。
 
-Teacher models:
+## RAG 层
 
-- Qwen3.5-27B.
-- Qwen3.5-35B-A3B.
+RAG 为系统提供外部地学知识。
 
-Model responsibilities:
+核心组件：
 
-- Understand user questions.
-- Generate answers from evidence.
-- Generate SQL when needed.
-- Produce short reasoning summaries.
-- Support tool-use format in the agent layer.
+- 文档解析。
+- Chunk 切分。
+- 元数据存储。
+- BM25 检索。
+- Embedding 检索。
+- Reranker 重排。
+- Prompt 组装。
 
-## Layer 2: RAG Layer
-
-RAG provides external geoscience knowledge.
-
-Main components:
-
-- Document parser.
-- Chunker.
-- Metadata store.
-- BM25 retriever.
-- Embedding retriever.
-- Reranker.
-- Prompt assembler.
-
-Chunk schema:
+Chunk schema：
 
 ```json
 {
-  "chunk_id": "doc_001#chunk_003",
-  "doc_id": "doc_001",
-  "text": "The chunk content.",
-  "source": "mineral_spectroscopy.pdf",
-  "page": 12,
-  "topic": "spectroscopy",
-  "mineral": "quartz"
+  "chunk_id": "doc_quartz#chunk_001",
+  "doc_id": "doc_quartz",
+  "text": "石英是常见的硅酸盐矿物，主要化学成分是二氧化硅 SiO2。",
+  "source": "MiniGeo curated mineral notes",
+  "url": "https://example.org/minigeo/quartz",
+  "page": null,
+  "topic": "concept",
+  "mineral": "quartz",
+  "license": "public"
 }
 ```
 
-## Layer 3: Verifier Layer
+## Verifier 层
 
-The verifier checks whether the answer is supported by retrieved evidence.
+Verifier 检查生成回答中的事实 claim 是否被检索证据支持。
 
-Input:
+输入：
 
-- User question.
-- Generated answer.
-- Retrieved evidence chunks.
+- 用户问题。
+- 生成回答。
+- 检索到的证据 chunk。
 
-Output:
+输出：
 
 ```json
 {
   "verdict": "supported",
   "claims": [
     {
-      "claim": "Quartz has a strong Raman peak near 464 cm-1.",
+      "claim": "石英的主要成分是二氧化硅。",
       "status": "supported",
-      "evidence": ["doc_001#chunk_003"]
+      "evidence": ["doc_quartz#chunk_001"],
+      "confidence": 0.8
     }
   ]
 }
 ```
 
-Verdict labels:
+标签：
 
 - `supported`
 - `partially_supported`
@@ -116,47 +112,45 @@ Verdict labels:
 - `contradicted`
 - `insufficient_evidence`
 
-## Layer 4: Agent Layer
+## Agent 层
 
-The agent decides which tools to call.
+Agent 负责判断问题是否需要文档检索、SQL 查询、证据验证或报告生成。
 
-Supported tools:
-
-| Tool | Input | Output |
+| 工具 | 输入 | 输出 |
 |---|---|---|
-| `search_docs` | question | evidence chunks |
-| `generate_sql` | question and schema | SQL query |
-| `execute_sql` | SQL query | table result |
-| `repair_sql` | SQL and error message | repaired SQL |
-| `verify_answer` | answer and evidence | verification report |
-| `write_report` | verified results | final report |
+| `search_docs` | 问题 | 证据 chunk |
+| `generate_sql` | 问题和 schema | SQL 查询 |
+| `execute_sql` | SQL 查询 | 表格结果 |
+| `repair_sql` | SQL 和错误信息 | 修复后的 SQL |
+| `verify_answer` | 回答和证据 | 验证报告 |
+| `write_report` | 验证后的结果 | 最终报告 |
 
-Example workflow:
+示例工作流：
 
 ```text
-Question: Which minerals are most often misclassified in Qinhuangdao samples and why?
+问题：秦皇岛样本中哪些矿物类别最常被误判，可能原因是什么？
 
-1. Read database schema.
-2. Generate SQL to find misclassification pairs.
-3. Execute SQL.
-4. Retrieve documents for the top confused mineral categories.
-5. Generate explanation with citations.
-6. Verify claims.
-7. Return answer, SQL, evidence, and verification report.
+1. 读取数据库 schema。
+2. 生成 SQL 查找误判类别。
+3. 执行 SQL。
+4. 根据误判类别检索矿物性质和光谱文档。
+5. 生成带引用的解释。
+6. 验证 claim 是否被证据支持。
+7. 返回回答、SQL、证据和验证报告。
 ```
 
-## Evaluation Layer
+## 评测层
 
-MiniGeo must evaluate both language quality and system reliability.
+MiniGeo 必须评测语言质量和系统可靠性。
 
-Metrics:
+核心指标：
 
-- Answer accuracy.
-- Citation hit rate.
-- Unsupported claim rate.
-- Hallucination rate.
-- Abstention accuracy.
-- SQL execution accuracy.
-- SQL repair success rate.
-- Latency.
+- 答案准确率。
+- Citation hit rate。
+- Unsupported claim rate。
+- Hallucination rate。
+- Abstention accuracy。
+- SQL execution accuracy。
+- SQL repair success rate。
+- Latency。
 

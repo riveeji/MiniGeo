@@ -1,313 +1,200 @@
-# MiniGeo Qwen3.5 Implementation Plan
+# MiniGeo Qwen3.5 实施计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> 面向后续 agentic worker：执行本计划时应优先保持测试驱动、可复现和小步提交。当前仓库已经完成本地 foundation、150 条种子 benchmark、BM25 RAG、OpenAI-compatible 模型接口、Verifier、SQL demo 和 Agent demo。
 
-**Goal:** Build MiniGeo as a Qwen3.5-based geoscience trustworthy QA and data analysis agent system.
+## 目标
 
-**Architecture:** The system uses Qwen3.5-2B as the main model, a hybrid RAG pipeline for geoscience evidence retrieval, a verifier for claim-level evidence checking, and an agent layer for SQL-backed analysis. Evaluation is centered on MiniGeo-Bench rather than subjective demos.
+构建一个基于 Qwen3.5 的地学可信问答与数据分析 Agent 系统。系统核心不是训练新的基础模型，而是建立可评测、可追踪、可拒答的领域应用闭环。
 
-**Tech Stack:** Python, PyTorch, Transformers, PEFT, bitsandbytes, FAISS, BM25, pandas, FastAPI or Gradio, SQLite or PostgreSQL.
+## 当前已完成
 
----
+- Python 包结构：`src/minigeo`。
+- Benchmark：`data/benchmark/minigeo_bench.jsonl`，150 条。
+- RAG corpus：`data/processed/rag_corpus.jsonl`，42 个 chunk。
+- 来源清单：`data/processed/source_manifest.jsonl`。
+- 中文 tokenizer、BM25、检索指标。
+- OpenAI-compatible Qwen 客户端。
+- 模型 RAG 链路：`src/minigeo/rag/model_rag.py`。
+- 简单 Verifier。
+- SQLite demo SQL 工具。
+- Agent 报告接口。
+- QLoRA 配置：`configs/qwen35_2b_lora.yaml`。
 
-### Task 1: Initialize Project Skeleton
+## Task 1：保持本地基础测试绿灯
 
-**Files:**
-- Create: `requirements.txt`
-- Create: `src/minigeo/__init__.py`
-- Create: `src/minigeo/rag/__init__.py`
-- Create: `src/minigeo/verifier/__init__.py`
-- Create: `src/minigeo/eval/__init__.py`
-- Create: `src/minigeo/agent/__init__.py`
+文件：
 
-- [ ] **Step 1: Create dependency file**
+- `tests/`
+- `src/minigeo/`
 
-Create `requirements.txt` with:
+步骤：
+
+```powershell
+$env:PYTHONPATH="src"
+python -m pytest -q
+```
+
+期望：
 
 ```text
-torch
-transformers
-accelerate
-peft
-bitsandbytes
-datasets
-sentence-transformers
-faiss-cpu
-rank-bm25
-pandas
-numpy
-scikit-learn
-tqdm
-pyyaml
-fastapi
-uvicorn
-gradio
-pytest
+20 passed
 ```
 
-- [ ] **Step 2: Create package marker files**
+如果测试失败，先修复测试失败，再继续新增功能。
 
-Create empty `__init__.py` files in each package directory listed above.
+## Task 2：运行当前数据和检索评测
 
-- [ ] **Step 3: Install dependencies**
+文件：
 
-Run:
+- `scripts/evaluate_bench.py`
+- `scripts/prepare_data.py`
+- `scripts/evaluate_retrieval.py`
+
+步骤：
 
 ```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip
-pip install -r requirements.txt
-```
-
-Expected: all dependencies install without import errors.
-
-### Task 2: Create MiniGeo-Bench MVP
-
-**Files:**
-- Create: `data/benchmark/minigeo_bench.jsonl`
-- Create: `scripts/evaluate_bench.py`
-
-- [ ] **Step 1: Add first benchmark records**
-
-Create `data/benchmark/minigeo_bench.jsonl` with at least these seed records:
-
-```jsonl
-{"id":"minigeo_001","question":"石英和长石在常见物理性质上有什么区别？","answer":"石英通常硬度较高，主要成分为二氧化硅；长石是一类铝硅酸盐矿物，常见于火成岩和变质岩中。","evidence":[],"type":"mineral_property","difficulty":"easy","answerable":true,"requires_sql":false}
-{"id":"minigeo_002","question":"如果资料库中没有某个样本的光谱记录，系统应该如何回答？","answer":"系统应说明当前证据不足，不能给出确定结论，并提示需要补充光谱记录。","evidence":[],"type":"unanswerable","difficulty":"easy","answerable":false,"requires_sql":false}
-{"id":"minigeo_003","question":"查询某地区识别错误最多的矿物类别需要使用什么类型的数据？","answer":"需要结构化样本预测数据，包括真实类别、预测类别、采样地区和错误计数。","evidence":[],"type":"sql","difficulty":"medium","answerable":true,"requires_sql":true}
-```
-
-- [ ] **Step 2: Implement benchmark loader**
-
-Create `scripts/evaluate_bench.py`:
-
-```python
-import json
-from pathlib import Path
-
-
-def load_jsonl(path: Path) -> list[dict]:
-    rows = []
-    with path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                rows.append(json.loads(line))
-    return rows
-
-
-def main() -> None:
-    path = Path("data/benchmark/minigeo_bench.jsonl")
-    rows = load_jsonl(path)
-    types = {}
-    for row in rows:
-        types[row["type"]] = types.get(row["type"], 0) + 1
-    print(f"items={len(rows)}")
-    print(f"types={types}")
-
-
-if __name__ == "__main__":
-    main()
-```
-
-- [ ] **Step 3: Run benchmark loader**
-
-Run:
-
-```powershell
+$env:PYTHONPATH="src"
 python scripts/evaluate_bench.py
+python scripts/prepare_data.py
+python scripts/evaluate_retrieval.py
 ```
 
-Expected:
+当前参考结果：
 
 ```text
-items=3
-types={'mineral_property': 1, 'unanswerable': 1, 'sql': 1}
+items=150
+requires_sql=30
+evidence_labeled=105
+corpus_chunks=42
+retrieval_recall@10=0.924
 ```
 
-### Task 3: Implement RAG Corpus Loader
+## Task 3：接入真实 Qwen3.5-2B 模型服务
 
-**Files:**
-- Create: `src/minigeo/rag/corpus.py`
-- Create: `tests/test_corpus.py`
+文件：
 
-- [ ] **Step 1: Write corpus loader test**
+- `configs/model_service.example.env`
+- `scripts/model_rag_demo.py`
+- `src/minigeo/llm/openai_compatible.py`
+- `src/minigeo/rag/model_rag.py`
 
-Create `tests/test_corpus.py`:
+环境变量：
 
-```python
-from pathlib import Path
-from minigeo.rag.corpus import load_corpus
-
-
-def test_load_corpus_reads_jsonl(tmp_path: Path) -> None:
-    path = tmp_path / "corpus.jsonl"
-    path.write_text(
-        '{"chunk_id":"doc_1#chunk_1","text":"石英是一种常见矿物。","source":"demo"}\n',
-        encoding="utf-8",
-    )
-    rows = load_corpus(path)
-    assert len(rows) == 1
-    assert rows[0]["chunk_id"] == "doc_1#chunk_1"
-    assert "石英" in rows[0]["text"]
+```powershell
+$env:OPENAI_BASE_URL="http://localhost:8000/v1"
+$env:OPENAI_API_KEY="EMPTY"
+$env:MINIGEO_MODEL="Qwen/Qwen3.5-2B"
+$env:PYTHONPATH="src"
 ```
 
-- [ ] **Step 2: Implement corpus loader**
+运行：
 
-Create `src/minigeo/rag/corpus.py`:
-
-```python
-import json
-from pathlib import Path
-
-
-def load_corpus(path: Path) -> list[dict]:
-    rows: list[dict] = []
-    with path.open("r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if line:
-                row = json.loads(line)
-                if "chunk_id" not in row or "text" not in row:
-                    raise ValueError("Each corpus row must contain chunk_id and text.")
-                rows.append(row)
-    return rows
+```powershell
+python scripts/model_rag_demo.py
 ```
 
-- [ ] **Step 3: Run test**
+期望：
 
-Run:
+- 输出 JSON-like 字典。
+- 包含 `answer`、`citations`、`abstained`、`confidence`、`evidence`。
+- citations 只包含本次检索得到的 chunk id。
+
+## Task 4：扩展公开资料语料
+
+文件：
+
+- `data/processed/source_manifest.jsonl`
+- `data/processed/rag_corpus.jsonl`
+- `docs/data-card.md`
+
+要求：
+
+- 新增来源必须记录 URL、用途和 license 备注。
+- 不提交版权不明确的原始文件。
+- 新 chunk 必须有稳定 `chunk_id`。
+- 新 benchmark evidence id 必须能在 corpus 中找到。
+
+验证：
 
 ```powershell
 $env:PYTHONPATH="src"
-pytest tests/test_corpus.py -v
+python -m pytest tests/test_seed_data.py -q
+python scripts/evaluate_retrieval.py
 ```
 
-Expected: `1 passed`.
+## Task 5：加入 dense retrieval 和 reranker
 
-### Task 4: Implement Baseline BM25 Retriever
+目标：
 
-**Files:**
-- Create: `src/minigeo/rag/bm25.py`
-- Create: `tests/test_bm25.py`
+- 加入 Qwen3-Embedding-0.6B dense retrieval。
+- 加入 Qwen3-Reranker-0.6B 或 bge-reranker。
+- 对比 BM25、dense、hybrid、hybrid+reranker。
 
-- [ ] **Step 1: Write retriever test**
+建议新增：
 
-Create `tests/test_bm25.py`:
+- `src/minigeo/rag/dense.py`
+- `src/minigeo/rag/hybrid.py`
+- `src/minigeo/rag/reranker.py`
+- `scripts/evaluate_retrieval_ablation.py`
 
-```python
-from minigeo.rag.bm25 import BM25Retriever
+指标：
 
+- `retrieval_recall@5`
+- `retrieval_recall@10`
+- `MRR`
+- `citation_hit_rate`
+- `latency`
 
-def test_bm25_returns_relevant_chunk() -> None:
-    docs = [
-        {"chunk_id": "a", "text": "石英 具有 较高 硬度"},
-        {"chunk_id": "b", "text": "方解石 遇 稀盐酸 起泡"},
-    ]
-    retriever = BM25Retriever(docs)
-    results = retriever.search("石英 硬度", top_k=1)
-    assert results[0]["chunk_id"] == "a"
-```
+## Task 6：增强 Verifier
 
-- [ ] **Step 2: Implement BM25 retriever**
+目标：
 
-Create `src/minigeo/rag/bm25.py`:
+- 从启发式验证器升级到模型辅助 claim extraction 和 support classification。
+- 记录 unsupported claim、contradicted claim 和 insufficient evidence。
 
-```python
-from rank_bm25 import BM25Okapi
+建议新增：
 
+- `src/minigeo/verifier/claim_extractor.py`
+- `src/minigeo/verifier/evidence_matcher.py`
+- `src/minigeo/verifier/verifier.py`
+- `results/verifier_eval.md`
 
-def tokenize(text: str) -> list[str]:
-    return text.lower().split()
+## Task 7：运行 QLoRA smoke test
 
+文件：
 
-class BM25Retriever:
-    def __init__(self, docs: list[dict]):
-        self.docs = docs
-        self.tokens = [tokenize(doc["text"]) for doc in docs]
-        self.index = BM25Okapi(self.tokens)
+- `configs/qwen35_2b_lora.yaml`
+- `scripts/train_lora.py`
 
-    def search(self, query: str, top_k: int = 5) -> list[dict]:
-        scores = self.index.get_scores(tokenize(query))
-        ranked = sorted(enumerate(scores), key=lambda item: item[1], reverse=True)
-        results = []
-        for idx, score in ranked[:top_k]:
-            row = dict(self.docs[idx])
-            row["score"] = float(score)
-            results.append(row)
-        return results
-```
+要求：
 
-- [ ] **Step 3: Run test**
+- 在 Colab Pro 或等价 GPU 环境执行。
+- 先运行小样本 smoke test。
+- 不直接用 MiniGeo-Bench reference answer 作为训练输出。
 
-Run:
+## Task 8：完善 SQL Agent
 
-```powershell
-$env:PYTHONPATH="src"
-pytest tests/test_bm25.py -v
-```
+目标：
 
-Expected: `1 passed`.
+- 扩展 demo database。
+- 实现 SQL 生成、执行、错误修复和结果验证。
+- 将 SQL 结果和文档证据合并到最终报告。
 
-### Task 5: Implement Verifier Data Contract
+现有基础：
 
-**Files:**
-- Create: `src/minigeo/verifier/types.py`
-- Create: `tests/test_verifier_types.py`
+- `src/minigeo/sql/tools.py`
+- `scripts/sql_demo.py`
+- `scripts/agent_demo.py`
 
-- [ ] **Step 1: Write verifier type test**
+## 完成标准
 
-Create `tests/test_verifier_types.py`:
+最终项目应能提供：
 
-```python
-from minigeo.verifier.types import ClaimVerification
-
-
-def test_claim_verification_to_dict() -> None:
-    item = ClaimVerification(
-        claim="石英硬度高。",
-        status="supported",
-        evidence=["doc_1#chunk_1"],
-        confidence=0.9,
-    )
-    data = item.to_dict()
-    assert data["status"] == "supported"
-    assert data["evidence"] == ["doc_1#chunk_1"]
-```
-
-- [ ] **Step 2: Implement verifier type**
-
-Create `src/minigeo/verifier/types.py`:
-
-```python
-from dataclasses import dataclass
-
-
-@dataclass
-class ClaimVerification:
-    claim: str
-    status: str
-    evidence: list[str]
-    confidence: float
-
-    def to_dict(self) -> dict:
-        return {
-            "claim": self.claim,
-            "status": self.status,
-            "evidence": self.evidence,
-            "confidence": self.confidence,
-        }
-```
-
-- [ ] **Step 3: Run test**
-
-Run:
-
-```powershell
-$env:PYTHONPATH="src"
-pytest tests/test_verifier_types.py -v
-```
-
-Expected: `1 passed`.
+- MiniGeo-Bench 300+ 题。
+- 可追踪 RAG corpus。
+- Qwen3.5-2B RAG 真实模型结果。
+- BM25 / dense / hybrid / reranker 消融表。
+- Verifier 评测。
+- SQL Agent demo。
+- 主结果表和失败案例分析。
 
