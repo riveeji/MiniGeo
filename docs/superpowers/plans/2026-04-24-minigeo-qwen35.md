@@ -15,6 +15,8 @@
 - 中文 tokenizer、BM25、检索指标。
 - OpenAI-compatible Qwen 客户端。
 - 模型 RAG 链路：`src/minigeo/rag/model_rag.py`。
+- Dense retrieval / hybrid retrieval / reranker 本地接口。
+- 检索消融脚本：`scripts/evaluate_retrieval_ablation.py`。
 - 简单 Verifier。
 - SQLite demo SQL 工具。
 - Agent 报告接口。
@@ -122,15 +124,15 @@ python -m pytest tests/test_seed_data.py -q
 python scripts/evaluate_retrieval.py
 ```
 
-## Task 5：加入 dense retrieval 和 reranker
+## Task 5：替换为真实 dense retrieval 和 reranker
 
 目标：
 
-- 加入 Qwen3-Embedding-0.6B dense retrieval。
-- 加入 Qwen3-Reranker-0.6B 或 bge-reranker。
+- 用 Qwen3-Embedding-0.6B 替换当前 hashing dense retriever。
+- 用 Qwen3-Reranker-0.6B 或 bge-reranker 替换当前 lexical reranker。
 - 对比 BM25、dense、hybrid、hybrid+reranker。
 
-建议新增：
+当前基础：
 
 - `src/minigeo/rag/dense.py`
 - `src/minigeo/rag/hybrid.py`
@@ -197,4 +199,3 @@ python scripts/evaluate_retrieval.py
 - Verifier 评测。
 - SQL Agent demo。
 - 主结果表和失败案例分析。
-

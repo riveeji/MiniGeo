@@ -138,17 +138,22 @@ BM25 retrieval
 当前产出：
 
 - `src/minigeo/rag/bm25.py`
+- `src/minigeo/rag/dense.py`
+- `src/minigeo/rag/hybrid.py`
+- `src/minigeo/rag/reranker.py`
 - `src/minigeo/rag/pipeline.py`
 - `src/minigeo/rag/model_rag.py`
 - `src/minigeo/llm/openai_compatible.py`
 - `scripts/rag_demo.py`
 - `scripts/model_rag_demo.py`
+- `scripts/evaluate_retrieval_ablation.py`
 
 成功标准：
 
 - demo 能回答 benchmark 中至少 20 个问题。
 - 每个回答包含 source chunk id。
 - RAG 的 citation hit rate 高于 no-RAG。
+- BM25、dense、hybrid、hybrid+rerank 可以在同一 benchmark 上做消融评测。
 
 ## Phase 4：MiniGeo-Verifier
 
@@ -290,4 +295,3 @@ answer
 推荐简历表述：
 
 > MiniGeo：构建基于 Qwen3.5 的地学可信问答与数据分析 Agent 系统，包含领域 benchmark 构建、混合 RAG、引用验证、LoRA 微调和 Text-to-SQL Agent 工作流。
-

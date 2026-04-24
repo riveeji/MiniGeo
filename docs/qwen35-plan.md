@@ -29,11 +29,12 @@ Qwen3.5-2B 适合作为第一阶段主模型：
 2. 构建 MiniGeo-Bench。
 3. 构建 BM25 RAG baseline。
 4. 加入模型 RAG 生成链路。
-5. 加入 Verifier。
-6. 运行评测。
-7. 使用 LoRA / QLoRA 微调 Qwen3.5-2B。
-8. 使用 Qwen3.5-4B 作为强基线。
-9. 加入 Agent 工具。
+5. 加入 dense retrieval、hybrid retrieval 和 reranker 消融。
+6. 加入 Verifier。
+7. 运行评测。
+8. 使用 LoRA / QLoRA 微调 Qwen3.5-2B。
+9. 使用 Qwen3.5-4B 作为强基线。
+10. 加入 Agent 工具。
 
 ## LoRA / QLoRA 计划
 
@@ -84,4 +85,3 @@ Qwen3.5-2B 适合作为第一阶段主模型：
 完成实现和评测后可使用：
 
 > 构建 MiniGeo，一个基于 Qwen3.5 的地学可信问答与数据分析 Agent 系统；构建 MiniGeo-Bench，实现混合 RAG、引用验证、Qwen3.5-2B LoRA 微调，并评测答案准确率、引用命中率、幻觉率、拒答准确率和 SQL 执行准确率。
-
