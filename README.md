@@ -48,10 +48,23 @@ python scripts/expand_seed_data.py
 python scripts/prepare_data.py
 python scripts/evaluate_retrieval.py
 python scripts/rag_demo.py
+python scripts/model_rag_demo.py
 python scripts/evaluate_verifier.py
 python scripts/sql_demo.py
 python scripts/agent_demo.py
 ```
+
+`scripts/model_rag_demo.py` requires an OpenAI-compatible Qwen service:
+
+```powershell
+$env:OPENAI_BASE_URL="http://localhost:8000/v1"
+$env:OPENAI_API_KEY="EMPTY"
+$env:MINIGEO_MODEL="Qwen/Qwen3.5-2B"
+$env:PYTHONPATH="src"
+python scripts/model_rag_demo.py
+```
+
+See `configs/model_service.example.env` for the environment variables.
 
 ## Core Interfaces
 
@@ -103,7 +116,7 @@ Verifier report:
 
 1. Expand MiniGeo-Bench from 150 to 300+ items.
 2. Replace or strengthen the curated seed corpus with more documented public geoscience sources.
-3. Add Qwen3.5-2B model-backed RAG through an OpenAI-compatible endpoint.
+3. Run Qwen3.5-2B model-backed RAG through the OpenAI-compatible endpoint.
 4. Add Qwen3-Embedding-0.6B dense retrieval and Qwen3-Reranker-0.6B reranking.
 5. Improve verifier with model-backed claim extraction and support classification.
 6. Run QLoRA SFT in Colab Pro using `configs/qwen35_2b_lora.yaml`.
