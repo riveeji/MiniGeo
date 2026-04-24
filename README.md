@@ -7,8 +7,8 @@ MiniGeo is a Qwen3.5-based geoscience trustworthy QA and data analysis agent pro
 Implemented locally:
 
 - Python package skeleton under `src/minigeo`.
-- 50-item UTF-8 MiniGeo-Bench MVP.
-- Curated seed RAG corpus with stable `chunk_id` values.
+- 150-item UTF-8 MiniGeo-Bench seed benchmark.
+- 42-chunk curated seed RAG corpus with stable `chunk_id` values.
 - Chinese-aware tokenizer with optional `jieba` and fallback character bigrams.
 - Pure-Python BM25 retriever.
 - Retrieval metrics: `recall@k`, `MRR`, `citation_hit_rate`.
@@ -44,6 +44,7 @@ If you only want to run the standard-library parts, `pytest` works without insta
 ```powershell
 $env:PYTHONPATH="src"
 python scripts/evaluate_bench.py
+python scripts/expand_seed_data.py
 python scripts/prepare_data.py
 python scripts/evaluate_retrieval.py
 python scripts/rag_demo.py
@@ -100,8 +101,8 @@ Verifier report:
 
 ## Roadmap
 
-1. Expand MiniGeo-Bench from 50 to 150-300 items.
-2. Replace seed corpus with documented public geoscience sources.
+1. Expand MiniGeo-Bench from 150 to 300+ items.
+2. Replace or strengthen the curated seed corpus with more documented public geoscience sources.
 3. Add Qwen3.5-2B model-backed RAG through an OpenAI-compatible endpoint.
 4. Add Qwen3-Embedding-0.6B dense retrieval and Qwen3-Reranker-0.6B reranking.
 5. Improve verifier with model-backed claim extraction and support classification.
@@ -112,4 +113,3 @@ Verifier report:
 ## Project Claim
 
 MiniGeo studies whether a lightweight Qwen3.5-based system can improve geoscience QA reliability through domain RAG, citation verification, and agentic data analysis, rather than relying only on model scale.
-

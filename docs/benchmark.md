@@ -4,21 +4,23 @@
 
 MiniGeo-Bench is the evaluation foundation of MiniGeo. It measures whether the system can answer geoscience questions with evidence, refuse unsupported questions, and execute database-backed analysis tasks.
 
-## Current MVP
+## Current Seed Benchmark
 
 The current MVP is `data/benchmark/minigeo_bench.jsonl`.
 
-- Items: 50
-- Answerable items: 41
-- Unanswerable items: 9
-- SQL-backed items: 8
-- Evidence-labeled items: 35
+- Items: 150
+- Answerable items: 133
+- Unanswerable items: 17
+- False-premise items: 19
+- SQL-backed items: 30
+- Evidence-labeled items: 105
 
 Run:
 
 ```powershell
 $env:PYTHONPATH="src"
 python scripts/evaluate_bench.py
+python scripts/expand_seed_data.py
 ```
 
 ## Dataset Format
@@ -60,6 +62,7 @@ Each item is one JSON Lines record:
 - Set `answerable=false` when the correct behavior is refusal.
 - For SQL questions, include `expected_sql_intent` and an `expected_result` object.
 - Do not use MiniGeo-Bench reference answers as SFT output.
+- Use `scripts/expand_seed_data.py` only for deterministic seed expansion; hand-review new benchmark records before making research claims.
 
 ## Metrics
 
@@ -71,4 +74,3 @@ Each item is one JSON Lines record:
 | `abstention_accuracy` | Whether unanswerable items trigger refusal |
 | `sql_exec_accuracy` | Whether SQL executes and returns the expected result |
 | `latency` | End-to-end response time |
-

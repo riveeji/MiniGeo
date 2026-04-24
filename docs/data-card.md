@@ -8,11 +8,12 @@ This document records data sources, processing rules, and known risks for MiniGe
 
 | File | Purpose |
 |---|---|
-| `data/benchmark/minigeo_bench.jsonl` | 50-item MiniGeo-Bench MVP |
-| `data/processed/rag_corpus.jsonl` | Curated evidence chunks for local RAG tests |
+| `data/benchmark/minigeo_bench.jsonl` | 150-item MiniGeo-Bench seed benchmark |
+| `data/processed/rag_corpus.jsonl` | 42 curated evidence chunks for local RAG tests |
+| `data/processed/source_manifest.jsonl` | Source URL and license notes for curated seed expansion |
 | `data/processed/minigeo_demo.sqlite` | Generated demo database, created by `scripts/init_demo_db.py` |
 
-The current corpus is a curated seed corpus for pipeline validation. It is intentionally small and should be replaced or expanded with documented public sources before research claims are made.
+The current corpus is a curated seed corpus for pipeline validation. It includes source URLs and license notes, but it is still not enough for final research claims. Before reporting model results, expand it with more documented public sources and manually review source alignment.
 
 ## RAG Corpus Schema
 
@@ -75,4 +76,3 @@ public source metadata
 - Commit public metadata and processing scripts.
 - Do not commit raw files whose redistribution status is unclear.
 - For every non-curated source, record source name, URL, license, and redistribution status.
-
