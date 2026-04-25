@@ -104,6 +104,13 @@ Verifier 检查生成回答中的事实 claim 是否被检索证据支持。
 }
 ```
 
+当前实现已经拆分为三层：
+
+- `claim_extractor.py`：本地句子切分和模型辅助 claim 抽取。
+- `evidence_matcher.py`：按 token overlap 找最相关证据 chunk。
+- `support_classifier.py`：启发式或模型辅助支持性分类。
+- `verifier.py`：组装完整验证报告。
+
 标签：
 
 - `supported`
@@ -153,4 +160,3 @@ MiniGeo 必须评测语言质量和系统可靠性。
 - SQL execution accuracy。
 - SQL repair success rate。
 - Latency。
-

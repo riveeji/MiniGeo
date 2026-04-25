@@ -18,7 +18,8 @@
 - Dense retrieval / hybrid retrieval / reranker 本地接口。
 - Embedding 服务客户端和 Reranker 服务客户端。
 - 检索消融脚本：`scripts/evaluate_retrieval_ablation.py`。
-- 简单 Verifier。
+- 分层 Verifier：claim extraction、evidence matching、support classification。
+- Verifier 评测脚本：`scripts/evaluate_verifier.py`。
 - SQLite demo SQL 工具。
 - Agent 报告接口。
 - QLoRA 配置：`configs/qwen35_2b_lora.yaml`。
@@ -161,14 +162,16 @@ python scripts/evaluate_retrieval_ablation.py --use-services
 
 目标：
 
-- 从启发式验证器升级到模型辅助 claim extraction 和 support classification。
-- 记录 unsupported claim、contradicted claim 和 insufficient evidence。
+- 当前已经完成本地分层 Verifier。
+- 下一步是用模型服务替换或增强 claim extraction 和 support classification。
+- 继续记录 unsupported claim、contradicted claim 和 insufficient evidence。
 
-建议新增：
+当前基础：
 
 - `src/minigeo/verifier/claim_extractor.py`
 - `src/minigeo/verifier/evidence_matcher.py`
 - `src/minigeo/verifier/verifier.py`
+- `src/minigeo/verifier/support_classifier.py`
 - `results/verifier_eval.md`
 
 ## Task 7：运行 QLoRA smoke test

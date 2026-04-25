@@ -192,6 +192,16 @@ answer
 - unanswerable 问题触发拒答。
 - Verifier 能说明每个 claim 的支持证据或证据不足原因。
 
+当前本地启发式评测结果：
+
+```text
+reports=150
+claims=167
+unsupported_claim_rate=0.557
+```
+
+该结果偏保守，后续需要接入模型辅助 support classification。
+
 ## Phase 5：Qwen3.5-2B LoRA / QLoRA
 
 周期：7-10 天。

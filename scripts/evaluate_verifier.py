@@ -1,14 +1,23 @@
 from pathlib import Path
 
+from minigeo.benchmark import load_benchmark
+from minigeo.eval.verifier import summarize_verification_reports
 from minigeo.rag.corpus import load_corpus
-from minigeo.verifier.simple import verify_answer
+from minigeo.verifier.verifier import MiniGeoVerifier
 
 
 def main() -> None:
+    bench = load_benchmark(Path("data/benchmark/minigeo_bench.jsonl"))
     corpus = load_corpus(Path("data/processed/rag_corpus.jsonl"))
-    answer = "石英常见强拉曼峰接近 464 cm-1。"
-    report = verify_answer(answer, [row for row in corpus if row["chunk_id"] == "doc_quartz#chunk_002"])
-    print(report)
+    chunks_by_id = {row["chunk_id"]: row for row in corpus}
+    verifier = MiniGeoVerifier()
+    reports = []
+    for row in bench:
+        evidence = [chunks_by_id[chunk_id] for chunk_id in row["evidence"] if chunk_id in chunks_by_id]
+        reports.append(verifier.verify(row["answer"], evidence))
+    summary = summarize_verification_reports(reports)
+    for key, value in summary.items():
+        print(f"{key}={value}")
 
 
 if __name__ == "__main__":
