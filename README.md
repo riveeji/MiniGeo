@@ -54,6 +54,8 @@ python scripts/audit_project.py
 
 该命令会依次运行单元测试、benchmark 分布统计、检索消融、Verifier 评测、SQL 评测、SFT 数据构建和本地结果摘要，并写入 `results/local_audit.md`。
 
+Colab Pro 模板见 `notebooks/minigeo_colab_template.ipynb`，用于模型服务评测、SFT 数据构建和 QLoRA 配置检查。
+
 ## 常用命令
 
 ```powershell
