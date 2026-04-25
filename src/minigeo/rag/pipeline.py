@@ -36,6 +36,15 @@ def _should_abstain(question: str, evidence: list[dict[str, Any]]) -> bool:
     ]
     if any(pattern in question for pattern in insufficient_patterns):
         return True
+    coverage_patterns = [
+        ("资料库是否包含", "样本"),
+        ("资料库是否包含", "拉曼峰"),
+        ("本语料库", "红外峰"),
+        ("本语料库", "所有"),
+        ("所有红外峰", ""),
+    ]
+    if any(left in question and (not right or right in question) for left, right in coverage_patterns):
+        return True
     return False
 
 

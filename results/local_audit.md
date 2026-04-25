@@ -28,9 +28,9 @@
 **stdout**
 
 ```text
-........................................................................ [ 98%]
-.                                                                        [100%]
-73 passed in 0.27s
+........................................................................ [ 96%]
+...                                                                      [100%]
+75 passed in 0.29s
 ```
 
 ### Benchmark 分布
@@ -58,10 +58,10 @@ evidence_labeled=105
 **stdout**
 
 ```text
-bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.527
-dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.381
-hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=29.746
-hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=36.051
+bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.629
+dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.436
+hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=36.416
+hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=45.324
 ```
 
 ### 拒答评测
@@ -73,12 +73,12 @@ hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 
 
 ```text
 items=150
-abstention_accuracy=0.98
-correct_abstain=14
-missed_abstain=3
+abstention_accuracy=1.0
+correct_abstain=17
+missed_abstain=0
 false_abstain=0
 correct_answer=133
-latency_ms=12.956778666654523
+latency_ms=16.119711333327967
 ```
 
 ### Verifier 评测
@@ -94,7 +94,7 @@ claims=167
 verdicts={'supported': 70, 'insufficient_evidence': 79, 'partially_supported': 1}
 statuses={'supported': 74, 'insufficient': 93}
 unsupported_claim_rate=0.5568862275449101
-latency_ms=0.5964339999870086
+latency_ms=0.6212740000046324
 ```
 
 ### SQL 评测
@@ -108,7 +108,7 @@ latency_ms=0.5964339999870086
 sql_items=30
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.2168300000145488
+latency_ms=0.23085000005570086
 ```
 
 ### SFT 数据构建

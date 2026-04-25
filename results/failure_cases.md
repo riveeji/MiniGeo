@@ -56,36 +56,3 @@ failure_type: retrieval_miss
 suspected_cause: tokenizer、同义词或语料覆盖不足
 next_action: 补充同义词、改进 query rewrite，或增加对应公开资料 chunk。
 ```
-
-```text
-case_id: abstention_001
-question: 资料库是否包含金刚石样本的拉曼峰？
-system: BM25 RAG baseline
-observed_output: doc_quartz#chunk_002, doc_system#chunk_002, doc_hematite#chunk_002
-expected_behavior: 应拒答并说明当前证据不足。
-failure_type: missed_abstain
-suspected_cause: 检索到相关矿物或系统规则 chunk，但证据不足以回答题目中的特定样本或完整峰位要求。
-next_action: 增强问题意图识别，区分一般矿物知识与特定样本、完整峰表、资料库覆盖性问题。
-```
-
-```text
-case_id: abstention_002
-question: 橄榄石在本语料库中的主要红外峰是什么？
-system: BM25 RAG baseline
-observed_output: doc_olivine#chunk_002, doc_system#chunk_002, doc_olivine#chunk_001
-expected_behavior: 应拒答并说明当前证据不足。
-failure_type: missed_abstain
-suspected_cause: 检索到相关矿物或系统规则 chunk，但证据不足以回答题目中的特定样本或完整峰位要求。
-next_action: 增强问题意图识别，区分一般矿物知识与特定样本、完整峰表、资料库覆盖性问题。
-```
-
-```text
-case_id: abstention_003
-question: 能否根据本语料库判断云母的所有红外峰？
-system: BM25 RAG baseline
-observed_output: doc_system#chunk_002, doc_system#chunk_008, doc_muscovite#chunk_001
-expected_behavior: 应拒答并说明当前证据不足。
-failure_type: missed_abstain
-suspected_cause: 检索到相关矿物或系统规则 chunk，但证据不足以回答题目中的特定样本或完整峰位要求。
-next_action: 增强问题意图识别，区分一般矿物知识与特定样本、完整峰表、资料库覆盖性问题。
-```
