@@ -14,6 +14,7 @@
 | SFT 数据构建 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/build_sft_corpus.py` |
 | QLoRA 配置检查 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/train_lora.py --check-only` |
 | Agent Demo | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/agent_demo.py` |
+| 结果文档生成 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/write_report_artifacts.py` |
 | 本地结果摘要 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/write_local_results.py` |
 
 ## 详细输出
@@ -26,8 +27,8 @@
 **stdout**
 
 ```text
-...............................................................          [100%]
-63 passed in 0.27s
+.................................................................        [100%]
+65 passed in 0.26s
 ```
 
 ### Benchmark 分布
@@ -179,6 +180,18 @@ output_dir=checkpoints/MiniGeo-Qwen3.5-2B-SFT
     "error": null
   }
 }
+```
+
+### 结果文档生成
+
+- 状态：PASS
+- 退出码：0
+
+**stdout**
+
+```text
+wrote=results/main_results.md
+wrote=results/failure_cases.md
 ```
 
 ### 本地结果摘要

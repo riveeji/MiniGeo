@@ -27,6 +27,7 @@ def main() -> None:
         ("SFT 数据构建", [python, "scripts/build_sft_corpus.py"]),
         ("QLoRA 配置检查", [python, "scripts/train_lora.py", "--check-only"]),
         ("Agent Demo", [python, "scripts/agent_demo.py"]),
+        ("结果文档生成", [python, "scripts/write_report_artifacts.py"]),
         ("本地结果摘要", [python, "scripts/write_local_results.py"]),
     ]
 
