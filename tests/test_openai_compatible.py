@@ -1,4 +1,5 @@
 import json
+import http.client
 
 from minigeo.llm.openai_compatible import OpenAICompatibleClient, client_from_env
 
@@ -68,3 +69,24 @@ def test_client_from_env_requires_base_url() -> None:
         assert "OPENAI_BASE_URL" in str(exc)
     else:
         raise AssertionError("client_from_env should require OPENAI_BASE_URL")
+
+
+def test_openai_compatible_client_retries_transient_disconnects() -> None:
+    calls = {"count": 0}
+
+    def flaky_transport(url, headers, payload, timeout):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            raise http.client.IncompleteRead(b"{", 10)
+        return {"choices": [{"message": {"content": "ok"}}]}
+
+    client = OpenAICompatibleClient(
+        base_url="https://example.test/v1",
+        api_key="EMPTY",
+        model="Qwen/Qwen3.5-4B",
+        transport=flaky_transport,
+        retries=1,
+    )
+
+    assert client.generate("hello") == "ok"
+    assert calls["count"] == 2

@@ -26,23 +26,48 @@ class ModelSQLGenerator:
         )
         raw = self.client.generate(prompt)
         sql = _extract_sql(raw)
-        if sql:
+        if sql and _is_usable_select(sql):
             return sql
         return self.fallback.generate(question)
 
 
 def _extract_sql(raw: str) -> str | None:
     text = raw.strip()
-    try:
-        data = json.loads(text)
+    data = _extract_json_object(text)
+    if data is not None:
         sql = str(data.get("sql", "")).strip()
         if sql.lower().startswith("select"):
             return sql
-    except json.JSONDecodeError:
-        pass
-    match = re.search(r"select\b.+", text, flags=re.IGNORECASE | re.DOTALL)
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.IGNORECASE | re.DOTALL).strip()
+    match = re.search(r"select\b[^\n;`]+", text, flags=re.IGNORECASE)
     if match:
         return match.group(0).strip().rstrip(";")
+    return None
+
+
+def _is_usable_select(sql: str) -> bool:
+    normalized = sql.strip().lower()
+    if not normalized.startswith("select"):
+        return False
+    if "..." in normalized or normalized in {"select", "select *", "select ..."}:
+        return False
+    return " from " in f" {normalized} "
+
+
+def _extract_json_object(text: str) -> dict | None:
+    cleaned = text.strip()
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+    candidates = [cleaned]
+    candidates.extend(match.group(0) for match in re.finditer(r"\{.*?\}", cleaned, flags=re.DOTALL))
+    for candidate in candidates:
+        try:
+            data = json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(data, dict):
+            return data
     return None
 
 
@@ -69,4 +94,3 @@ def sql_generator_from_env(
         transport=transport,
     )
     return ModelSQLGenerator(client)
-
