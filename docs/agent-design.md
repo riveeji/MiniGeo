@@ -26,6 +26,7 @@ Analyze which mineral categories are most frequently misclassified in samples co
 
 ```text
 question
+-> plan_agent_tools
 -> generate_sql
 -> execute_sql
 -> retrieve_evidence
@@ -35,6 +36,8 @@ question
 ```
 
 当前 demo 的 SQL 会按 `predicted_mineral` 汇总秦皇岛误判样本：
+
+`plan_agent_tools` 会把该问题路由为 `mode=hybrid`，并选择 `generate_sql`、`execute_sql`、`retrieve_evidence`、`verify_answer` 和 `write_report`。
 
 ```sql
 select predictions.predicted_mineral, count(*) as errors

@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Any
 
+from minigeo.agent.planner import plan_agent_tools
 from minigeo.rag.pipeline import retrieve_with_bm25
 from minigeo.sql.generator import RuleBasedSQLGenerator
 from minigeo.sql.tools import execute_sql
@@ -37,6 +38,7 @@ class MiniGeoAgent:
         self.verifier = verifier or MiniGeoVerifier()
 
     def run(self, question: str) -> dict[str, Any]:
+        plan = plan_agent_tools(question)
         sql = self.sql_generator.generate(question)
         sql_result = execute_sql(self.db_path, sql)
         doc_evidence = self._retrieve_evidence(sql_result, top_k=3)
@@ -55,6 +57,7 @@ class MiniGeoAgent:
             ],
         )
         report["sql_result"] = sql_result
+        report["plan"] = plan
         return report
 
     def _sql_evidence_chunk(self, sql_result: dict[str, Any]) -> dict[str, Any] | None:
