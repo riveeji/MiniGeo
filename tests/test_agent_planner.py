@@ -27,3 +27,29 @@ def test_agent_planner_routes_sql_question() -> None:
     assert plan["requires_sql"] is True
     assert plan["requires_docs"] is False
     assert plan["mode"] == "sql"
+
+
+def test_agent_planner_does_not_route_conceptual_sample_question_to_sql() -> None:
+    plan = plan_agent_tools("为什么不能只根据一个弱峰判断未知样本一定是石英？")
+
+    assert plan["requires_sql"] is False
+    assert plan["mode"] == "docs"
+
+
+def test_agent_planner_routes_explicit_query_questions_to_sql() -> None:
+    plan = plan_agent_tools("查询每个矿物类别的关键光谱特征。")
+
+    assert plan["requires_sql"] is True
+    assert plan["mode"] == "sql"
+
+
+def test_agent_planner_routes_list_and_statistical_questions_to_sql() -> None:
+    assert plan_agent_tools("列出 Qinhuangdao 中所有预测错误的 sample_id。")["requires_sql"] is True
+    assert plan_agent_tools("统计预测正确率。")["requires_sql"] is True
+
+
+def test_agent_planner_keeps_conceptual_agent_question_out_of_sql() -> None:
+    plan = plan_agent_tools("为什么 Agent 最终答案需要同时返回 SQL 和证据？")
+
+    assert plan["requires_sql"] is False
+    assert plan["mode"] == "docs"

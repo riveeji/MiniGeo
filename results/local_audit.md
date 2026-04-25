@@ -29,9 +29,9 @@
 **stdout**
 
 ```text
-........................................................................ [ 88%]
-.........                                                                [100%]
-81 passed in 0.33s
+........................................................................ [ 84%]
+.............                                                            [100%]
+85 passed in 0.40s
 ```
 
 ### Benchmark 分布
@@ -59,10 +59,10 @@ evidence_labeled=105
 **stdout**
 
 ```text
-bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=1.068
-dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.702
-hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=37.879
-hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=45.968
+bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.738
+dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.809
+hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=43.601
+hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=51.321
 ```
 
 ### 拒答评测
@@ -79,7 +79,7 @@ correct_abstain=17
 missed_abstain=0
 false_abstain=0
 correct_answer=133
-latency_ms=16.019696666674765
+latency_ms=18.023494000008213
 ```
 
 ### Verifier 评测
@@ -95,7 +95,7 @@ claims=167
 verdicts={'supported': 70, 'insufficient_evidence': 79, 'partially_supported': 1}
 statuses={'supported': 74, 'insufficient': 93}
 unsupported_claim_rate=0.5568862275449101
-latency_ms=0.6732273333424624
+latency_ms=0.7381820000106624
 ```
 
 ### SQL 评测
@@ -109,7 +109,7 @@ latency_ms=0.6732273333424624
 sql_items=30
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.2602399999886984
+latency_ms=0.28139666671146796
 ```
 
 ### Agent Planner 评测
@@ -121,9 +121,9 @@ latency_ms=0.2602399999886984
 
 ```text
 items=150
-sql_routing_accuracy=0.8666666666666667
-modes={'docs': 106, 'sql': 20, 'hybrid': 24}
-latency_ms=0.003219333326948496
+sql_routing_accuracy=1.0
+modes={'docs': 120, 'hybrid': 3, 'sql': 27}
+latency_ms=0.006063333324467142
 ```
 
 ### SFT 数据构建
