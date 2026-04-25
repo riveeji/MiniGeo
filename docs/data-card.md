@@ -11,7 +11,8 @@
 | `data/benchmark/minigeo_bench.jsonl` | 150 条 MiniGeo-Bench 种子评测集 |
 | `data/processed/rag_corpus.jsonl` | 42 个本地 RAG 测试用证据 chunk |
 | `data/processed/source_manifest.jsonl` | 种子扩展使用的来源 URL 和 license 备注 |
-| `data/processed/minigeo_demo.sqlite` | 由 `scripts/init_demo_db.py` 生成的演示数据库 |
+| `data/processed/sft_corpus.jsonl` | 89 条 SFT 草案样本 |
+| `data/processed/minigeo_demo.sqlite` | 由 `scripts/init_demo_db.py` 生成的演示数据库，属于运行产物，不提交 |
 
 当前 corpus 是用于管线验证的种子语料。它包含来源 URL 和 license 备注，但仍不足以支撑最终研究结论。报告模型结果前，应继续扩展更多可追踪公开资料，并人工复核来源和内容对应关系。
 
@@ -35,13 +36,27 @@
 
 ```json
 {
-  "id": "sft_001",
+  "id": "sft_0001",
   "instruction": "根据证据回答问题；如果证据不足，应明确拒答。",
   "input": "Question and evidence.",
   "output": "Grounded answer with citations.",
   "task_type": "evidence_qa"
 }
 ```
+
+## SFT 样本策略
+
+当前 `scripts/build_sft_corpus.py` 只生成草案样本：
+
+- `evidence_summary`：基于 RAG chunk 生成引用格式训练样本。
+- `refusal`：基于不可回答 benchmark 问题生成通用拒答样本。
+- `sql_format`：基于 SQL benchmark 生成 SQL intent 格式样本。
+
+泄漏控制：
+
+- 不直接复制 MiniGeo-Bench reference answer 作为 SFT 输出。
+- 运行 `find_reference_answer_leaks` 检查 exact output copy。
+- 当前生成结果：`reference_answer_leaks=[]`。
 
 ## 处理流程
 
@@ -53,7 +68,7 @@
 -> 分配稳定 chunk id
 -> 添加 source、url、topic、mineral、license
 -> 导出 JSONL
--> 运行 corpus 校验和检索评测
+-> 运行 corpus 校验、检索评测和泄漏检查
 ```
 
 ## 数据质量检查
@@ -63,7 +78,7 @@
 - 删除空 chunk 或过短 chunk。
 - 尽量记录来源 URL 和 license。
 - Benchmark reference answer 不进入 SFT 输出。
-- 每次更新后记录 corpus 规模和 topic 分布。
+- 每次更新后记录 corpus 规模、topic 分布和 SFT 样本数。
 
 ## 泄漏控制
 

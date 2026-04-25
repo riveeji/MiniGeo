@@ -61,6 +61,7 @@ python scripts/model_rag_demo.py
 python scripts/evaluate_verifier.py
 python scripts/evaluate_sql.py
 python scripts/write_local_results.py
+python scripts/build_sft_corpus.py
 python scripts/sql_demo.py
 python scripts/agent_demo.py
 ```

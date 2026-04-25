@@ -23,6 +23,7 @@
 - SQLite demo SQL 工具。
 - SQL 规则生成、SQL 修复和 SQL 评测。
 - 模型 SQL generator 接入层。
+- SFT corpus 草案生成和 reference answer 泄漏检查。
 - Agent 报告接口。
 - QLoRA 配置：`configs/qwen35_2b_lora.yaml`。
 
@@ -182,12 +183,15 @@ python scripts/evaluate_retrieval_ablation.py --use-services
 
 - `configs/qwen35_2b_lora.yaml`
 - `scripts/train_lora.py`
+- `scripts/build_sft_corpus.py`
+- `data/processed/sft_corpus.jsonl`
 
 要求：
 
 - 在 Colab Pro 或等价 GPU 环境执行。
 - 先运行小样本 smoke test。
 - 不直接用 MiniGeo-Bench reference answer 作为训练输出。
+- 训练前运行 `python scripts/build_sft_corpus.py`，确认 `reference_answer_leaks=[]`。
 
 ## Task 8：完善 SQL Agent
 
