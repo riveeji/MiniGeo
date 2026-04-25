@@ -64,6 +64,7 @@ python scripts/expand_seed_data.py
 python scripts/prepare_data.py
 python scripts/evaluate_retrieval.py
 python scripts/evaluate_retrieval_ablation.py
+python scripts/evaluate_abstention.py
 python scripts/rag_demo.py
 python scripts/model_rag_demo.py
 python scripts/evaluate_verifier.py

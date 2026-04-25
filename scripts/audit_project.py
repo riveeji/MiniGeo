@@ -22,6 +22,7 @@ def main() -> None:
         ("单元测试", [python, "-m", "pytest", "-q"]),
         ("Benchmark 分布", [python, "scripts/evaluate_bench.py"]),
         ("检索消融", [python, "scripts/evaluate_retrieval_ablation.py"]),
+        ("拒答评测", [python, "scripts/evaluate_abstention.py"]),
         ("Verifier 评测", [python, "scripts/evaluate_verifier.py"]),
         ("SQL 评测", [python, "scripts/evaluate_sql.py"]),
         ("SFT 数据构建", [python, "scripts/build_sft_corpus.py"]),

@@ -9,6 +9,7 @@
 | 单元测试 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe -m pytest -q` |
 | Benchmark 分布 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_bench.py` |
 | 检索消融 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_retrieval_ablation.py` |
+| 拒答评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_abstention.py` |
 | Verifier 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_verifier.py` |
 | SQL 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_sql.py` |
 | SFT 数据构建 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/build_sft_corpus.py` |
@@ -27,8 +28,8 @@
 **stdout**
 
 ```text
-....................................................................     [100%]
-68 passed in 0.26s
+......................................................................   [100%]
+70 passed in 0.25s
 ```
 
 ### Benchmark 分布
@@ -56,10 +57,27 @@ evidence_labeled=105
 **stdout**
 
 ```text
-bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.561
-dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.311
-hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=30.024
-hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=36.277
+bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.558
+dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.319
+hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=29.813
+hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=35.936
+```
+
+### 拒答评测
+
+- 状态：PASS
+- 退出码：0
+
+**stdout**
+
+```text
+items=150
+abstention_accuracy=0.8866666666666667
+correct_abstain=0
+missed_abstain=17
+false_abstain=0
+correct_answer=133
+latency_ms=12.873980666675683
 ```
 
 ### Verifier 评测
@@ -75,7 +93,7 @@ claims=167
 verdicts={'supported': 70, 'insufficient_evidence': 79, 'partially_supported': 1}
 statuses={'supported': 74, 'insufficient': 93}
 unsupported_claim_rate=0.5568862275449101
-latency_ms=0.5721306666479601
+latency_ms=0.5746473333419999
 ```
 
 ### SQL 评测
@@ -89,7 +107,7 @@ latency_ms=0.5721306666479601
 sql_items=30
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.2224933333006144
+latency_ms=0.2665400000599523
 ```
 
 ### SFT 数据构建

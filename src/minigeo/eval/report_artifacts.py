@@ -20,13 +20,22 @@ def format_main_results(
     retrieval: dict[str, dict[str, float]],
     verifier: dict[str, Any],
     sql: dict[str, Any],
+    abstention: dict[str, Any],
     agent_demo_passed: bool,
     agent_latency_ms: float | None = None,
 ) -> str:
     rows = [
         ("Qwen3.5-0.8B", "", "", "", "", "-", "未测"),
         ("Qwen3.5-2B", "", "", "", "", "-", "未测"),
-        ("BM25 RAG baseline", "", retrieval.get("bm25", {}).get("citation_hit_rate"), "", "", "-", _latency(retrieval.get("bm25", {}))),
+        (
+            "BM25 RAG baseline",
+            "",
+            retrieval.get("bm25", {}).get("citation_hit_rate"),
+            "",
+            abstention.get("abstention_accuracy"),
+            "-",
+            _latency(retrieval.get("bm25", {})),
+        ),
         ("Dense baseline", "", retrieval.get("dense", {}).get("citation_hit_rate"), "", "", "-", _latency(retrieval.get("dense", {}))),
         ("Hybrid RAG baseline", "", retrieval.get("hybrid", {}).get("citation_hit_rate"), "", "", "-", _latency(retrieval.get("hybrid", {}))),
         (

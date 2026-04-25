@@ -6,13 +6,13 @@
 |---|---:|---:|---:|---:|---:|---:|
 | Qwen3.5-0.8B |  |  |  |  | - | 未测 |
 | Qwen3.5-2B |  |  |  |  | - | 未测 |
-| BM25 RAG baseline |  | 0.924 |  |  | - | 0.545 ms/q |
-| Dense baseline |  | 0.819 |  |  | - | 1.323 ms/q |
-| Hybrid RAG baseline |  | 0.876 |  |  | - | 29.779 ms/q |
-| Hybrid + rerank baseline |  | 0.838 |  |  | - | 35.802 ms/q |
-| Verifier baseline |  |  | 0.557 |  | - | 0.604 ms/q |
-| SQL rule baseline |  |  |  |  | 1.000 | 0.254 ms/q |
-| MiniGeo-Agent demo | demo | demo | 见 verifier | demo | PASS | 16.218 ms/q |
+| BM25 RAG baseline |  | 0.924 |  | 0.887 | - | 0.546 ms/q |
+| Dense baseline |  | 0.819 |  |  | - | 1.343 ms/q |
+| Hybrid RAG baseline |  | 0.876 |  |  | - | 29.439 ms/q |
+| Hybrid + rerank baseline |  | 0.838 |  |  | - | 36.138 ms/q |
+| Verifier baseline |  |  | 0.557 |  | - | 0.592 ms/q |
+| SQL rule baseline |  |  |  |  | 1.000 | 0.345 ms/q |
+| MiniGeo-Agent demo | demo | demo | 见 verifier | demo | PASS | 17.245 ms/q |
 
 ## 待补充模型结果
 

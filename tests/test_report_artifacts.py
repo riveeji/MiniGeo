@@ -9,6 +9,7 @@ def test_format_main_results_includes_local_baselines() -> None:
         },
         verifier={"unsupported_claim_rate": 0.557, "latency_ms": 0.8},
         sql={"sql_exec_accuracy": 1.0, "latency_ms": 0.4},
+        abstention={"abstention_accuracy": 0.75},
         agent_demo_passed=True,
         agent_latency_ms=5.0,
     )
@@ -19,6 +20,7 @@ def test_format_main_results_includes_local_baselines() -> None:
     assert "1.200 ms/q" in markdown
     assert "0.800 ms/q" in markdown
     assert "0.400 ms/q" in markdown
+    assert "0.750" in markdown
     assert "5.000 ms/q" in markdown
     assert "MiniGeo-Agent demo" in markdown
 
