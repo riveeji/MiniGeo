@@ -22,6 +22,7 @@
 - Verifier 评测脚本：`scripts/evaluate_verifier.py`。
 - SQLite demo SQL 工具。
 - SQL 规则生成、SQL 修复和 SQL 评测。
+- 模型 SQL generator 接入层。
 - Agent 报告接口。
 - QLoRA 配置：`configs/qwen35_2b_lora.yaml`。
 
@@ -200,6 +201,7 @@ python scripts/evaluate_retrieval_ablation.py --use-services
 
 - `src/minigeo/sql/tools.py`
 - `src/minigeo/sql/generator.py`
+- `src/minigeo/sql/model_generator.py`
 - `src/minigeo/sql/repair.py`
 - `src/minigeo/eval/sql.py`
 - `scripts/sql_demo.py`
@@ -211,6 +213,12 @@ python scripts/evaluate_retrieval_ablation.py --use-services
 ```text
 sql_items=30
 sql_exec_accuracy=1.0
+```
+
+模型模式：
+
+```powershell
+python scripts/evaluate_sql.py --use-model
 ```
 
 ## 完成标准

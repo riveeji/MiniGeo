@@ -276,6 +276,7 @@ python scripts/evaluate_verifier.py --use-model
 
 - `src/minigeo/agent/`
 - `src/minigeo/sql/generator.py`
+- `src/minigeo/sql/model_generator.py`
 - `src/minigeo/sql/repair.py`
 - `src/minigeo/eval/sql.py`
 - `scripts/init_demo_db.py`
@@ -290,7 +291,7 @@ sql_items=30
 sql_exec_accuracy=1.0
 ```
 
-后续应接入模型 SQL generator，并与规则型 baseline 对比。
+已支持 `python scripts/evaluate_sql.py --use-model` 接入模型 SQL generator。后续应运行模型 SQL generator，并与规则型 baseline 对比。
 
 ## Phase 8：可选 MiniGeo-Tiny
 

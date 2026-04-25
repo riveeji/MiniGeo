@@ -10,7 +10,7 @@ class RuleBasedSQLGenerator:
             return "select sample_id, region, true_mineral, 'PX-101' as sample_code from samples where 'PX-101' = cast(sample_id as text)"
         if "哪个表" in question and ("光谱" in question or "峰位" in question):
             return "select name from sqlite_master where type = 'table' and name = 'spectra'"
-        if "关键光谱特征" in question or "矿物类别" in question and "光谱" in question:
+        if "关键光谱特征" in question or ("矿物类别" in question and "光谱" in question):
             return "select name, mineral_class, key_spectral_feature from minerals order by name"
         if "460" in normalized and "470" in normalized:
             return (
@@ -76,3 +76,4 @@ class RuleBasedSQLGenerator:
             "select predictions.predicted_mineral, count(*) as count "
             "from predictions group by predictions.predicted_mineral order by count desc"
         )
+

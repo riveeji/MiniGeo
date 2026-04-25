@@ -19,6 +19,6 @@ failures={}
 说明：
 
 - 当前结果基于演示数据库和规则型 SQL generator。
-- 后续接入模型 SQL generator 后，应与规则型 baseline 做对比。
+- 已支持 `python scripts/evaluate_sql.py --use-model` 接入模型 SQL generator。
+- 后续应运行模型 SQL generator，并与规则型 baseline 做对比。
 - 对于 `expected_result` 中的 `table` / `tables`，评测会同时检查 SQL 文本和执行结果。
-

@@ -99,6 +99,15 @@ $env:MINIGEO_VERIFIER_MODEL="Qwen/Qwen3.5-2B"
 python scripts/evaluate_verifier.py --use-model
 ```
 
+如果要启用模型 SQL generator：
+
+```powershell
+$env:MINIGEO_SQL_BASE_URL="http://localhost:8000/v1"
+$env:MINIGEO_SQL_API_KEY="EMPTY"
+$env:MINIGEO_SQL_MODEL="Qwen/Qwen3.5-2B"
+python scripts/evaluate_sql.py --use-model
+```
+
 ## 核心接口
 
 Benchmark 条目：
@@ -154,7 +163,7 @@ Verifier 报告：
 5. 用模型增强 claim extraction 和 support classification。
 6. 在 Colab Pro 上基于 `configs/qwen35_2b_lora.yaml` 运行 QLoRA SFT。
 7. 扩展 SQL 评测和 MiniGeo-Agent。
-8. 接入模型 SQL generator，并与规则型 SQL baseline 对比。
+8. 启动模型 SQL generator 评测，并与规则型 SQL baseline 对比。
 9. 填充 `results/main_results.md` 和 `results/failure_cases.md`。
 
 ## 项目定位
