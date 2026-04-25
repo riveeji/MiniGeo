@@ -13,4 +13,3 @@ def test_format_markdown_summary_contains_core_metrics() -> None:
     assert "150" in markdown
     assert "0.900" in markdown
     assert "1.000" in markdown
-

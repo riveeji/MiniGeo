@@ -52,4 +52,3 @@ def format_markdown_summary(
         ]
     )
     return "\n".join(lines)
-
