@@ -112,3 +112,32 @@ def format_failure_cases(cases: list[dict[str, Any]]) -> str:
             ]
         )
     return "\n".join(lines)
+
+
+def abstention_failure_cases(
+    benchmark_rows: list[dict[str, Any]],
+    answers: dict[str, dict[str, Any]],
+    max_cases: int = 5,
+) -> list[dict[str, Any]]:
+    cases: list[dict[str, Any]] = []
+    for row in benchmark_rows:
+        if row.get("answerable", True):
+            continue
+        answer = answers.get(row["id"], {})
+        if answer.get("abstained") is True:
+            continue
+        cases.append(
+            {
+                "case_id": f"abstention_{len(cases) + 1:03d}",
+                "question": row["question"],
+                "system": "BM25 RAG baseline",
+                "observed_output": ", ".join(answer.get("citations", [])) or str(answer),
+                "expected_behavior": "应拒答并说明当前证据不足。",
+                "failure_type": "missed_abstain",
+                "suspected_cause": "检索到相关矿物或系统规则 chunk，但证据不足以回答题目中的特定样本或完整峰位要求。",
+                "next_action": "增强问题意图识别，区分一般矿物知识与特定样本、完整峰表、资料库覆盖性问题。",
+            }
+        )
+        if len(cases) >= max_cases:
+            break
+    return cases

@@ -1,4 +1,4 @@
-from minigeo.eval.report_artifacts import format_failure_cases, format_main_results
+from minigeo.eval.report_artifacts import abstention_failure_cases, format_failure_cases, format_main_results
 
 
 def test_format_main_results_includes_local_baselines() -> None:
@@ -44,3 +44,14 @@ def test_format_failure_cases_limits_cases_and_keeps_schema() -> None:
     assert "# MiniGeo 失败案例" in markdown
     assert "case_id: retrieval_001" in markdown
     assert "failure_type: retrieval_miss" in markdown
+
+
+def test_abstention_failure_cases_capture_missed_abstain() -> None:
+    cases = abstention_failure_cases(
+        [{"id": "q1", "question": "资料库是否包含金刚石样本的拉曼峰？", "answerable": False}],
+        {"q1": {"abstained": False, "citations": ["doc_quartz#chunk_002"]}},
+    )
+
+    assert cases[0]["case_id"] == "abstention_001"
+    assert cases[0]["failure_type"] == "missed_abstain"
+    assert "doc_quartz#chunk_002" in cases[0]["observed_output"]

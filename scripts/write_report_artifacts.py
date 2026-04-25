@@ -4,7 +4,7 @@ from time import perf_counter
 from minigeo.agent.simple_agent import MiniGeoAgent
 from minigeo.benchmark import load_benchmark
 from minigeo.eval.abstention import summarize_abstention
-from minigeo.eval.report_artifacts import format_failure_cases, format_main_results
+from minigeo.eval.report_artifacts import abstention_failure_cases, format_failure_cases, format_main_results
 from minigeo.eval.retrieval_ablation import run_retrieval_ablation
 from minigeo.eval.sql import summarize_sql_results
 from minigeo.eval.verifier import summarize_verification_reports
@@ -98,7 +98,7 @@ def main() -> None:
         newline="\n",
     )
     Path("results/failure_cases.md").write_text(
-        format_failure_cases(_bm25_failure_cases(bench, corpus)),
+        format_failure_cases(_bm25_failure_cases(bench, corpus) + abstention_failure_cases(bench, rag_answers)),
         encoding="utf-8",
         newline="\n",
     )
