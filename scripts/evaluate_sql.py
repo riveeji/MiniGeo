@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 import sqlite3
 import sys
+from time import perf_counter
 
 from minigeo.benchmark import load_benchmark
 from minigeo.eval.sql import summarize_sql_results
@@ -30,9 +31,9 @@ def main() -> None:
     with sqlite3.connect(db_path) as conn:
         schema = schema_text(conn)
     outputs = {}
-    for row in bench:
-        if not row["requires_sql"]:
-            continue
+    sql_rows = [row for row in bench if row["requires_sql"]]
+    started = perf_counter()
+    for row in sql_rows:
         try:
             sql = generator.generate(row["question"], schema=schema)
         except TypeError:
@@ -46,7 +47,8 @@ def main() -> None:
             outputs[row["id"]] = repaired_result
         else:
             outputs[row["id"]] = result
-    summary = summarize_sql_results(bench, outputs)
+    latency_ms = (perf_counter() - started) * 1000.0 / max(len(sql_rows), 1)
+    summary = summarize_sql_results(bench, outputs, latency_ms=latency_ms)
     for key, value in summary.items():
         print(f"{key}={value}")
 

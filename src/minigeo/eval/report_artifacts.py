@@ -21,6 +21,7 @@ def format_main_results(
     verifier: dict[str, Any],
     sql: dict[str, Any],
     agent_demo_passed: bool,
+    agent_latency_ms: float | None = None,
 ) -> str:
     rows = [
         ("Qwen3.5-0.8B", "", "", "", "", "-", "未测"),
@@ -37,9 +38,17 @@ def format_main_results(
             "-",
             _latency(retrieval.get("hybrid_rerank", {})),
         ),
-        ("Verifier baseline", "", "", verifier.get("unsupported_claim_rate"), "", "-", "未测"),
-        ("SQL rule baseline", "", "", "", "", sql.get("sql_exec_accuracy"), "未测"),
-        ("MiniGeo-Agent demo", "demo", "demo", "见 verifier", "demo", "PASS" if agent_demo_passed else "FAIL", "未测"),
+        ("Verifier baseline", "", "", verifier.get("unsupported_claim_rate"), "", "-", _latency(verifier)),
+        ("SQL rule baseline", "", "", "", "", sql.get("sql_exec_accuracy"), _latency(sql)),
+        (
+            "MiniGeo-Agent demo",
+            "demo",
+            "demo",
+            "见 verifier",
+            "demo",
+            "PASS" if agent_demo_passed else "FAIL",
+            "未测" if agent_latency_ms is None else f"{agent_latency_ms:.3f} ms/q",
+        ),
     ]
     lines = [
         "# MiniGeo 主结果",

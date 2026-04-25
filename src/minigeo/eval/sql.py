@@ -37,15 +37,22 @@ def sql_exec_accuracy(benchmark_rows: list[dict[str, Any]], outputs: dict[str, d
     return correct / len(sql_rows)
 
 
-def summarize_sql_results(benchmark_rows: list[dict[str, Any]], outputs: dict[str, dict[str, Any]]) -> dict[str, Any]:
+def summarize_sql_results(
+    benchmark_rows: list[dict[str, Any]],
+    outputs: dict[str, dict[str, Any]],
+    latency_ms: float | None = None,
+) -> dict[str, Any]:
     sql_rows = [row for row in benchmark_rows if row.get("requires_sql")]
     failures = {
         row["id"]: outputs.get(row["id"], {"error": "missing"}).get("error")
         for row in sql_rows
         if not expected_result_matches(row.get("expected_result"), outputs.get(row["id"], {"error": "missing"}))
     }
-    return {
+    summary = {
         "sql_items": len(sql_rows),
         "sql_exec_accuracy": sql_exec_accuracy(benchmark_rows, outputs),
         "failures": failures,
     }
+    if latency_ms is not None:
+        summary["latency_ms"] = latency_ms
+    return summary

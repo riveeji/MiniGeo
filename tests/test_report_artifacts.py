@@ -7,15 +7,19 @@ def test_format_main_results_includes_local_baselines() -> None:
             "bm25": {"citation_hit_rate": 0.924, "latency_ms": 1.2},
             "hybrid": {"citation_hit_rate": 0.876, "latency_ms": 2.5},
         },
-        verifier={"unsupported_claim_rate": 0.557},
-        sql={"sql_exec_accuracy": 1.0},
+        verifier={"unsupported_claim_rate": 0.557, "latency_ms": 0.8},
+        sql={"sql_exec_accuracy": 1.0, "latency_ms": 0.4},
         agent_demo_passed=True,
+        agent_latency_ms=5.0,
     )
 
     assert "# MiniGeo 主结果" in markdown
     assert "BM25 RAG baseline" in markdown
     assert "0.924" in markdown
     assert "1.200 ms/q" in markdown
+    assert "0.800 ms/q" in markdown
+    assert "0.400 ms/q" in markdown
+    assert "5.000 ms/q" in markdown
     assert "MiniGeo-Agent demo" in markdown
 
 

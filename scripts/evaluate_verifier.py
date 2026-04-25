@@ -2,6 +2,7 @@ import argparse
 import os
 from pathlib import Path
 import sys
+from time import perf_counter
 
 from minigeo.benchmark import load_benchmark
 from minigeo.eval.verifier import summarize_verification_reports
@@ -26,10 +27,12 @@ def main() -> None:
         print(f"configuration_error={exc}", file=sys.stderr)
         raise SystemExit(2) from exc
     reports = []
+    started = perf_counter()
     for row in bench:
         evidence = [chunks_by_id[chunk_id] for chunk_id in row["evidence"] if chunk_id in chunks_by_id]
         reports.append(verifier.verify(row["answer"], evidence))
-    summary = summarize_verification_reports(reports)
+    latency_ms = (perf_counter() - started) * 1000.0 / max(len(bench), 1)
+    summary = summarize_verification_reports(reports, latency_ms=latency_ms)
     for key, value in summary.items():
         print(f"{key}={value}")
 

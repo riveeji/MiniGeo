@@ -65,3 +65,13 @@ def test_sql_eval_summarizes_expected_result_matches() -> None:
 
     assert sql_exec_accuracy(rows, outputs) == 0.5
     assert summarize_sql_results(rows, outputs)["sql_items"] == 2
+
+
+def test_sql_eval_summary_accepts_latency() -> None:
+    rows = [{"id": "q1", "requires_sql": True, "expected_result": None}]
+    outputs = {"q1": {"error": None, "execution_result": [{"value": 1}]}}
+
+    summary = summarize_sql_results(rows, outputs, latency_ms=3.25)
+
+    assert summary["sql_exec_accuracy"] == 1.0
+    assert summary["latency_ms"] == 3.25
