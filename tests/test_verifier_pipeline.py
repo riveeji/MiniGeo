@@ -61,6 +61,7 @@ def test_model_support_classifier_reads_json_object() -> None:
     assert result.status == "contradicted"
     assert result.evidence == ["doc_a"]
     assert result.confidence == 0.7
+    assert "判断 claim 是否被证据支持" in client.prompts[0]
 
 
 def test_minigeo_verifier_produces_partial_report() -> None:
@@ -73,4 +74,3 @@ def test_minigeo_verifier_produces_partial_report() -> None:
     assert report["verdict"] == "partially_supported"
     assert report["claims"][0]["status"] == "supported"
     assert report["claims"][1]["status"] == "insufficient"
-

@@ -163,7 +163,7 @@ python scripts/evaluate_retrieval_ablation.py --use-services
 目标：
 
 - 当前已经完成本地分层 Verifier。
-- 下一步是用模型服务替换或增强 claim extraction 和 support classification。
+- 当前也支持通过 `python scripts/evaluate_verifier.py --use-model` 启用模型辅助 claim extraction 和 support classification。
 - 继续记录 unsupported claim、contradicted claim 和 insufficient evidence。
 
 当前基础：

@@ -202,6 +202,12 @@ unsupported_claim_rate=0.557
 
 该结果偏保守，后续需要接入模型辅助 support classification。
 
+模型辅助模式：
+
+```powershell
+python scripts/evaluate_verifier.py --use-model
+```
+
 ## Phase 5：Qwen3.5-2B LoRA / QLoRA
 
 周期：7-10 天。

@@ -89,6 +89,15 @@ python scripts/evaluate_retrieval_ablation.py --use-services
 
 默认不加 `--use-services` 时，脚本使用本地 deterministic baseline，方便无模型服务时做回归测试。
 
+如果要启用模型辅助 Verifier：
+
+```powershell
+$env:MINIGEO_VERIFIER_BASE_URL="http://localhost:8000/v1"
+$env:MINIGEO_VERIFIER_API_KEY="EMPTY"
+$env:MINIGEO_VERIFIER_MODEL="Qwen/Qwen3.5-2B"
+python scripts/evaluate_verifier.py --use-model
+```
+
 ## 核心接口
 
 Benchmark 条目：
