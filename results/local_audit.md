@@ -14,6 +14,7 @@
 | SQL 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_sql.py` |
 | Agent Planner 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_agent_planner.py` |
 | SFT 数据构建 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/build_sft_corpus.py` |
+| 数据质量审计 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/audit_data_quality.py` |
 | QLoRA 配置检查 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/train_lora.py --check-only` |
 | Agent Demo | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/agent_demo.py` |
 | 结果文档生成 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/write_report_artifacts.py` |
@@ -29,9 +30,9 @@
 **stdout**
 
 ```text
-........................................................................ [ 84%]
-.............                                                            [100%]
-85 passed in 0.40s
+........................................................................ [ 82%]
+...............                                                          [100%]
+87 passed in 0.33s
 ```
 
 ### Benchmark 分布
@@ -59,10 +60,10 @@ evidence_labeled=105
 **stdout**
 
 ```text
-bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.738
-dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.809
-hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=43.601
-hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=51.321
+bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.686
+dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.580
+hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=36.961
+hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=44.668
 ```
 
 ### 拒答评测
@@ -79,7 +80,7 @@ correct_abstain=17
 missed_abstain=0
 false_abstain=0
 correct_answer=133
-latency_ms=18.023494000008213
+latency_ms=16.152215999997377
 ```
 
 ### Verifier 评测
@@ -95,7 +96,7 @@ claims=167
 verdicts={'supported': 70, 'insufficient_evidence': 79, 'partially_supported': 1}
 statuses={'supported': 74, 'insufficient': 93}
 unsupported_claim_rate=0.5568862275449101
-latency_ms=0.7381820000106624
+latency_ms=0.7365060000059506
 ```
 
 ### SQL 评测
@@ -109,7 +110,7 @@ latency_ms=0.7381820000106624
 sql_items=30
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.28139666671146796
+latency_ms=0.27075999993636896
 ```
 
 ### Agent Planner 评测
@@ -123,7 +124,7 @@ latency_ms=0.28139666671146796
 items=150
 sql_routing_accuracy=1.0
 modes={'docs': 120, 'hybrid': 3, 'sql': 27}
-latency_ms=0.006063333324467142
+latency_ms=0.0036826666716175773
 ```
 
 ### SFT 数据构建
@@ -137,6 +138,25 @@ latency_ms=0.006063333324467142
 items=89
 output=data\processed\sft_corpus.jsonl
 reference_answer_leaks=[]
+```
+
+### 数据质量审计
+
+- 状态：PASS
+- 退出码：0
+
+**stdout**
+
+```text
+benchmark_items=150
+corpus_chunks=42
+sft_items=89
+missing_evidence_refs=[]
+reference_answer_leaks=[]
+metadata_missing=[]
+duplicate_chunk_ids=[]
+duplicate_benchmark_ids=[]
+duplicate_sft_ids=[]
 ```
 
 ### QLoRA 配置检查

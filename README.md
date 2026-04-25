@@ -74,6 +74,7 @@ python scripts/evaluate_sql.py
 python scripts/evaluate_agent_planner.py
 python scripts/write_local_results.py
 python scripts/build_sft_corpus.py
+python scripts/audit_data_quality.py
 python scripts/train_lora.py --check-only
 python scripts/write_report_artifacts.py
 python scripts/sql_demo.py
