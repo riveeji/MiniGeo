@@ -5,6 +5,8 @@ def test_core_text_files_keep_readable_chinese_text() -> None:
     files = [
         Path("README.md"),
         Path("src/minigeo/eval/local_summary.py"),
+        Path("src/minigeo/finetune/lora_config.py"),
+        Path("src/minigeo/finetune/sft.py"),
         Path("tests/test_local_summary.py"),
         Path("src/minigeo/sql/generator.py"),
         Path("src/minigeo/verifier/claim_extractor.py"),

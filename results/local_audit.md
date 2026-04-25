@@ -12,6 +12,7 @@
 | Verifier 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_verifier.py` |
 | SQL 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_sql.py` |
 | SFT 数据构建 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/build_sft_corpus.py` |
+| QLoRA 配置检查 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/train_lora.py --check-only` |
 | 本地结果摘要 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/write_local_results.py` |
 
 ## 详细输出
@@ -24,8 +25,8 @@
 **stdout**
 
 ```text
-...........................................................              [100%]
-59 passed in 0.21s
+..............................................................           [100%]
+62 passed in 0.23s
 ```
 
 ### Benchmark 分布
@@ -98,6 +99,21 @@ failures={}
 items=89
 output=data\processed\sft_corpus.jsonl
 reference_answer_leaks=[]
+```
+
+### QLoRA 配置检查
+
+- 状态：PASS
+- 退出码：0
+
+**stdout**
+
+```text
+QLoRA config check passed.
+base_model=Qwen/Qwen3.5-2B
+train_path=data/processed/sft_corpus.jsonl
+eval_path=data/benchmark/minigeo_bench.jsonl
+output_dir=checkpoints/MiniGeo-Qwen3.5-2B-SFT
 ```
 
 ### 本地结果摘要
