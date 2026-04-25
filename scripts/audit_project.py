@@ -26,6 +26,7 @@ def main() -> None:
         ("SQL 评测", [python, "scripts/evaluate_sql.py"]),
         ("SFT 数据构建", [python, "scripts/build_sft_corpus.py"]),
         ("QLoRA 配置检查", [python, "scripts/train_lora.py", "--check-only"]),
+        ("Agent Demo", [python, "scripts/agent_demo.py"]),
         ("本地结果摘要", [python, "scripts/write_local_results.py"]),
     ]
 

@@ -13,6 +13,7 @@
 | SQL 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_sql.py` |
 | SFT 数据构建 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/build_sft_corpus.py` |
 | QLoRA 配置检查 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/train_lora.py --check-only` |
+| Agent Demo | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/agent_demo.py` |
 | 本地结果摘要 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/write_local_results.py` |
 
 ## 详细输出
@@ -25,8 +26,8 @@
 **stdout**
 
 ```text
-..............................................................           [100%]
-62 passed in 0.23s
+...............................................................          [100%]
+63 passed in 0.27s
 ```
 
 ### Benchmark 分布
@@ -114,6 +115,70 @@ base_model=Qwen/Qwen3.5-2B
 train_path=data/processed/sft_corpus.jsonl
 eval_path=data/benchmark/minigeo_bench.jsonl
 output_dir=checkpoints/MiniGeo-Qwen3.5-2B-SFT
+```
+
+### Agent Demo
+
+- 状态：PASS
+- 退出码：0
+
+**stdout**
+
+```text
+{
+  "answer": "SQL �����ʾ���ػʵ��������������Ϊ feldspar�����зֲ�Ϊ feldspar��2 �Σ�, quartz��1 �Σ�������ԭ�������ʯӢ�� 464 cm-1 �����������ǹؼ�ʶ��֤�ݣ���ʯ��ʯӢͬ����������ϵ��Al-Si �Ǽ���ع��������������ӻ������ա����֤�ݼ� [doc_feldspar#chunk_002] [doc_quartz#chunk_002]��",
+  "sql": "select predictions.predicted_mineral, count(*) as errors from predictions join samples on samples.sample_id = predictions.sample_id where samples.region = 'Qinhuangdao' and predictions.is_correct = 0 group by predicted_mineral order by errors desc",
+  "evidence": [
+    "doc_feldspar#chunk_002",
+    "doc_quartz#chunk_002"
+  ],
+  "verification": {
+    "verdict": "partially_supported",
+    "claims": [
+      {
+        "claim": "SQL �����ʾ���ػʵ��������������Ϊ feldspar�����зֲ�Ϊ feldspar��2 �Σ�, quartz��1 �Σ�",
+        "status": "insufficient",
+        "evidence": [],
+        "confidence": 0.0
+      },
+      {
+        "claim": "����ԭ�������ʯӢ�� 464 cm-1 �����������ǹؼ�ʶ��֤�ݣ���ʯ��ʯӢͬ����������ϵ��Al-Si �Ǽ���ع��������������ӻ�������",
+        "status": "supported",
+        "evidence": [
+          "doc_feldspar#chunk_002",
+          "doc_quartz#chunk_002"
+        ],
+        "confidence": 0.4574468085106383
+      },
+      {
+        "claim": "���֤�ݼ� [doc_feldspar#chunk_002] [doc_quartz#chunk_002]",
+        "status": "supported",
+        "evidence": [
+          "doc_quartz#chunk_002"
+        ],
+        "confidence": 0.3076923076923077
+      }
+    ]
+  },
+  "limitations": [
+    "��ǰ Agent ʹ����ʾ���ݿ���������ϣ�����ֻ������֤��������",
+    "����ԭ�����Լ���֤�ݺ͹����ֶεĽ����Թ��ɣ���Ҫ��ʵʵ���¼���ˡ�"
+  ],
+  "sql_result": {
+    "sql": "select predictions.predicted_mineral, count(*) as errors from predictions join samples on samples.sample_id = predictions.sample_id where samples.region = 'Qinhuangdao' and predictions.is_correct = 0 group by predicted_mineral order by errors desc",
+    "execution_result": [
+      {
+        "predicted_mineral": "feldspar",
+        "errors": 2
+      },
+      {
+        "predicted_mineral": "quartz",
+        "errors": 1
+      }
+    ],
+    "error": null
+  }
+}
 ```
 
 ### 本地结果摘要

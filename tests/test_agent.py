@@ -1,4 +1,8 @@
-from minigeo.agent.simple_agent import write_report
+from pathlib import Path
+
+from minigeo.agent.simple_agent import MiniGeoAgent, write_report
+from minigeo.rag.corpus import load_corpus
+from minigeo.sql.tools import init_demo_db
 
 
 def test_write_report_includes_sql_evidence_and_limitations() -> None:
@@ -14,3 +18,27 @@ def test_write_report_includes_sql_evidence_and_limitations() -> None:
     assert report["evidence"] == ["doc_feldspar#chunk_001"]
     assert report["limitations"] == ["Demo database is small."]
 
+
+def test_minigeo_agent_combines_sql_evidence_and_verification(tmp_path: Path) -> None:
+    db_path = tmp_path / "demo.sqlite"
+    init_demo_db(db_path)
+    corpus = load_corpus(Path("data/processed/rag_corpus.jsonl"))
+
+    report = MiniGeoAgent(db_path=db_path, corpus=corpus).run(
+        "Analyze which mineral categories are most frequently misclassified in samples collected from Qinhuangdao, "
+        "and explain possible causes using spectral evidence."
+    )
+
+    assert "Qinhuangdao" in report["sql"]
+    assert report["sql_result"]["error"] is None
+    assert report["sql_result"]["execution_result"][0]["predicted_mineral"] == "feldspar"
+    assert report["sql_result"]["execution_result"][0]["errors"] == 2
+    assert report["evidence"]
+    assert "doc_feldspar#chunk_002" in report["evidence"]
+    assert report["verification"]["verdict"] in {
+        "supported",
+        "partially_supported",
+        "unsupported",
+        "contradicted",
+        "insufficient_evidence",
+    }
