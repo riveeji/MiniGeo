@@ -9,6 +9,13 @@ def _fmt(value: Any) -> str:
     return str(value)
 
 
+def _latency(metrics: dict[str, float]) -> str:
+    value = metrics.get("latency_ms")
+    if value is None:
+        return "未测"
+    return f"{value:.3f} ms/q"
+
+
 def format_main_results(
     retrieval: dict[str, dict[str, float]],
     verifier: dict[str, Any],
@@ -18,9 +25,9 @@ def format_main_results(
     rows = [
         ("Qwen3.5-0.8B", "", "", "", "", "-", "未测"),
         ("Qwen3.5-2B", "", "", "", "", "-", "未测"),
-        ("BM25 RAG baseline", "", retrieval.get("bm25", {}).get("citation_hit_rate"), "", "", "-", "未测"),
-        ("Dense baseline", "", retrieval.get("dense", {}).get("citation_hit_rate"), "", "", "-", "未测"),
-        ("Hybrid RAG baseline", "", retrieval.get("hybrid", {}).get("citation_hit_rate"), "", "", "-", "未测"),
+        ("BM25 RAG baseline", "", retrieval.get("bm25", {}).get("citation_hit_rate"), "", "", "-", _latency(retrieval.get("bm25", {}))),
+        ("Dense baseline", "", retrieval.get("dense", {}).get("citation_hit_rate"), "", "", "-", _latency(retrieval.get("dense", {}))),
+        ("Hybrid RAG baseline", "", retrieval.get("hybrid", {}).get("citation_hit_rate"), "", "", "-", _latency(retrieval.get("hybrid", {}))),
         (
             "Hybrid + rerank baseline",
             "",
@@ -28,7 +35,7 @@ def format_main_results(
             "",
             "",
             "-",
-            "未测",
+            _latency(retrieval.get("hybrid_rerank", {})),
         ),
         ("Verifier baseline", "", "", verifier.get("unsupported_claim_rate"), "", "-", "未测"),
         ("SQL rule baseline", "", "", "", "", sql.get("sql_exec_accuracy"), "未测"),

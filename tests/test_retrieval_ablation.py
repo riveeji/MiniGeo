@@ -30,6 +30,8 @@ def test_run_retrieval_ablation_returns_all_systems() -> None:
 
     assert set(results) == {"bm25", "dense", "hybrid", "hybrid_rerank"}
     assert results["hybrid"]["recall@5"] == 1.0
+    assert results["bm25"]["latency_ms"] > 0.0
+    assert results["hybrid_rerank"]["latency_ms"] > 0.0
 
 
 def test_run_retrieval_ablation_accepts_custom_reranker() -> None:

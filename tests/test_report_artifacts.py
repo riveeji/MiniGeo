@@ -3,7 +3,10 @@ from minigeo.eval.report_artifacts import format_failure_cases, format_main_resu
 
 def test_format_main_results_includes_local_baselines() -> None:
     markdown = format_main_results(
-        retrieval={"bm25": {"citation_hit_rate": 0.924}, "hybrid": {"citation_hit_rate": 0.876}},
+        retrieval={
+            "bm25": {"citation_hit_rate": 0.924, "latency_ms": 1.2},
+            "hybrid": {"citation_hit_rate": 0.876, "latency_ms": 2.5},
+        },
         verifier={"unsupported_claim_rate": 0.557},
         sql={"sql_exec_accuracy": 1.0},
         agent_demo_passed=True,
@@ -12,6 +15,7 @@ def test_format_main_results_includes_local_baselines() -> None:
     assert "# MiniGeo 主结果" in markdown
     assert "BM25 RAG baseline" in markdown
     assert "0.924" in markdown
+    assert "1.200 ms/q" in markdown
     assert "MiniGeo-Agent demo" in markdown
 
 
