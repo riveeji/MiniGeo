@@ -21,6 +21,7 @@
 - 分层 Verifier：claim extraction、evidence matching、support classification。
 - Verifier 评测脚本：`scripts/evaluate_verifier.py`。
 - SQLite demo SQL 工具。
+- SQL 规则生成、SQL 修复和 SQL 评测。
 - Agent 报告接口。
 - QLoRA 配置：`configs/qwen35_2b_lora.yaml`。
 
@@ -198,8 +199,19 @@ python scripts/evaluate_retrieval_ablation.py --use-services
 现有基础：
 
 - `src/minigeo/sql/tools.py`
+- `src/minigeo/sql/generator.py`
+- `src/minigeo/sql/repair.py`
+- `src/minigeo/eval/sql.py`
 - `scripts/sql_demo.py`
+- `scripts/evaluate_sql.py`
 - `scripts/agent_demo.py`
+
+当前规则型 SQL baseline：
+
+```text
+sql_items=30
+sql_exec_accuracy=1.0
+```
 
 ## 完成标准
 
