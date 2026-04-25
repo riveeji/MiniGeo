@@ -15,16 +15,35 @@ def _extract_json_object(raw: str) -> dict[str, Any] | None:
     if text.startswith("```"):
         text = re.sub(r"^```(?:json)?\s*", "", text)
         text = re.sub(r"\s*```$", "", text)
-    try:
-        return json.loads(text)
-    except json.JSONDecodeError:
-        match = re.search(r"\{.*\}", text, re.DOTALL)
-        if not match:
-            return None
+    candidates: list[dict[str, Any]] = []
+    for block in re.findall(r"```(?:json)?\s*(\{.*?\})\s*```", text, flags=re.DOTALL | re.IGNORECASE):
         try:
-            return json.loads(match.group(0))
+            data = json.loads(block)
         except json.JSONDecodeError:
-            return None
+            continue
+        if isinstance(data, dict):
+            candidates.append(data)
+    decoder = json.JSONDecoder()
+    for match in re.finditer(r"\{", text):
+        try:
+            data, _ = decoder.raw_decode(text[match.start():])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(data, dict):
+            candidates.append(data)
+    for candidate in reversed(candidates):
+        if _looks_like_answer_object(candidate):
+            return candidate
+    return None
+
+
+def _looks_like_answer_object(data: dict[str, Any]) -> bool:
+    answer = str(data.get("answer", "")).strip().lower()
+    if not {"answer", "citations", "abstained", "confidence"}.issubset(data):
+        return False
+    if answer in {"", "string"}:
+        return False
+    return isinstance(data.get("citations"), list)
 
 
 def _extract_bracket_citations(raw: str, allowed_citations: set[str]) -> list[str]:
@@ -64,8 +83,9 @@ def assemble_json_rag_prompt(question: str, evidence: list[dict[str, Any]]) -> s
     base_prompt = assemble_evidence_prompt(question, evidence)
     return (
         f"{base_prompt}\n\n"
-        "Return only valid JSON with this schema:\n"
-        '{"answer": "string", "citations": ["chunk_id"], "abstained": false, "confidence": 0.0}\n'
+        "Output only one JSON object. Do not output markdown, schema examples, or thinking process.\n"
+        "The JSON keys must be answer, citations, abstained, confidence.\n"
+        "The answer value must be the final Chinese answer, never the literal word string.\n"
         "Use only retrieved chunk ids in citations. If evidence is insufficient, set abstained to true."
     )
 
@@ -94,4 +114,3 @@ def generate_model_rag_answer(
     parsed["evidence"] = positive_evidence
     parsed["raw_model_output"] = raw
     return parsed
-

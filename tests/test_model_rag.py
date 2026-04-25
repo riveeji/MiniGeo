@@ -22,6 +22,20 @@ def test_parse_model_answer_extracts_json_contract() -> None:
     assert parsed["confidence"] == 0.82
 
 
+def test_parse_model_answer_prefers_final_json_over_schema_example() -> None:
+    raw = (
+        'Thinking Process: schema {"answer":"string","citations":["chunk_id"],"abstained":false,"confidence":0.0}\n'
+        "```json\n"
+        '{"answer":"石英主要成分是二氧化硅。","citations":["doc_quartz#chunk_001"],"abstained":false,"confidence":0.9}\n'
+        "```"
+    )
+
+    parsed = parse_model_answer(raw, allowed_citations={"doc_quartz#chunk_001"})
+
+    assert parsed["answer"] == "石英主要成分是二氧化硅。"
+    assert parsed["citations"] == ["doc_quartz#chunk_001"]
+
+
 def test_generate_model_rag_answer_uses_retrieved_evidence_and_filters_citations() -> None:
     corpus = [
         {
@@ -45,4 +59,3 @@ def test_generate_model_rag_answer_uses_retrieved_evidence_and_filters_citations
     assert result["abstained"] is False
     assert "doc_quartz#chunk_001" in client.prompts[0]
     assert "JSON" in client.prompts[0]
-

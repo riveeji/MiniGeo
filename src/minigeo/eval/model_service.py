@@ -16,6 +16,9 @@ def summarize_model_rag_outputs(
     non_empty = 0
     citation_hits = 0
     empty_raw = 0
+    request_errors = 0
+    abstention_correct = 0
+    abstention_items = 0
     for row in benchmark_rows:
         output = outputs.get(row["id"], {})
         answer = str(output.get("answer", "")).strip()
@@ -28,12 +31,22 @@ def summarize_model_rag_outputs(
             citation_hits += 1
         if not raw:
             empty_raw += 1
+        if output.get("error"):
+            request_errors += 1
+        if "answerable" in row:
+            abstention_items += 1
+            expected_abstain = not bool(row.get("answerable", True))
+            if bool(output.get("abstained", False)) == expected_abstain:
+                abstention_correct += 1
     summary = {
         "items": len(benchmark_rows),
         "non_empty_answer_rate": non_empty / len(benchmark_rows),
         "citation_hit_rate": citation_hits / len(benchmark_rows),
         "empty_raw_outputs": empty_raw,
+        "request_errors": request_errors,
     }
+    if abstention_items:
+        summary["abstention_accuracy"] = abstention_correct / abstention_items
     if latency_ms is not None:
         summary["latency_ms"] = latency_ms
     return summary

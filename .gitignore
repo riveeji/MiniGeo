@@ -12,3 +12,7 @@ results/generated/
 data/raw/*
 !data/raw/.gitkeep
 tmp/
+.tmp/
+.pytest_tmp*/
+.pytest_cache_run*/
+pytest-cache-files-*/
