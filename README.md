@@ -56,6 +56,8 @@ python scripts/audit_project.py
 
 Colab Pro 模板见 `notebooks/minigeo_colab_template.ipynb`，用于模型服务评测、SFT 数据构建和 QLoRA 配置检查。
 
+Agent 设计说明见 `docs/agent-design.md`。
+
 ## 常用命令
 
 ```powershell
