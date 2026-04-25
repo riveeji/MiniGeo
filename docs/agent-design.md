@@ -52,7 +52,10 @@ feldspar: 2
 quartz: 1
 ```
 
-证据检索优先保留与预测矿物类别相关的 chunk，例如 `doc_feldspar#chunk_002` 和 `doc_quartz#chunk_002`。
+证据链包含两类证据：
+
+- SQL 结果证据：`agent_sql#result`，用于支持“秦皇岛样本最常被误判为 feldspar，误判分布为 feldspar 2 次、quartz 1 次”这类统计 claim。
+- 文档证据：优先保留与预测矿物类别相关的 chunk，例如 `doc_feldspar#chunk_002` 和 `doc_quartz#chunk_002`。
 
 ## 输出契约
 
@@ -67,7 +70,7 @@ Agent final report 必须包含：
     "execution_result": [],
     "error": null
   },
-  "evidence": ["doc_feldspar#chunk_002"],
+  "evidence": ["agent_sql#result", "doc_feldspar#chunk_002"],
   "verification": {
     "verdict": "supported|partially_supported|unsupported|contradicted|insufficient_evidence",
     "claims": []
@@ -97,7 +100,7 @@ python scripts/audit_project.py
 - 当前 Agent 是确定性 MVP，不包含完整 planner。
 - SQL generator 默认是规则型 baseline；模型模式需要 OpenAI-compatible Qwen 服务。
 - demo database 很小，结果只用于验证工具链。
-- Verifier 对 SQL 结果本身仍偏保守，SQL 统计类 claim 可能被标为 insufficient。
+- 当前 SQL 结果已被转换为 `agent_sql#result` 证据，能支持 SQL 统计类 claim；但它仍是 demo database 的执行结果，不等同于真实实验结论。
 - 文档证据仍是种子 corpus，后续需要更多公开资料和人工 evidence label。
 
 ## 下一步

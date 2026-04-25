@@ -34,7 +34,15 @@ def test_minigeo_agent_combines_sql_evidence_and_verification(tmp_path: Path) ->
     assert report["sql_result"]["execution_result"][0]["predicted_mineral"] == "feldspar"
     assert report["sql_result"]["execution_result"][0]["errors"] == 2
     assert report["evidence"]
+    assert "agent_sql#result" in report["evidence"]
     assert "doc_feldspar#chunk_002" in report["evidence"]
+    sql_claims = [
+        claim for claim in report["verification"]["claims"]
+        if "SQL" in claim["claim"] and "feldspar" in claim["claim"]
+    ]
+    assert sql_claims
+    assert sql_claims[0]["status"] == "supported"
+    assert "agent_sql#result" in sql_claims[0]["evidence"]
     assert report["verification"]["verdict"] in {
         "supported",
         "partially_supported",

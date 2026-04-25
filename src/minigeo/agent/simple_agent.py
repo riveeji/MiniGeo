@@ -39,8 +39,10 @@ class MiniGeoAgent:
     def run(self, question: str) -> dict[str, Any]:
         sql = self.sql_generator.generate(question)
         sql_result = execute_sql(self.db_path, sql)
-        evidence = self._retrieve_evidence(sql_result, top_k=3)
-        answer = self._answer_from_sql_and_evidence(sql_result, evidence)
+        doc_evidence = self._retrieve_evidence(sql_result, top_k=3)
+        sql_evidence = self._sql_evidence_chunk(sql_result)
+        evidence = [sql_evidence] + doc_evidence if sql_evidence else doc_evidence
+        answer = self._answer_from_sql_and_evidence(sql_result, doc_evidence)
         verification = self.verifier.verify(answer, evidence)
         report = write_report(
             answer=answer,
@@ -54,6 +56,26 @@ class MiniGeoAgent:
         )
         report["sql_result"] = sql_result
         return report
+
+    def _sql_evidence_chunk(self, sql_result: dict[str, Any]) -> dict[str, Any] | None:
+        if sql_result.get("error"):
+            return None
+        rows = sql_result.get("execution_result", [])
+        if not rows:
+            return None
+        ranking = ", ".join(f"{row['predicted_mineral']} {row['errors']} 次" for row in rows)
+        top = rows[0]["predicted_mineral"]
+        return {
+            "chunk_id": "agent_sql#result",
+            "doc_id": "agent_sql",
+            "text": f"SQL 结果显示，秦皇岛样本中最常被误判为 {top}，误判分布为 {ranking}。",
+            "source": "MiniGeo demo SQLite",
+            "url": "",
+            "page": None,
+            "topic": "sql_result",
+            "mineral": top,
+            "license": "generated",
+        }
 
     def _evidence_query(self, sql_result: dict[str, Any]) -> str:
         minerals = " ".join(str(row.get("predicted_mineral", "")) for row in sql_result.get("execution_result", []))

@@ -30,7 +30,7 @@
 ```text
 ........................................................................ [ 94%]
 ....                                                                     [100%]
-76 passed in 0.28s
+76 passed in 0.35s
 ```
 
 ### Benchmark 分布
@@ -58,10 +58,10 @@ evidence_labeled=105
 **stdout**
 
 ```text
-bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.573
-dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.390
-hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=31.075
-hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=37.668
+bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.671
+dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.680
+hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=38.301
+hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=46.428
 ```
 
 ### 拒答评测
@@ -78,7 +78,7 @@ correct_abstain=17
 missed_abstain=0
 false_abstain=0
 correct_answer=133
-latency_ms=13.577698666679984
+latency_ms=16.2343426666727
 ```
 
 ### Verifier 评测
@@ -94,7 +94,7 @@ claims=167
 verdicts={'supported': 70, 'insufficient_evidence': 79, 'partially_supported': 1}
 statuses={'supported': 74, 'insufficient': 93}
 unsupported_claim_rate=0.5568862275449101
-latency_ms=0.6301339999966634
+latency_ms=0.6997433333405448
 ```
 
 ### SQL 评测
@@ -108,7 +108,7 @@ latency_ms=0.6301339999966634
 sql_items=30
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.22863000000749403
+latency_ms=0.23767999991832767
 ```
 
 ### SFT 数据构建
@@ -151,17 +151,20 @@ output_dir=checkpoints/MiniGeo-Qwen3.5-2B-SFT
   "answer": "SQL �����ʾ���ػʵ��������������Ϊ feldspar�����зֲ�Ϊ feldspar��2 �Σ�, quartz��1 �Σ�������ԭ�������ʯӢ�� 464 cm-1 �����������ǹؼ�ʶ��֤�ݣ���ʯ��ʯӢͬ����������ϵ��Al-Si �Ǽ���ع��������������ӻ������ա����֤�ݼ� [doc_feldspar#chunk_002] [doc_quartz#chunk_002]��",
   "sql": "select predictions.predicted_mineral, count(*) as errors from predictions join samples on samples.sample_id = predictions.sample_id where samples.region = 'Qinhuangdao' and predictions.is_correct = 0 group by predicted_mineral order by errors desc",
   "evidence": [
+    "agent_sql#result",
     "doc_feldspar#chunk_002",
     "doc_quartz#chunk_002"
   ],
   "verification": {
-    "verdict": "partially_supported",
+    "verdict": "supported",
     "claims": [
       {
         "claim": "SQL �����ʾ���ػʵ��������������Ϊ feldspar�����зֲ�Ϊ feldspar��2 �Σ�, quartz��1 �Σ�",
-        "status": "insufficient",
-        "evidence": [],
-        "confidence": 0.0
+        "status": "supported",
+        "evidence": [
+          "agent_sql#result"
+        ],
+        "confidence": 1.0
       },
       {
         "claim": "����ԭ�������ʯӢ�� 464 cm-1 �����������ǹؼ�ʶ��֤�ݣ���ʯ��ʯӢͬ����������ϵ��Al-Si �Ǽ���ع��������������ӻ�������",
