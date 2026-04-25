@@ -69,6 +69,7 @@ python scripts/evaluate_retrieval_ablation.py
 python scripts/evaluate_abstention.py
 python scripts/rag_demo.py
 python scripts/model_rag_demo.py
+python scripts/evaluate_model_service.py --limit 3
 python scripts/evaluate_verifier.py
 python scripts/evaluate_sql.py
 python scripts/evaluate_agent_planner.py
