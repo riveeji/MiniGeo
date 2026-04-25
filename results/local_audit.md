@@ -28,8 +28,8 @@
 **stdout**
 
 ```text
-......................................................................   [100%]
-70 passed in 0.25s
+........................................................................ [100%]
+72 passed in 0.26s
 ```
 
 ### Benchmark 分布
@@ -57,10 +57,10 @@ evidence_labeled=105
 **stdout**
 
 ```text
-bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.558
-dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.319
-hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=29.813
-hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=35.936
+bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.565
+dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.361
+hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=30.176
+hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=36.441
 ```
 
 ### 拒答评测
@@ -72,12 +72,12 @@ hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 
 
 ```text
 items=150
-abstention_accuracy=0.8866666666666667
-correct_abstain=0
-missed_abstain=17
+abstention_accuracy=0.98
+correct_abstain=14
+missed_abstain=3
 false_abstain=0
 correct_answer=133
-latency_ms=12.873980666675683
+latency_ms=13.210263333336721
 ```
 
 ### Verifier 评测
@@ -93,7 +93,7 @@ claims=167
 verdicts={'supported': 70, 'insufficient_evidence': 79, 'partially_supported': 1}
 statuses={'supported': 74, 'insufficient': 93}
 unsupported_claim_rate=0.5568862275449101
-latency_ms=0.5746473333419999
+latency_ms=0.612048000014814
 ```
 
 ### SQL 评测
@@ -107,7 +107,7 @@ latency_ms=0.5746473333419999
 sql_items=30
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.2665400000599523
+latency_ms=0.2323199999712718
 ```
 
 ### SFT 数据构建
