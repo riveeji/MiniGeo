@@ -4,7 +4,13 @@ version = "0.1.0"
 description = "Qwen3.5-based geoscience trustworthy QA and data analysis agent system."
 requires-python = ">=3.10"
 
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-
