@@ -12,6 +12,7 @@
 | 拒答评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_abstention.py` |
 | Verifier 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_verifier.py` |
 | SQL 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_sql.py` |
+| Agent Planner 评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_agent_planner.py` |
 | SFT 数据构建 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/build_sft_corpus.py` |
 | QLoRA 配置检查 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/train_lora.py --check-only` |
 | Agent Demo | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/agent_demo.py` |
@@ -28,9 +29,9 @@
 **stdout**
 
 ```text
-........................................................................ [ 91%]
-.......                                                                  [100%]
-79 passed in 0.38s
+........................................................................ [ 88%]
+.........                                                                [100%]
+81 passed in 0.33s
 ```
 
 ### Benchmark 分布
@@ -58,10 +59,10 @@ evidence_labeled=105
 **stdout**
 
 ```text
-bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.684
-dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.718
-hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=35.827
-hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=44.048
+bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=1.068
+dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.702
+hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=37.879
+hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=45.968
 ```
 
 ### 拒答评测
@@ -78,7 +79,7 @@ correct_abstain=17
 missed_abstain=0
 false_abstain=0
 correct_answer=133
-latency_ms=16.452273333319074
+latency_ms=16.019696666674765
 ```
 
 ### Verifier 评测
@@ -94,7 +95,7 @@ claims=167
 verdicts={'supported': 70, 'insufficient_evidence': 79, 'partially_supported': 1}
 statuses={'supported': 74, 'insufficient': 93}
 unsupported_claim_rate=0.5568862275449101
-latency_ms=0.7130586666607996
+latency_ms=0.6732273333424624
 ```
 
 ### SQL 评测
@@ -108,7 +109,21 @@ latency_ms=0.7130586666607996
 sql_items=30
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.2514366666825178
+latency_ms=0.2602399999886984
+```
+
+### Agent Planner 评测
+
+- 状态：PASS
+- 退出码：0
+
+**stdout**
+
+```text
+items=150
+sql_routing_accuracy=0.8666666666666667
+modes={'docs': 106, 'sql': 20, 'hybrid': 24}
+latency_ms=0.003219333326948496
 ```
 
 ### SFT 数据构建

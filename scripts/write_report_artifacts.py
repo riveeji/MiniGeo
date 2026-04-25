@@ -4,6 +4,7 @@ from time import perf_counter
 from minigeo.agent.simple_agent import MiniGeoAgent
 from minigeo.benchmark import load_benchmark
 from minigeo.eval.abstention import summarize_abstention
+from minigeo.eval.agent_planner import summarize_planner_routes
 from minigeo.eval.report_artifacts import abstention_failure_cases, format_failure_cases, format_main_results
 from minigeo.eval.retrieval_ablation import run_retrieval_ablation
 from minigeo.eval.sql import summarize_sql_results
@@ -51,6 +52,11 @@ def main() -> None:
     retrieval = run_retrieval_ablation(bench, corpus, top_k=10)
 
     started = perf_counter()
+    planner_summary = summarize_planner_routes(bench)
+    planner_latency_ms = (perf_counter() - started) * 1000.0 / max(len(bench), 1)
+    planner_summary["latency_ms"] = planner_latency_ms
+
+    started = perf_counter()
     rag_answers = {row["id"]: offline_rag_answer(row["question"], corpus, top_k=3) for row in bench}
     abstention_latency_ms = (perf_counter() - started) * 1000.0 / max(len(bench), 1)
 
@@ -91,6 +97,7 @@ def main() -> None:
             verifier=summarize_verification_reports(verifier_reports, latency_ms=verifier_latency_ms),
             sql=summarize_sql_results(bench, sql_outputs, latency_ms=sql_latency_ms),
             abstention=summarize_abstention(bench, rag_answers, latency_ms=abstention_latency_ms),
+            planner=planner_summary,
             agent_demo_passed=agent_demo_passed,
             agent_latency_ms=agent_latency_ms,
         ),

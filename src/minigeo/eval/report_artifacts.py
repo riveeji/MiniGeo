@@ -22,8 +22,10 @@ def format_main_results(
     sql: dict[str, Any],
     abstention: dict[str, Any],
     agent_demo_passed: bool,
+    planner: dict[str, Any] | None = None,
     agent_latency_ms: float | None = None,
 ) -> str:
+    planner = planner or {}
     rows = [
         ("Qwen3.5-0.8B", "", "", "", "", "-", "未测"),
         ("Qwen3.5-2B", "", "", "", "", "-", "未测"),
@@ -49,6 +51,7 @@ def format_main_results(
         ),
         ("Verifier baseline", "", "", verifier.get("unsupported_claim_rate"), "", "-", _latency(verifier)),
         ("SQL rule baseline", "", "", "", "", sql.get("sql_exec_accuracy"), _latency(sql)),
+        ("Planner baseline", planner.get("sql_routing_accuracy"), "", "", "", "-", _latency(planner)),
         (
             "MiniGeo-Agent demo",
             "demo",
