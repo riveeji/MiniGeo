@@ -24,11 +24,13 @@ def format_main_results(
     agent_demo_passed: bool,
     planner: dict[str, Any] | None = None,
     agent_latency_ms: float | None = None,
+    extra_rows: list[tuple[Any, ...]] | None = None,
 ) -> str:
     planner = planner or {}
     rows = [
         ("Qwen3.5-0.8B", "", "", "", "", "-", "未测"),
         ("Qwen3.5-2B", "", "", "", "", "-", "未测"),
+        *(extra_rows or []),
         (
             "BM25 RAG baseline",
             "",
@@ -65,7 +67,7 @@ def format_main_results(
     lines = [
         "# MiniGeo 主结果",
         "",
-        "本表由 `scripts/write_report_artifacts.py` 生成。当前数值是本地 baseline 和 demo 结果，不代表真实 Qwen3.5 模型服务或 QLoRA 训练结果。",
+        "本表由 `scripts/write_report_artifacts.py` 生成，包含本地 baseline、demo 结果，以及已保存的真实模型服务小样本结果。",
         "",
         "| System | Acc | Citation Hit | Unsupported Claim | Abstention | SQL Exec | Latency |",
         "|---|---:|---:|---:|---:|---:|---:|",
@@ -81,7 +83,7 @@ def format_main_results(
             "- Qwen3.5-2B + 模型 RAG。",
             "- MiniGeo-2B-SFT。",
             "- MiniGeo-2B-SFT + RAG + Verifier。",
-            "- Qwen3.5-4B + RAG。",
+            "- Qwen3.5-4B + RAG 的 300 题全量模型服务结果。",
             "",
         ]
     )

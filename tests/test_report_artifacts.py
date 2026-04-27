@@ -13,6 +13,7 @@ def test_format_main_results_includes_local_baselines() -> None:
         planner={"sql_routing_accuracy": 0.9, "latency_ms": 0.01},
         agent_demo_passed=True,
         agent_latency_ms=5.0,
+        extra_rows=[("Qwen3.5-4B + BM25 RAG", "", 0.833, "", 0.9, "-", "见 model_service_eval")],
     )
 
     assert "# MiniGeo 主结果" in markdown
@@ -26,6 +27,7 @@ def test_format_main_results_includes_local_baselines() -> None:
     assert "0.900" in markdown
     assert "5.000 ms/q" in markdown
     assert "MiniGeo-Agent demo" in markdown
+    assert "Qwen3.5-4B + BM25 RAG" in markdown
 
 
 def test_format_failure_cases_limits_cases_and_keeps_schema() -> None:

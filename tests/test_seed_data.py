@@ -9,10 +9,12 @@ def test_seed_benchmark_reaches_resume_ready_scale() -> None:
 
     risk_items = [row for row in rows if row["type"] in {"unanswerable", "false_premise"}]
     sql_items = [row for row in rows if row["requires_sql"]]
+    evidence_items = [row for row in rows if row["evidence"]]
 
-    assert len(rows) >= 150
-    assert len(risk_items) >= 30
-    assert len(sql_items) >= 30
+    assert len(rows) >= 300
+    assert len(risk_items) >= 60
+    assert len(sql_items) >= 45
+    assert len(evidence_items) >= 180
 
 
 def test_seed_evidence_ids_exist_in_corpus() -> None:
@@ -27,4 +29,3 @@ def test_seed_evidence_ids_exist_in_corpus() -> None:
 
     assert len(corpus) >= 30
     assert referenced <= chunk_ids
-

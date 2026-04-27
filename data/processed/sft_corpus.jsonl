@@ -87,3 +87,49 @@
 {"id": "sft_sql_0028", "input": "根据错误信息修复把 predicted 写成 prediction 的 SQL。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 使用 schema 将错误列名修复为 predicted_mineral。", "task_type": "sql_format"}
 {"id": "sft_sql_0029", "input": "根据 schema 修复缺少 join 条件的 SQL。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 使用 sample_id 连接 samples 和 predictions。", "task_type": "sql_format"}
 {"id": "sft_sql_0030", "input": "查询 Agent 最终报告应返回哪些结构化字段。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 最终报告应包含 SQL、证据、验证结果和限制说明。", "task_type": "sql_format"}
+{"id": "sft_refusal_0018", "input": "当前资料库能否确定样本 PX-101 的矿物类别？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_refusal_0019", "input": "当前资料库能否确定样本 MOON-204 的矿物类别？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_refusal_0020", "input": "当前资料库能否确定样本 MICA-777 的矿物类别？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_refusal_0021", "input": "当前资料库能否确定样本 DIAMOND-404 的矿物类别？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_refusal_0022", "input": "当前资料库能否确定样本 MARS-CLAY-9 的矿物类别？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_refusal_0023", "input": "当前资料库能否确定样本 OLV-UNKNOWN 的矿物类别？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_refusal_0024", "input": "当前资料库能否确定样本 SPECTRA-X0 的矿物类别？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_refusal_0025", "input": "当前资料库能否确定样本 QHD-999 的矿物类别？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_sql_0031", "input": "查询 Qinhuangdao 地区每种预测矿物的错误次数。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 按地区过滤样本并按 predicted_mineral 聚合错误预测。", "task_type": "sql_format"}
+{"id": "sft_sql_0032", "input": "找出每个地区的错误样本数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 连接 samples 和 predictions，按 region 统计 is_correct=0 的记录。", "task_type": "sql_format"}
+{"id": "sft_sql_0033", "input": "列出 Qinhuangdao 中所有预测错误的 sample_id。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 连接 samples 和 predictions 并筛选 region 与 is_correct。", "task_type": "sql_format"}
+{"id": "sft_sql_0034", "input": "查询每个真实矿物被误判成什么矿物。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 按 true_mineral 和 predicted_mineral 聚合错误预测。", "task_type": "sql_format"}
+{"id": "sft_sql_0035", "input": "统计 spectra 表中每个样本的峰位数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 按 sample_id 聚合 spectra 记录。", "task_type": "sql_format"}
+{"id": "sft_sql_0036", "input": "查询具有 460 到 470 cm-1 峰位的样本。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 在 spectra 表中筛选 peak_cm1 范围。", "task_type": "sql_format"}
+{"id": "sft_sql_0037", "input": "查询 Qinhuangdao 错误样本对应的光谱备注。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 连接 samples、predictions、spectra 并筛选错误预测。", "task_type": "sql_format"}
+{"id": "sft_sql_0038", "input": "统计预测正确率。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 用 predictions 表中 is_correct 计算平均正确率。", "task_type": "sql_format"}
+{"id": "sft_sql_0039", "input": "查询真实矿物为 quartz 的错误预测。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 筛选 true_mineral=quartz 且 is_correct=0。", "task_type": "sql_format"}
+{"id": "sft_sql_0040", "input": "查询预测为 feldspar 的样本来自哪些地区。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 连接 samples 和 predictions 并筛选 predicted_mineral。", "task_type": "sql_format"}
+{"id": "sft_sql_0041", "input": "查询数据库中有哪些表参与 Agent 分析。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 读取 schema 或列出 samples、predictions、spectra。", "task_type": "sql_format"}
+{"id": "sft_sql_0042", "input": "查询每个矿物类别的关键光谱特征。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 读取 minerals 表的 mineral_class 和 key_spectral_feature。", "task_type": "sql_format"}
+{"id": "sft_sql_0043", "input": "查询峰位大于 1000 cm-1 的光谱记录。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 筛选 spectra.peak_cm1 > 1000。", "task_type": "sql_format"}
+{"id": "sft_sql_0044", "input": "统计 Qinhuangdao 地区样本总数。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 按 samples.region 过滤并计数。", "task_type": "sql_format"}
+{"id": "sft_sql_0045", "input": "查询每个预测矿物的正确和错误数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 按 predicted_mineral 与 is_correct 聚合。", "task_type": "sql_format"}
+{"id": "sft_sql_0046", "input": "查询错误预测最多的真实矿物。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 筛选错误预测并按 true_mineral 聚合排序。", "task_type": "sql_format"}
+{"id": "sft_sql_0047", "input": "查询每个 sample_id 的真实矿物、预测矿物和峰位。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 连接 samples、predictions、spectra。", "task_type": "sql_format"}
+{"id": "sft_sql_0048", "input": "查询没有光谱记录的样本。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: samples 左连接 spectra 并筛选缺失 spectrum_id。", "task_type": "sql_format"}
+{"id": "sft_sql_0049", "input": "查询 Qinhuangdao 中被预测为 quartz 的错误样本。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 筛选 region、predicted_mineral 和 is_correct。", "task_type": "sql_format"}
+{"id": "sft_sql_0050", "input": "根据错误信息修复把 predicted 写成 prediction 的 SQL。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 使用 schema 将错误列名修复为 predicted_mineral。", "task_type": "sql_format"}
+{"id": "sft_sql_0051", "input": "根据 schema 修复缺少 join 条件的 SQL。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 使用 sample_id 连接 samples 和 predictions。", "task_type": "sql_format"}
+{"id": "sft_sql_0052", "input": "查询 Agent 最终报告应返回哪些结构化字段。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: 最终报告应包含 SQL、证据、验证结果和限制说明。", "task_type": "sql_format"}
+{"id": "sft_refusal_0026", "input": "当前资料库是否能证明样本 UNKNOWN-239 是白云石？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_sql_0053", "input": "查询数据库中真实矿物为 magnetite 的错误预测数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: count incorrect predictions where true_mineral=magnetite", "task_type": "sql_format"}
+{"id": "sft_refusal_0027", "input": "当前资料库是否能证明样本 UNKNOWN-247 是石英？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_sql_0054", "input": "查询数据库中真实矿物为 calcite 的错误预测数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: count incorrect predictions where true_mineral=calcite", "task_type": "sql_format"}
+{"id": "sft_refusal_0028", "input": "当前资料库是否能证明样本 UNKNOWN-255 是橄榄石？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_sql_0055", "input": "查询数据库中真实矿物为 kaolinite 的错误预测数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: count incorrect predictions where true_mineral=kaolinite", "task_type": "sql_format"}
+{"id": "sft_refusal_0029", "input": "当前资料库是否能证明样本 UNKNOWN-263 是白云石？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_sql_0056", "input": "查询数据库中真实矿物为 magnetite 的错误预测数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: count incorrect predictions where true_mineral=magnetite", "task_type": "sql_format"}
+{"id": "sft_refusal_0030", "input": "当前资料库是否能证明样本 UNKNOWN-271 是石英？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_sql_0057", "input": "查询数据库中真实矿物为 calcite 的错误预测数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: count incorrect predictions where true_mineral=calcite", "task_type": "sql_format"}
+{"id": "sft_refusal_0031", "input": "当前资料库是否能证明样本 UNKNOWN-279 是橄榄石？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_sql_0058", "input": "查询数据库中真实矿物为 kaolinite 的错误预测数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: count incorrect predictions where true_mineral=kaolinite", "task_type": "sql_format"}
+{"id": "sft_refusal_0032", "input": "当前资料库是否能证明样本 UNKNOWN-287 是白云石？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_sql_0059", "input": "查询数据库中真实矿物为 magnetite 的错误预测数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: count incorrect predictions where true_mineral=magnetite", "task_type": "sql_format"}
+{"id": "sft_refusal_0033", "input": "当前资料库是否能证明样本 UNKNOWN-295 是石英？", "instruction": "当证据不足时，用简短中文拒答，不要编造事实。", "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。", "task_type": "refusal"}
+{"id": "sft_sql_0060", "input": "查询数据库中真实矿物为 calcite 的错误预测数量。", "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。", "output": "SQL_INTENT: count incorrect predictions where true_mineral=calcite", "task_type": "sql_format"}

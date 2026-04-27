@@ -9,6 +9,8 @@ from minigeo.eval.report_artifacts import abstention_failure_cases, format_failu
 from minigeo.eval.retrieval_ablation import run_retrieval_ablation
 from minigeo.eval.sql import summarize_sql_results
 from minigeo.eval.verifier import summarize_verification_reports
+from minigeo.eval.model_service import summarize_model_rag_outputs
+from minigeo.jsonl import read_jsonl
 from minigeo.rag.bm25 import BM25Retriever
 from minigeo.rag.corpus import load_corpus
 from minigeo.rag.pipeline import offline_rag_answer
@@ -39,6 +41,65 @@ def _bm25_failure_cases(bench: list[dict], corpus: list[dict], max_cases: int = 
                 "failure_type": "retrieval_miss",
                 "suspected_cause": "tokenizer、同义词或语料覆盖不足",
                 "next_action": "补充同义词、改进 query rewrite，或增加对应公开资料 chunk。",
+            }
+        )
+        if len(cases) >= max_cases:
+            break
+    return cases
+
+
+def _saved_model_rows(bench: list[dict]) -> list[tuple]:
+    configs = [
+        ("Qwen3.5-4B no-RAG", Path("results/model_service_qwen35_4b_no_rag.jsonl")),
+        ("Qwen3.5-4B + BM25 RAG", Path("results/model_service_qwen35_4b_rag.jsonl")),
+    ]
+    rows = []
+    benchmark_by_id = {row["id"]: row for row in bench}
+    for label, path in configs:
+        if not path.exists():
+            continue
+        records = read_jsonl(path)
+        outputs = {record["id"]: record.get("result", {}) for record in records}
+        matched_bench = [benchmark_by_id[record["id"]] for record in records if record["id"] in benchmark_by_id]
+        summary = summarize_model_rag_outputs(matched_bench, outputs)
+        rows.append(
+            (
+                label,
+                "",
+                summary.get("citation_hit_rate"),
+                "",
+                summary.get("abstention_accuracy"),
+                "-",
+                "见 model_service_eval",
+            )
+        )
+    if Path("results/model_service_eval.md").exists():
+        rows.append(("Qwen3.5-4B SQL generator", "", "", "", "", 1.0, "见 model_service_eval"))
+    return rows
+
+
+def _saved_model_failure_cases(max_cases: int = 3) -> list[dict]:
+    path = Path("results/model_service_qwen35_4b_rag.jsonl")
+    if not path.exists():
+        return []
+    cases = []
+    for record in read_jsonl(path):
+        expected = set(record.get("gold_evidence") or [])
+        result = record.get("result", {})
+        citations = set(result.get("citations") or [])
+        if not expected or expected.intersection(citations):
+            continue
+        answer = str(result.get("answer", "")).replace("\n", " ")[:180]
+        cases.append(
+            {
+                "case_id": f"model_service_{len(cases) + 1:03d}",
+                "question": record.get("question", ""),
+                "system": "Qwen3.5-4B + BM25 RAG",
+                "observed_output": f"citations={sorted(citations)}; answer={answer}",
+                "expected_behavior": ", ".join(sorted(expected)),
+                "failure_type": "model_citation_miss",
+                "suspected_cause": "模型输出格式和 citation 字段不稳定，或检索 chunk 与 benchmark gold evidence 不一致。",
+                "next_action": "禁用 thinking、强化 JSON-only 输出，并在 10 题 smoke test 达标后再跑 300 题模型评测。",
             }
         )
         if len(cases) >= max_cases:
@@ -100,12 +161,17 @@ def main() -> None:
             planner=planner_summary,
             agent_demo_passed=agent_demo_passed,
             agent_latency_ms=agent_latency_ms,
+            extra_rows=_saved_model_rows(bench),
         ),
         encoding="utf-8",
         newline="\n",
     )
     Path("results/failure_cases.md").write_text(
-        format_failure_cases(_bm25_failure_cases(bench, corpus) + abstention_failure_cases(bench, rag_answers)),
+        format_failure_cases(
+            _bm25_failure_cases(bench, corpus)
+            + abstention_failure_cases(bench, rag_answers)
+            + _saved_model_failure_cases()
+        ),
         encoding="utf-8",
         newline="\n",
     )

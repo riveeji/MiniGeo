@@ -4,27 +4,27 @@
 
 ## Benchmark
 
-- 题目数：150
-- SQL 题数：30
-- 带 evidence label：105
+- 题目数：300
+- SQL 题数：60
+- 带 evidence label：209
 
 ## Retrieval
 
 | 系统 | Recall@5 | Recall@10 | MRR | Citation Hit |
 |---|---:|---:|---:|---:|
-| bm25 | 0.743 | 0.924 | 0.575 | 0.924 |
-| dense | 0.600 | 0.819 | 0.440 | 0.819 |
-| hybrid | 0.695 | 0.876 | 0.517 | 0.876 |
-| hybrid_rerank | 0.600 | 0.838 | 0.524 | 0.838 |
+| bm25 | 0.756 | 0.943 | 0.523 | 0.943 |
+| dense | 0.550 | 0.828 | 0.393 | 0.828 |
+| hybrid | 0.703 | 0.895 | 0.472 | 0.895 |
+| hybrid_rerank | 0.589 | 0.833 | 0.452 | 0.833 |
 
 ## Verifier
 
-- reports：150
-- claims：167
-- unsupported_claim_rate：0.557
+- reports：300
+- claims：343
+- unsupported_claim_rate：0.638
 
 ## SQL
 
-- sql_items：30
+- sql_items：60
 - sql_exec_accuracy：1.000
 - failures：{}

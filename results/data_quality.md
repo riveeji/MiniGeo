@@ -4,9 +4,9 @@
 
 ## 规模
 
-- benchmark_items：150
+- benchmark_items：300
 - corpus_chunks：42
-- sft_items：89
+- sft_items：135
 
 ## Evidence 引用缺失
 

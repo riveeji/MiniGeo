@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 
 from minigeo.benchmark import load_benchmark
@@ -121,7 +122,7 @@ def item(idx: int, question: str, answer: str, type_: str, evidence: list[str], 
     }
 
 
-def make_extra_items(start: int) -> list[dict]:
+def make_extra_items(start: int, count: int = 200) -> list[dict]:
     rows: list[dict] = []
     idx = start
 
@@ -175,14 +176,36 @@ def make_extra_items(start: int) -> list[dict]:
     for left, right, evidence in multi_hop_pairs:
         rows.append(item(idx, f"比较{left}和{right}时为什么需要多条证据？", f"因为需要分别确认{left}和{right}的类别或光谱特征，再进行可靠对比。", "multi_hop", evidence, "medium")); idx += 1
 
-    while len(rows) < 100:
+    while len(rows) < count:
         fact = MINERAL_FACTS[len(rows) % len(MINERAL_FACTS)]
-        rows.append(item(idx, f"MiniGeo 如何避免在回答{fact['zh']}问题时产生无证据结论？", f"MiniGeo 应检索{fact['zh']}相关证据，证据不足时拒答或说明限制。", "evidence", fact["evidence"], "medium")); idx += 1
+        mode = len(rows) % 8
+        if mode == 0:
+            rows.append(item(idx, f"当前资料库是否能证明样本 UNKNOWN-{idx} 是{fact['zh']}？", f"不能。当前资料库没有 UNKNOWN-{idx} 的充分证据，系统应拒答。", "unanswerable", [], "medium", False))
+        elif mode == 1:
+            rows.append(item(idx, f"如果问题声称{fact['zh']}一定属于碳酸盐矿物，MiniGeo 应如何处理？", f"MiniGeo 应检查证据并指出该前提需要验证；若证据显示{fact['zh']}属于{fact['class']}，应纠正错误前提。", "false_premise", fact["evidence"], "medium"))
+        elif mode == 2:
+            rows.append(item(idx, f"查询数据库中真实矿物为 {fact['name']} 的错误预测数量。", f"筛选 true_mineral={fact['name']} 且 is_correct=0，并统计错误数量。", "sql", [], "medium", True, True, f"count incorrect predictions where true_mineral={fact['name']}", {"true_mineral": fact["name"], "is_correct": 0}))
+        elif mode == 3:
+            rows.append(item(idx, f"{fact['zh']}的证据引用应包含哪些 chunk？", f"回答{fact['zh']}基础问题时应优先引用 {', '.join(fact['evidence'])}。", "evidence", fact["evidence"], "easy"))
+        elif mode == 4:
+            rows.append(item(idx, f"为什么不能只凭外观判断{fact['zh']}？", f"因为外观信息可能混淆，关于{fact['zh']}的可靠判断需要成分、性质或光谱证据。", "mineral_property", fact["evidence"] + fact["spectra"], "medium"))
+        elif mode == 5:
+            rows.append(item(idx, f"{fact['zh']}相关光谱或性质证据在回答中有什么作用？", f"它用于把关于{fact['zh']}的结论限制在可追踪证据范围内，避免无依据推断。", "spectroscopy", fact["spectra"], "medium"))
+        elif mode == 6:
+            other = MINERAL_FACTS[(len(rows) + 3) % len(MINERAL_FACTS)]
+            rows.append(item(idx, f"比较{fact['zh']}和{other['zh']}类别时需要哪些证据？", f"需要分别引用{fact['zh']}和{other['zh']}的类别证据，再进行对比。", "multi_hop", fact["evidence"] + other["evidence"], "medium"))
+        else:
+            rows.append(item(idx, f"MiniGeo 如何避免在回答{fact['zh']}问题时产生无证据结论？", f"MiniGeo 应检索{fact['zh']}相关证据，证据不足时拒答或说明限制。", "evidence", fact["evidence"], "medium"))
+        idx += 1
 
-    return rows[:100]
+    return rows[:count]
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description="Expand deterministic MiniGeo seed benchmark and corpus.")
+    parser.add_argument("--target-items", type=int, default=300)
+    args = parser.parse_args()
+
     bench = load_benchmark(BENCH_PATH)
     corpus = load_corpus(CORPUS_PATH)
 
@@ -203,11 +226,11 @@ def main() -> None:
                 }
             )
 
-    if len(bench) < 150:
+    if len(bench) < args.target_items:
         existing_ids = {row["id"] for row in bench}
         next_idx = max(int(row["id"].split("_")[1]) for row in bench) + 1
-        needed = 150 - len(bench)
-        extra = [row for row in make_extra_items(next_idx) if row["id"] not in existing_ids]
+        needed = args.target_items - len(bench)
+        extra = [row for row in make_extra_items(next_idx, needed) if row["id"] not in existing_ids]
         bench.extend(extra[:needed])
 
     write_jsonl(CORPUS_PATH, corpus)

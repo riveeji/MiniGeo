@@ -1,12 +1,12 @@
 # MiniGeo 模型评测 Runbook
 
-本文件用于下次开启 Colab A100 时执行 Phase 1/Phase 2。原则是先用 10 题 smoke test 验证 JSON-only 输出，再跑 150 题正式评测。
+本文件用于下次开启 Colab A100 时执行 Phase 1/Phase 2。原则是先用 10 题 smoke test 验证 JSON-only 输出，再跑 150 题或 300 题正式评测。
 
 ## 目标
 
 - 修复并验证 `Thinking Process` 泄漏。
 - 先跑 10 题 smoke test，确认输出质量达标。
-- 再跑 150 题 `Qwen3.5-4B no-RAG` 与 `Qwen3.5-4B + BM25 RAG` 对照。
+- 再跑 150 题或 300 题 `Qwen3.5-4B no-RAG` 与 `Qwen3.5-4B + BM25 RAG` 对照。
 - 所有长任务都使用逐题落盘与 resume，避免 Cloudflare tunnel 抖动导致整批结果丢失。
 
 ## Colab 服务要求
@@ -91,6 +91,19 @@ python scripts/evaluate_model_service.py `
   --output results/model_service_qwen35_4b_150.jsonl
 ```
 
+如果 A100 时间充足，并且 150 题结果稳定，可以直接跑 300 题全量 benchmark：
+
+```powershell
+python scripts/evaluate_model_service.py `
+  --limit 300 `
+  --selection all `
+  --mode both `
+  --output results/model_service_qwen35_4b_300.jsonl `
+  --no-resume
+```
+
+中断后同样去掉 `--no-resume` 继续。
+
 ## Step 4：150 题质量审计
 
 ```powershell
@@ -98,6 +111,15 @@ python scripts/audit_model_outputs.py `
   --rag results/model_service_qwen35_4b_150_rag.jsonl `
   --no-rag results/model_service_qwen35_4b_150_no_rag.jsonl `
   --output results/model_output_quality_150.md
+```
+
+300 题质量审计命令：
+
+```powershell
+python scripts/audit_model_outputs.py `
+  --rag results/model_service_qwen35_4b_300_rag.jsonl `
+  --no-rag results/model_service_qwen35_4b_300_no_rag.jsonl `
+  --output results/model_output_quality_300.md
 ```
 
 ## Step 5：结果入表
