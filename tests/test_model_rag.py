@@ -5,9 +5,11 @@ class FakeClient:
     def __init__(self, content: str):
         self.content = content
         self.prompts = []
+        self.kwargs = []
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, **kwargs) -> str:
         self.prompts.append(prompt)
+        self.kwargs.append(kwargs)
         return self.content
 
 
@@ -36,6 +38,24 @@ def test_parse_model_answer_prefers_final_json_over_schema_example() -> None:
     assert parsed["citations"] == ["doc_quartz#chunk_001"]
 
 
+def test_parse_model_answer_normalizes_bracketed_json_citations() -> None:
+    raw = '{"answer":"石英主要成分是二氧化硅。","citations":["[doc_quartz#chunk_001]"],"abstained":false,"confidence":0.9}'
+
+    parsed = parse_model_answer(raw, allowed_citations={"doc_quartz#chunk_001"})
+
+    assert parsed["citations"] == ["doc_quartz#chunk_001"]
+
+
+def test_parse_model_answer_rejects_thinking_only_fallback() -> None:
+    raw = "Thinking Process:\n先分析证据。\n没有最终 JSON。"
+
+    parsed = parse_model_answer(raw, allowed_citations={"doc_quartz#chunk_001"})
+
+    assert parsed["answer"] == ""
+    assert parsed["abstained"] is True
+    assert parsed["format_error"] is True
+
+
 def test_generate_model_rag_answer_uses_retrieved_evidence_and_filters_citations() -> None:
     corpus = [
         {
@@ -59,3 +79,5 @@ def test_generate_model_rag_answer_uses_retrieved_evidence_and_filters_citations
     assert result["abstained"] is False
     assert "doc_quartz#chunk_001" in client.prompts[0]
     assert "JSON" in client.prompts[0]
+    assert client.kwargs[0]["temperature"] == 0.0
+    assert "JSON API" in client.kwargs[0]["system"]

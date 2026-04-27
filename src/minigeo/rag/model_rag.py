@@ -6,8 +6,20 @@ from minigeo.rag.pipeline import assemble_evidence_prompt, retrieve_with_bm25
 
 
 class TextGenerator(Protocol):
-    def generate(self, prompt: str) -> str:
+    def generate(
+        self,
+        prompt: str,
+        system: str | None = None,
+        temperature: float = 0.2,
+        max_tokens: int = 1024,
+    ) -> str:
         ...
+
+
+JSON_ONLY_SYSTEM = (
+    "You are a JSON API for MiniGeo. /no_think\n"
+    "Return only the final JSON object. Do not reveal chain-of-thought, analysis, markdown, or schema examples."
+)
 
 
 def _extract_json_object(raw: str) -> dict[str, Any] | None:
@@ -51,9 +63,21 @@ def _extract_bracket_citations(raw: str, allowed_citations: set[str]) -> list[st
     return [item for item in found if item in allowed_citations]
 
 
+def _normalize_citation(value: Any) -> str:
+    return str(value).strip().strip("[]").strip()
+
+
 def parse_model_answer(raw: str, allowed_citations: set[str]) -> dict[str, Any]:
     data = _extract_json_object(raw)
     if data is None:
+        if _contains_thinking(raw):
+            return {
+                "answer": "",
+                "citations": [],
+                "abstained": True,
+                "confidence": 0.0,
+                "format_error": True,
+            }
         citations = _extract_bracket_citations(raw, allowed_citations)
         return {
             "answer": raw.strip(),
@@ -63,8 +87,8 @@ def parse_model_answer(raw: str, allowed_citations: set[str]) -> dict[str, Any]:
         }
 
     citations = [
-        citation for citation in data.get("citations", [])
-        if citation in allowed_citations
+        normalized for citation in data.get("citations", [])
+        if (normalized := _normalize_citation(citation)) in allowed_citations
     ]
     answer = str(data.get("answer", "")).strip()
     abstained = bool(data.get("abstained", False))
@@ -79,11 +103,17 @@ def parse_model_answer(raw: str, allowed_citations: set[str]) -> dict[str, Any]:
     }
 
 
+def _contains_thinking(text: str) -> bool:
+    lowered = text.lower()
+    return "thinking process" in lowered or "<think>" in lowered
+
+
 def assemble_json_rag_prompt(question: str, evidence: list[dict[str, Any]]) -> str:
     base_prompt = assemble_evidence_prompt(question, evidence)
     return (
         f"{base_prompt}\n\n"
         "Output only one JSON object. Do not output markdown, schema examples, or thinking process.\n"
+        "If the model supports thinking modes, disable them for this answer.\n"
         "The JSON keys must be answer, citations, abstained, confidence.\n"
         "The answer value must be the final Chinese answer, never the literal word string.\n"
         "Use only retrieved chunk ids in citations. If evidence is insufficient, set abstained to true."
@@ -108,7 +138,7 @@ def generate_model_rag_answer(
             "raw_model_output": "",
         }
     prompt = assemble_json_rag_prompt(question, positive_evidence)
-    raw = client.generate(prompt)
+    raw = client.generate(prompt, system=JSON_ONLY_SYSTEM, temperature=0.0, max_tokens=512)
     allowed = {row["chunk_id"] for row in positive_evidence}
     parsed = parse_model_answer(raw, allowed)
     parsed["evidence"] = positive_evidence

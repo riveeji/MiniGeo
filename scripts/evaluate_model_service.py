@@ -21,7 +21,12 @@ def generate_no_rag_answer(question: str, client) -> dict[str, Any]:
         "Do not invent document citations. If you are unsure, set abstained to true.\n\n"
         f"Question: {question}"
     )
-    raw = client.generate(prompt)
+    raw = client.generate(
+        prompt,
+        system="You are a JSON API for MiniGeo. /no_think\nReturn only final JSON. No thinking process.",
+        temperature=0.0,
+        max_tokens=512,
+    )
     parsed = parse_model_answer(raw, allowed_citations=set())
     parsed["evidence"] = []
     parsed["raw_model_output"] = raw
@@ -31,13 +36,18 @@ def generate_no_rag_answer(question: str, client) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run a limited real model-service RAG smoke evaluation.")
     parser.add_argument("--limit", type=int, default=3)
+    parser.add_argument("--selection", choices=["evidence", "all", "answerable", "unanswerable"], default="evidence")
     parser.add_argument("--mode", choices=["rag", "no-rag", "both"], default="rag")
     parser.add_argument("--output", default="results/model_service_rag_smoke.jsonl")
     parser.add_argument("--no-resume", action="store_true", help="Ignore existing output files and start from scratch.")
+    parser.add_argument("--dry-run", action="store_true", help="Only print selected benchmark ids without calling the model.")
     args = parser.parse_args()
 
     benchmark = load_benchmark(Path("data/benchmark/minigeo_bench.jsonl"))
-    rows = [row for row in benchmark if row.get("evidence")][: args.limit]
+    rows = select_benchmark_rows(benchmark, args.selection, args.limit)
+    if args.dry_run:
+        print(json.dumps({"items": len(rows), "ids": [row["id"] for row in rows]}, ensure_ascii=False))
+        return
     corpus = load_corpus(Path("data/processed/rag_corpus.jsonl"))
     client = client_from_env()
     modes = ["rag", "no-rag"] if args.mode == "both" else [args.mode]
@@ -61,6 +71,18 @@ def _mode_output_path(path: Path, mode: str, multi_mode: bool) -> Path:
     if not multi_mode:
         return path
     return path.with_name(f"{path.stem}_{mode.replace('-', '_')}{path.suffix}")
+
+
+def select_benchmark_rows(rows: list[dict[str, Any]], selection: str, limit: int) -> list[dict[str, Any]]:
+    if selection == "evidence":
+        selected = [row for row in rows if row.get("evidence")]
+    elif selection == "answerable":
+        selected = [row for row in rows if bool(row.get("answerable", True))]
+    elif selection == "unanswerable":
+        selected = [row for row in rows if not bool(row.get("answerable", True))]
+    else:
+        selected = list(rows)
+    return selected[:limit]
 
 
 def _run_mode(

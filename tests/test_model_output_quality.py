@@ -22,6 +22,7 @@ def test_analyze_model_outputs_counts_quality_failures() -> None:
                 "abstained": True,
                 "raw_model_output": "{}",
                 "error": "timeout",
+                "format_error": True,
             },
         },
     ]
@@ -38,6 +39,7 @@ def test_analyze_model_outputs_counts_quality_failures() -> None:
     assert summary["thinking_raw_count"] == 1
     assert summary["placeholder_answer_count"] == 1
     assert summary["request_errors"] == 1
+    assert summary["format_error_count"] == 1
     assert summary["abstention_error_count"] == 1
 
 
@@ -49,6 +51,7 @@ def test_format_model_output_quality_markdown_lists_modes() -> None:
                 "citation_miss_rate": 0.5,
                 "thinking_answer_rate": 0.5,
                 "placeholder_answer_rate": 0.0,
+                "format_error_rate": 0.0,
                 "abstention_error_rate": 0.0,
                 "request_errors": 0,
             }
@@ -56,4 +59,4 @@ def test_format_model_output_quality_markdown_lists_modes() -> None:
     )
 
     assert "MiniGeo 模型输出质量审计" in markdown
-    assert "| rag | 2 | 0.500 | 0.500 | 0.000 | 0.000 | 0 |" in markdown
+    assert "| rag | 2 | 0.500 | 0.500 | 0.000 | 0.000 | 0.000 | 0 |" in markdown

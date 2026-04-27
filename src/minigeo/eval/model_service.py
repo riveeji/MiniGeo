@@ -15,6 +15,7 @@ def summarize_model_rag_outputs(
         }
     non_empty = 0
     citation_hits = 0
+    citation_items = 0
     empty_raw = 0
     request_errors = 0
     abstention_correct = 0
@@ -27,8 +28,10 @@ def summarize_model_rag_outputs(
         gold = set(row.get("evidence", []))
         if answer:
             non_empty += 1
-        if gold and citations.intersection(gold):
-            citation_hits += 1
+        if gold:
+            citation_items += 1
+            if citations.intersection(gold):
+                citation_hits += 1
         if not raw:
             empty_raw += 1
         if output.get("error"):
@@ -41,7 +44,8 @@ def summarize_model_rag_outputs(
     summary = {
         "items": len(benchmark_rows),
         "non_empty_answer_rate": non_empty / len(benchmark_rows),
-        "citation_hit_rate": citation_hits / len(benchmark_rows),
+        "citation_items": citation_items,
+        "citation_hit_rate": citation_hits / citation_items if citation_items else 0.0,
         "empty_raw_outputs": empty_raw,
         "request_errors": request_errors,
     }
