@@ -20,6 +20,7 @@ class OpenAICompatibleClient:
         transport: Transport | None = None,
         retries: int = 2,
         retry_sleep: float = 1.0,
+        disable_thinking: bool = False,
     ):
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
@@ -28,6 +29,7 @@ class OpenAICompatibleClient:
         self.transport = transport or self._urllib_transport
         self.retries = retries
         self.retry_sleep = retry_sleep
+        self.disable_thinking = disable_thinking
 
     def generate(
         self,
@@ -58,6 +60,8 @@ class OpenAICompatibleClient:
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
+        if self.disable_thinking:
+            payload["chat_template_kwargs"] = {"enable_thinking": False}
         headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
@@ -106,6 +110,7 @@ def client_from_env(env: dict[str, str] | None = None, transport: Transport | No
     model = values.get("MINIGEO_MODEL", "Qwen/Qwen3.5-2B")
     timeout = float(values.get("MINIGEO_LLM_TIMEOUT", "60"))
     retries = int(values.get("MINIGEO_LLM_RETRIES", "2"))
+    disable_thinking = _enabled(values.get("MINIGEO_DISABLE_THINKING"))
     return OpenAICompatibleClient(
         base_url=base_url,
         api_key=api_key,
@@ -113,4 +118,9 @@ def client_from_env(env: dict[str, str] | None = None, transport: Transport | No
         timeout=timeout,
         transport=transport,
         retries=retries,
+        disable_thinking=disable_thinking,
     )
+
+
+def _enabled(value: str | None) -> bool:
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}

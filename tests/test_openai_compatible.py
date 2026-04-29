@@ -62,6 +62,27 @@ def test_client_from_env_uses_openai_compatible_defaults() -> None:
     assert client.generate("hello") == "ok"
 
 
+def test_client_from_env_can_disable_qwen_thinking() -> None:
+    captured = {}
+
+    def fake_transport(url, headers, payload, timeout):
+        captured["payload"] = payload
+        return {"choices": [{"message": {"content": "ok"}}]}
+
+    client = client_from_env(
+        {
+            "OPENAI_BASE_URL": "http://localhost:8000/v1",
+            "OPENAI_API_KEY": "EMPTY",
+            "MINIGEO_MODEL": "Qwen/Qwen3.5-4B",
+            "MINIGEO_DISABLE_THINKING": "1",
+        },
+        transport=fake_transport,
+    )
+
+    assert client.generate("hello") == "ok"
+    assert captured["payload"]["chat_template_kwargs"] == {"enable_thinking": False}
+
+
 def test_client_from_env_requires_base_url() -> None:
     try:
         client_from_env({}, transport=lambda url, headers, payload, timeout: {})

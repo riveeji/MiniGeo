@@ -31,6 +31,7 @@ $env:OPENAI_API_KEY="EMPTY"
 $env:MINIGEO_MODEL="Qwen/Qwen3.5-4B"
 $env:MINIGEO_LLM_TIMEOUT="180"
 $env:MINIGEO_LLM_RETRIES="5"
+$env:MINIGEO_DISABLE_THINKING="1"
 ```
 
 ## Step 1：连通性检查
@@ -143,5 +144,5 @@ python scripts/audit_model_outputs.py `
 ## 当前注意事项
 
 - 当前 parser 会归一化 `"[doc_id#chunk_id]"` 形式的 citation。
-- 当前 prompt 已加入 `/no_think` 和 JSON API system message，但是否真正禁用 thinking 仍取决于 vLLM/Qwen chat template。
+- 当前 prompt 已加入 `/no_think` 和 JSON API system message；本地 client 还会在 `MINIGEO_DISABLE_THINKING=1` 时向 vLLM 发送 `chat_template_kwargs={"enable_thinking": false}`。
 - 150 题正式评测必须在 10 题 smoke test 达标后再跑，避免浪费 A100。

@@ -67,7 +67,7 @@ def format_main_results(
     lines = [
         "# MiniGeo 主结果",
         "",
-        "本表由 `scripts/write_report_artifacts.py` 生成，包含本地 baseline、demo 结果，以及已保存的真实模型服务小样本结果。",
+        "本表由 `scripts/write_report_artifacts.py` 生成，包含本地 baseline、demo 结果，以及已保存的真实模型服务结果。",
         "",
         "| System | Acc | Citation Hit | Unsupported Claim | Abstention | SQL Exec | Latency |",
         "|---|---:|---:|---:|---:|---:|---:|",

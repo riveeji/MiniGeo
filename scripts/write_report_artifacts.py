@@ -49,9 +49,11 @@ def _bm25_failure_cases(bench: list[dict], corpus: list[dict], max_cases: int = 
 
 
 def _saved_model_rows(bench: list[dict]) -> list[tuple]:
+    rag_path = _best_model_output_path("rag")
+    no_rag_path = _best_model_output_path("no_rag")
     configs = [
-        ("Qwen3.5-4B no-RAG", Path("results/model_service_qwen35_4b_no_rag.jsonl")),
-        ("Qwen3.5-4B + BM25 RAG", Path("results/model_service_qwen35_4b_rag.jsonl")),
+        ("Qwen3.5-4B no-RAG", no_rag_path),
+        ("Qwen3.5-4B + BM25 RAG", rag_path),
     ]
     rows = []
     benchmark_by_id = {row["id"]: row for row in bench}
@@ -79,7 +81,7 @@ def _saved_model_rows(bench: list[dict]) -> list[tuple]:
 
 
 def _saved_model_failure_cases(max_cases: int = 3) -> list[dict]:
-    path = Path("results/model_service_qwen35_4b_rag.jsonl")
+    path = _best_model_output_path("rag")
     if not path.exists():
         return []
     cases = []
@@ -98,13 +100,25 @@ def _saved_model_failure_cases(max_cases: int = 3) -> list[dict]:
                 "observed_output": f"citations={sorted(citations)}; answer={answer}",
                 "expected_behavior": ", ".join(sorted(expected)),
                 "failure_type": "model_citation_miss",
-                "suspected_cause": "模型输出格式和 citation 字段不稳定，或检索 chunk 与 benchmark gold evidence 不一致。",
-                "next_action": "禁用 thinking、强化 JSON-only 输出，并在 10 题 smoke test 达标后再跑 300 题模型评测。",
+                "suspected_cause": "模型最终回答使用了相关但非 gold 的 chunk，或在证据不足场景中过早拒答。",
+                "next_action": "复查 citation miss 样例，比较 BM25 top-k 与模型实际引用；后续用 reranker、Verifier 或更严格 citation prompt 降低 miss。",
             }
         )
         if len(cases) >= max_cases:
             break
     return cases
+
+
+def _best_model_output_path(mode: str) -> Path:
+    candidates = [
+        Path(f"results/model_service_qwen35_4b_300_{mode}.jsonl"),
+        Path(f"results/model_service_qwen35_4b_150_{mode}.jsonl"),
+        Path(f"results/model_service_qwen35_4b_{mode}.jsonl"),
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    return candidates[-1]
 
 
 def main() -> None:

@@ -4,8 +4,8 @@
 
 | Mode | Items | Non-empty | Citation Hit | Abstention Acc | Empty Raw | Request Errors | Latency | Raw Outputs |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
-| rag | 30 | 1.000 | 0.833 | 0.900 | 0 | 0 | 12843.900 ms/q | `results\model_service_qwen35_4b_rag.jsonl` |
-| no-rag | 30 | 1.000 | 0.000 | 0.267 | 0 | 0 | 10742.210 ms/q | `results\model_service_qwen35_4b_no_rag.jsonl` |
+| rag | 150 | 1.000 | 0.667 | 0.767 | 0 | 0 | 2181.328 ms/q | `results\model_service_qwen35_4b_150_rag.jsonl` |
+| no-rag | 150 | 1.000 | 0.000 | 0.793 | 0 | 0 | 1997.961 ms/q | `results\model_service_qwen35_4b_150_no_rag.jsonl` |
 
 补充 SQL Tool 结果：
 
@@ -17,6 +17,7 @@
 - 服务形态：Colab A100 + vLLM OpenAI-compatible API + Cloudflare quick tunnel
 - 模型：`Qwen/Qwen3.5-4B`
 - `/v1/models` 连通性：通过
+- 本轮通过 `MINIGEO_DISABLE_THINKING=1` 向 vLLM 发送 `chat_template_kwargs={"enable_thinking": false}`。
 
 说明：Cloudflare quick tunnel 和 Colab runtime 都是临时服务。若 Colab 页面停止、运行时断开或 tunnel cell 被中断，本地评测需要换成新的 tunnel URL 后重新运行。
 
@@ -26,4 +27,3 @@
 - `citation_hit_rate` 统计模型返回 citation 与 benchmark evidence 的交集比例。
 - `no-rag` 模式不提供文档证据，因此 citation hit 通常应显著低于 RAG。
 - `empty_raw_outputs>0` 说明 MiniGeo 没有收到可解析的最终回答文本。
-- 当前 Qwen3.5-4B 服务会输出 `Thinking Process`；解析器已尽量提取最终 JSON，但仍应在后续优先配置禁用 thinking 或更严格的 chat template。
