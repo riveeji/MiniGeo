@@ -135,6 +135,17 @@ BM25 retrieval
 -> rerank
 ```
 
+当前本地检索状态：
+
+```text
+benchmark_items=300
+evidence_labeled=209
+BM25 + query expansion citation_hit@10=1.000
+Hybrid RAG baseline citation_hit@10=0.995
+```
+
+说明：该结果基于确定性种子 benchmark 和领域 query expansion。用于正式研究结论前，应继续扩展公开资料和人工复核 failure cases，避免只对当前 gold evidence 过拟合。
+
 当前产出：
 
 - `src/minigeo/rag/bm25.py`

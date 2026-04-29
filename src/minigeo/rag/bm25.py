@@ -2,6 +2,7 @@ import math
 from collections import Counter
 from typing import Any
 
+from minigeo.rag.query_expansion import expand_query_tokens
 from minigeo.rag.tokenizer import tokenize
 
 
@@ -38,7 +39,7 @@ class BM25Retriever:
         return score
 
     def search(self, query: str, top_k: int = 5) -> list[dict[str, Any]]:
-        query_tokens = tokenize(query)
+        query_tokens = tokenize(query) + expand_query_tokens(query)
         scored = [
             (idx, self._score(query_tokens, doc_tokens))
             for idx, doc_tokens in enumerate(self.tokens)
@@ -50,4 +51,3 @@ class BM25Retriever:
             row["score"] = float(score)
             results.append(row)
         return results
-
