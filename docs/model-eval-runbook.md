@@ -123,13 +123,32 @@ python scripts/audit_model_outputs.py `
   --output results/model_output_quality_300.md
 ```
 
-## Step 5：结果入表
+## Step 5：失败归因分析
+
+```powershell
+python scripts/analyze_model_failures.py `
+  --input results/model_service_qwen35_4b_150_rag.jsonl `
+  --output results/model_failure_analysis_150.md
+```
+
+300 题失败归因命令：
+
+```powershell
+python scripts/analyze_model_failures.py `
+  --input results/model_service_qwen35_4b_300_rag.jsonl `
+  --output results/model_failure_analysis_300.md
+```
+
+重点先看 `model_cited_other` 和 `model_cited_neighbor`。前者通常说明模型没有严格引用 gold evidence；后者通常说明 chunk 粒度或 evidence label 需要人工抽检。
+
+## Step 6：结果入表
 
 评测结束后更新：
 
 - `results/main_results.md`
 - `results/model_service_eval.md`
 - `results/model_output_quality_150.md`
+- `results/model_failure_analysis_150.md`
 - `results/failure_cases.md`
 
 主表至少记录：
