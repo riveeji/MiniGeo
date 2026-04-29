@@ -164,4 +164,5 @@ python scripts/analyze_model_failures.py `
 
 - 当前 parser 会归一化 `"[doc_id#chunk_id]"` 形式的 citation。
 - 当前 prompt 已加入 `/no_think` 和 JSON API system message；本地 client 还会在 `MINIGEO_DISABLE_THINKING=1` 时向 vLLM 发送 `chat_template_kwargs={"enable_thinking": false}`。
+- 当前 RAG prompt 要求 citation 必须直接支撑答案；非系统类问题如果模型引用泛化 `doc_system` chunk，本地后处理会过滤这类系统引用，或在只引用系统 chunk 时改为与答案文本更匹配的领域 evidence chunk。
 - 150 题正式评测必须在 10 题 smoke test 达标后再跑，避免浪费 A100。
