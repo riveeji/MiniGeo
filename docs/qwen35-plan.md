@@ -25,16 +25,13 @@ Qwen3.5-2B 适合作为第一阶段主模型：
 
 ## 开发顺序
 
-1. 不微调，先接入 Qwen3.5-2B 推理。
-2. 构建 MiniGeo-Bench。
-3. 构建 BM25 RAG baseline。
-4. 加入模型 RAG 生成链路。
-5. 加入 dense retrieval、hybrid retrieval 和 reranker 消融。
-6. 加入 Verifier。
-7. 运行评测。
-8. 使用 LoRA / QLoRA 微调 Qwen3.5-2B。
-9. 使用 Qwen3.5-4B 作为强基线。
-10. 加入 Agent 工具。
+1. 已完成 MiniGeo-Bench、BM25 RAG baseline、模型 RAG 生成链路和本地 Verifier。
+2. 已完成 Qwen3.5-4B 150 题模型服务结果、输出质量审计和 RAG + Verifier 离线后处理。
+3. 下一步在 A100 上用最新 prompt / Verifier 链路重跑 Qwen3.5-4B smoke10、150 题和可选 300 题。
+4. 启动真实 Qwen3-Embedding-0.6B 与 Qwen3-Reranker-0.6B，运行服务化检索消融。
+5. 使用模型辅助 claim extraction 和 support classification 复判 Verifier 拦截样例。
+6. 使用 LoRA / QLoRA 微调 Qwen3.5-2B。
+7. 扩展 Agent 工具评测和最终 demo。
 
 ## LoRA / QLoRA 计划
 
@@ -77,7 +74,8 @@ Qwen3.5-2B 适合作为第一阶段主模型：
 | MiniGeo-2B-SFT | | | | | - | |
 | MiniGeo-2B-SFT + RAG | | | | | - | |
 | MiniGeo-2B-SFT + RAG + Verifier | | | | | - | |
-| Qwen3.5-4B + RAG | | | | | - | |
+| Qwen3.5-4B + RAG | | 0.667 | | 0.767 | - | |
+| Qwen3.5-4B + RAG + Verifier | | 0.667 | 0.017 | 0.767 | - | |
 | MiniGeo-Agent | | | | | | |
 
 ## 简历表述

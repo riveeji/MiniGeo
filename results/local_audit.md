@@ -30,9 +30,9 @@
 **stdout**
 
 ```text
-........................................................................ [ 82%]
-...............                                                          [100%]
-87 passed in 0.33s
+........................................................................ [ 61%]
+..............................................                           [100%]
+118 passed in 1.59s
 ```
 
 ### Benchmark 分布
@@ -43,13 +43,13 @@
 **stdout**
 
 ```text
-items=150
-types={'concept': 21, 'false_premise': 19, 'evidence': 35, 'spectroscopy': 4, 'unanswerable': 17, 'sql': 27, 'mineral_property': 18, 'multi_hop': 9}
-difficulty={'easy': 58, 'medium': 92}
-answerable=133
-unanswerable=17
-requires_sql=30
-evidence_labeled=105
+items=300
+types={'concept': 33, 'false_premise': 39, 'evidence': 63, 'spectroscopy': 13, 'unanswerable': 33, 'sql': 57, 'mineral_property': 39, 'multi_hop': 23}
+difficulty={'easy': 90, 'medium': 210}
+answerable=267
+unanswerable=33
+requires_sql=60
+evidence_labeled=209
 ```
 
 ### 检索消融
@@ -60,10 +60,10 @@ evidence_labeled=105
 **stdout**
 
 ```text
-bm25: recall@5=0.743 recall@10=0.924 mrr=0.575 citation_hit_rate=0.924 latency_ms=0.686
-dense: recall@5=0.600 recall@10=0.819 mrr=0.440 citation_hit_rate=0.819 latency_ms=1.580
-hybrid: recall@5=0.695 recall@10=0.876 mrr=0.517 citation_hit_rate=0.876 latency_ms=36.961
-hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 latency_ms=44.668
+bm25: recall@5=0.976 recall@10=1.000 mrr=0.774 citation_hit_rate=1.000 latency_ms=2.257
+dense: recall@5=0.550 recall@10=0.828 mrr=0.393 citation_hit_rate=0.828 latency_ms=1.703
+hybrid: recall@5=0.914 recall@10=0.995 mrr=0.636 citation_hit_rate=0.995 latency_ms=37.750
+hybrid_rerank: recall@5=0.608 recall@10=0.880 mrr=0.476 citation_hit_rate=0.880 latency_ms=44.438
 ```
 
 ### 拒答评测
@@ -74,13 +74,13 @@ hybrid_rerank: recall@5=0.600 recall@10=0.838 mrr=0.524 citation_hit_rate=0.838 
 **stdout**
 
 ```text
-items=150
+items=300
 abstention_accuracy=1.0
-correct_abstain=17
+correct_abstain=33
 missed_abstain=0
 false_abstain=0
-correct_answer=133
-latency_ms=16.152215999997377
+correct_answer=267
+latency_ms=17.307219666666544
 ```
 
 ### Verifier 评测
@@ -91,12 +91,12 @@ latency_ms=16.152215999997377
 **stdout**
 
 ```text
-reports=150
-claims=167
-verdicts={'supported': 70, 'insufficient_evidence': 79, 'partially_supported': 1}
-statuses={'supported': 74, 'insufficient': 93}
-unsupported_claim_rate=0.5568862275449101
-latency_ms=0.7365060000059506
+reports=300
+claims=314
+verdicts={'supported': 113, 'insufficient_evidence': 179, 'partially_supported': 8}
+statuses={'supported': 122, 'insufficient': 192}
+unsupported_claim_rate=0.6114649681528662
+latency_ms=0.678202000000662
 ```
 
 ### SQL 评测
@@ -107,10 +107,10 @@ latency_ms=0.7365060000059506
 **stdout**
 
 ```text
-sql_items=30
+sql_items=60
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.27075999993636896
+latency_ms=0.3375900000037291
 ```
 
 ### Agent Planner 评测
@@ -121,10 +121,10 @@ latency_ms=0.27075999993636896
 **stdout**
 
 ```text
-items=150
+items=300
 sql_routing_accuracy=1.0
-modes={'docs': 120, 'hybrid': 3, 'sql': 27}
-latency_ms=0.0036826666716175773
+modes={'docs': 240, 'hybrid': 3, 'sql': 57}
+latency_ms=0.004885666667178157
 ```
 
 ### SFT 数据构建
@@ -135,7 +135,7 @@ latency_ms=0.0036826666716175773
 **stdout**
 
 ```text
-items=89
+items=135
 output=data\processed\sft_corpus.jsonl
 reference_answer_leaks=[]
 ```
@@ -148,9 +148,9 @@ reference_answer_leaks=[]
 **stdout**
 
 ```text
-benchmark_items=150
+benchmark_items=300
 corpus_chunks=42
-sft_items=89
+sft_items=135
 missing_evidence_refs=[]
 reference_answer_leaks=[]
 metadata_missing=[]

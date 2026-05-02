@@ -20,8 +20,8 @@
 ## Verifier
 
 - reports：300
-- claims：343
-- unsupported_claim_rate：0.638
+- claims：314
+- unsupported_claim_rate：0.611
 
 ## SQL
 
