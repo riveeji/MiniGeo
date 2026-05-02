@@ -141,7 +141,25 @@ python scripts/analyze_model_failures.py `
 
 重点先看 `model_cited_other` 和 `model_cited_neighbor`。前者通常说明模型没有严格引用 gold evidence；后者通常说明 chunk 粒度或 evidence label 需要人工抽检。
 
-## Step 6：结果入表
+## Step 6：导出人工抽检表
+
+```powershell
+python scripts/export_failure_review.py `
+  --input results/model_service_qwen35_4b_150_rag.jsonl `
+  --csv-output results/model_failure_review_150.csv `
+  --markdown-output results/model_failure_review_150.md
+```
+
+默认只导出 `model_cited_neighbor` 和 `model_cited_other`。如果要导出全部 citation miss：
+
+```powershell
+python scripts/export_failure_review.py `
+  --categories all
+```
+
+CSV 中的 `review_decision` 建议使用 `model_error`、`label_expand`、`retrieval_error` 或 `ambiguous`。其中 `label_expand` 表示模型引用的 chunk 也能支撑答案，应扩充 benchmark evidence label。
+
+## Step 7：结果入表
 
 评测结束后更新：
 
@@ -149,6 +167,7 @@ python scripts/analyze_model_failures.py `
 - `results/model_service_eval.md`
 - `results/model_output_quality_150.md`
 - `results/model_failure_analysis_150.md`
+- `results/model_failure_review_150.md`
 - `results/failure_cases.md`
 
 主表至少记录：
