@@ -8,16 +8,16 @@
 | Qwen3.5-2B |  |  |  |  | - | 未测 |
 | Qwen3.5-4B no-RAG |  | 0.000 |  | 0.793 | - | 见 model_service_eval |
 | Qwen3.5-4B + BM25 RAG |  | 0.667 |  | 0.767 | - | 见 model_service_eval |
-| Qwen3.5-4B + BM25 RAG + Verifier |  | 0.657 | 0.025 | 0.760 | - | 见 model_service_verified_eval |
+| Qwen3.5-4B + BM25 RAG + Verifier |  | 0.667 | 0.017 | 0.767 | - | 见 model_service_verified_eval |
 | Qwen3.5-4B SQL generator |  |  |  |  | 1.000 | 见 model_service_eval |
-| BM25 RAG baseline |  | 1.000 |  | 1.000 | - | 4.949 ms/q |
-| Dense baseline |  | 0.828 |  |  | - | 2.255 ms/q |
-| Hybrid RAG baseline |  | 0.995 |  |  | - | 87.847 ms/q |
-| Hybrid + rerank baseline |  | 0.880 |  |  | - | 102.698 ms/q |
-| Verifier baseline |  |  | 0.638 |  | - | 1.863 ms/q |
-| SQL rule baseline |  |  |  |  | 1.000 | 0.589 ms/q |
-| Planner baseline | 1.000 |  |  |  | - | 0.011 ms/q |
-| MiniGeo-Agent demo | demo | demo | 见 verifier | demo | PASS | 100.263 ms/q |
+| BM25 RAG baseline |  | 1.000 |  | 1.000 | - | 3.813 ms/q |
+| Dense baseline |  | 0.828 |  |  | - | 1.948 ms/q |
+| Hybrid RAG baseline |  | 0.995 |  |  | - | 63.791 ms/q |
+| Hybrid + rerank baseline |  | 0.880 |  |  | - | 77.703 ms/q |
+| Verifier baseline |  |  | 0.611 |  | - | 1.281 ms/q |
+| SQL rule baseline |  |  |  |  | 1.000 | 0.431 ms/q |
+| Planner baseline | 1.000 |  |  |  | - | 0.008 ms/q |
+| MiniGeo-Agent demo | demo | demo | 见 verifier | demo | PASS | 55.970 ms/q |
 
 ## 待补充模型结果
 

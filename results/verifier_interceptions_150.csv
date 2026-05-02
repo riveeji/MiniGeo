@@ -1,0 +1,3 @@
+id,question,verdict,unverified_answer,final_answer,unsupported_claims,gold_evidence,retrieved_evidence,review_decision,reviewer_note
+minigeo_037,资料库是否证明所有秦皇岛长石预测都是错误的？,insufficient_evidence,资料库未证明所有秦皇岛长石预测都是错误的。,当前证据不足，不能确认原始回答中的全部事实，因此拒绝给出可靠结论。,资料库未证明所有秦皇岛长石预测都是错误的,,"doc_feldspar#chunk_001, doc_feldspar#chunk_002, doc_anorthite#chunk_002, doc_anorthite#chunk_001, doc_system#chunk_002",,
+minigeo_039,MiniGeo 是否应该在没有证据时回答陨石样本的年龄？,insufficient_evidence,MiniGeo 不应在没有证据时回答陨石样本的年龄，因为证据验证机制要求 claim 必须有支持证据，否则应标记为 insufficient_evidence。,当前证据不足，不能确认原始回答中的全部事实，因此拒绝给出可靠结论。,MiniGeo 不应在没有证据时回答陨石样本的年龄，因为证据验证机制要求 claim 必须有支持证据，否则应标记为 insufficient_evidence,,"doc_system#chunk_001, doc_system#chunk_007, doc_system#chunk_008, doc_anorthite#chunk_002, doc_system#chunk_004",,

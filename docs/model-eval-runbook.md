@@ -179,7 +179,18 @@ python scripts/evaluate_verified_model_service.py --use-model
 
 离线 Verifier 会保留 `verification` 报告；如果答案不是 `supported`，会把最终结果改为拒答，并把原始回答保存在 `unverified_answer`。
 
-## Step 8：结果入表
+## Step 8：导出 Verifier 拦截样例
+
+```powershell
+python scripts/export_verifier_interceptions.py `
+  --input results/model_service_qwen35_4b_150_rag_verified.jsonl `
+  --csv-output results/verifier_interceptions_150.csv `
+  --markdown-output results/verifier_interceptions_150.md
+```
+
+CSV 中的 `review_decision` 建议使用 `correct_reject`、`false_reject`、`claim_split_error` 或 `needs_model_verifier`。如果剩余样例需要模型辅助复判，再等 A100 开启后用 `evaluate_verified_model_service.py --use-model`。
+
+## Step 9：结果入表
 
 评测结束后更新：
 
@@ -189,6 +200,7 @@ python scripts/evaluate_verified_model_service.py --use-model
 - `results/model_failure_analysis_150.md`
 - `results/model_failure_review_150.md`
 - `results/model_service_verified_eval_150.md`
+- `results/verifier_interceptions_150.md`
 - `results/failure_cases.md`
 
 主表至少记录：

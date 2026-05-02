@@ -20,6 +20,12 @@ def test_local_claim_extractor_splits_chinese_sentences() -> None:
     assert claims == ["石英主要成分是二氧化硅", "方解石是碳酸盐矿物"]
 
 
+def test_local_claim_extractor_drops_standalone_modal_fragment_when_other_claims_exist() -> None:
+    claims = LocalClaimExtractor().extract("能。石英的 464 cm-1 峰和方解石 1085 cm-1 带可用于区分两者。")
+
+    assert claims == ["石英的 464 cm-1 峰和方解石 1085 cm-1 带可用于区分两者"]
+
+
 def test_model_claim_extractor_reads_json_list() -> None:
     client = FakeClient('["石英是二氧化硅", "石英有 464 cm-1 拉曼峰"]')
 

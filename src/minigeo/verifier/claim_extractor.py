@@ -15,7 +15,15 @@ class LocalClaimExtractor:
             for part in re.split(r"[。.!！？；;]\s*", answer)
             if part.strip(" \t\r\n。.!！？；;")
         ]
+        if len(parts) > 1:
+            filtered = [part for part in parts if not _is_standalone_modal_fragment(part)]
+            if filtered:
+                parts = filtered
         return parts or ([answer.strip()] if answer.strip() else [])
+
+
+def _is_standalone_modal_fragment(text: str) -> bool:
+    return text.strip() in {"能", "可以", "可", "否", "是", "不能", "不可以"}
 
 
 class ModelClaimExtractor:
@@ -38,4 +46,3 @@ class ModelClaimExtractor:
             return self.fallback.extract(answer)
         claims = [str(item).strip() for item in data if str(item).strip()]
         return claims or self.fallback.extract(answer)
-
