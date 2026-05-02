@@ -159,7 +159,27 @@ python scripts/export_failure_review.py `
 
 CSV 中的 `review_decision` 建议使用 `model_error`、`label_expand`、`retrieval_error` 或 `ambiguous`。其中 `label_expand` 表示模型引用的 chunk 也能支撑答案，应扩充 benchmark evidence label。
 
-## Step 7：结果入表
+## Step 7：离线运行 RAG + Verifier
+
+```powershell
+python scripts/evaluate_verified_model_service.py `
+  --input results/model_service_qwen35_4b_150_rag.jsonl `
+  --output results/model_service_qwen35_4b_150_rag_verified.jsonl `
+  --report results/model_service_verified_eval_150.md
+```
+
+默认使用本地 heuristic Verifier，不会调用模型服务。如果要使用模型辅助 Verifier：
+
+```powershell
+$env:MINIGEO_VERIFIER_BASE_URL="https://your-tunnel.trycloudflare.com/v1"
+$env:MINIGEO_VERIFIER_API_KEY="EMPTY"
+$env:MINIGEO_VERIFIER_MODEL="Qwen/Qwen3.5-4B"
+python scripts/evaluate_verified_model_service.py --use-model
+```
+
+离线 Verifier 会保留 `verification` 报告；如果答案不是 `supported`，会把最终结果改为拒答，并把原始回答保存在 `unverified_answer`。
+
+## Step 8：结果入表
 
 评测结束后更新：
 
@@ -168,6 +188,7 @@ CSV 中的 `review_decision` 建议使用 `model_error`、`label_expand`、`retr
 - `results/model_output_quality_150.md`
 - `results/model_failure_analysis_150.md`
 - `results/model_failure_review_150.md`
+- `results/model_service_verified_eval_150.md`
 - `results/failure_cases.md`
 
 主表至少记录：

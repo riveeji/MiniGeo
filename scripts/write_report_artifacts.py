@@ -75,6 +75,29 @@ def _saved_model_rows(bench: list[dict]) -> list[tuple]:
                 "见 model_service_eval",
             )
         )
+    verified_path = _best_verified_model_output_path()
+    if verified_path.exists():
+        records = read_jsonl(verified_path)
+        outputs = {record["id"]: record.get("result", {}) for record in records}
+        matched_bench = [benchmark_by_id[record["id"]] for record in records if record["id"] in benchmark_by_id]
+        model_summary = summarize_model_rag_outputs(matched_bench, outputs)
+        verifier_summary = summarize_verification_reports(
+            [
+                record.get("result", {}).get("verification", {"verdict": "missing", "claims": []})
+                for record in records
+            ]
+        )
+        rows.append(
+            (
+                "Qwen3.5-4B + BM25 RAG + Verifier",
+                "",
+                model_summary.get("citation_hit_rate"),
+                verifier_summary.get("unsupported_claim_rate"),
+                model_summary.get("abstention_accuracy"),
+                "-",
+                "见 model_service_verified_eval",
+            )
+        )
     if Path("results/model_service_eval.md").exists():
         rows.append(("Qwen3.5-4B SQL generator", "", "", "", "", 1.0, "见 model_service_eval"))
     return rows
@@ -114,6 +137,17 @@ def _best_model_output_path(mode: str) -> Path:
         Path(f"results/model_service_qwen35_4b_300_{mode}.jsonl"),
         Path(f"results/model_service_qwen35_4b_150_{mode}.jsonl"),
         Path(f"results/model_service_qwen35_4b_{mode}.jsonl"),
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    return candidates[-1]
+
+
+def _best_verified_model_output_path() -> Path:
+    candidates = [
+        Path("results/model_service_qwen35_4b_300_rag_verified.jsonl"),
+        Path("results/model_service_qwen35_4b_150_rag_verified.jsonl"),
     ]
     for path in candidates:
         if path.exists():
