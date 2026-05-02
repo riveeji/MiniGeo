@@ -4,8 +4,8 @@
 
 | Mode | Items | Non-empty | Citation Hit | Abstention Acc | Empty Raw | Request Errors | Latency | Raw Outputs |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
-| rag | 150 | 1.000 | 0.667 | 0.767 | 0 | 0 | 2181.328 ms/q | `results\model_service_qwen35_4b_150_rag.jsonl` |
-| no-rag | 150 | 1.000 | 0.000 | 0.793 | 0 | 0 | 1997.961 ms/q | `results\model_service_qwen35_4b_150_no_rag.jsonl` |
+| rag | 300 | 1.000 | 0.689 | 0.763 | 0 | 0 | 1566.444 ms/q | `results\model_service_qwen35_4b_300_latest_rag.jsonl` |
+| no-rag | 300 | 1.000 | 0.000 | 0.783 | 0 | 0 | 1468.111 ms/q | `results\model_service_qwen35_4b_300_latest_no_rag.jsonl` |
 
 补充 SQL Tool 结果：
 

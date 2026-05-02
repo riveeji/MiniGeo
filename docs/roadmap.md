@@ -351,13 +351,12 @@ sql_exec_accuracy=1.0
 
 - MiniGeo-Bench 已扩展到 300 条。
 - BM25、dense/hybrid/reranker 本地 deterministic 消融接口已实现。
-- Qwen3.5-4B 的 150 题 RAG/no-RAG 已保存，并完成输出质量审计、citation miss 归因、人工抽检导出。
-- RAG + Verifier 离线后处理已接入主结果表。
-- Verifier 误杀样例已导出，当前剩余 2 条拦截样例。
+- Qwen3.5-4B 的 300 题 RAG/no-RAG 已保存，并完成输出质量审计、citation miss 归因、人工抽检导出。
+- RAG + Verifier 的 300 题离线后处理已接入主结果表。
+- Verifier 拦截样例已导出，当前 300 题剩余 5 条拦截样例。
 
 下一批必须依赖 A100 或外部模型服务的任务：
 
-1. 用最新代码重跑 Qwen3.5-4B smoke10、150 题和可选 300 题。
-2. 运行真实 Qwen3-Embedding-0.6B / Qwen3-Reranker-0.6B 服务消融。
-3. 运行模型辅助 Verifier。
-4. 运行 QLoRA smoke run。
+1. 运行真实 Qwen3-Embedding-0.6B / Qwen3-Reranker-0.6B 服务消融。
+2. 运行模型辅助 Verifier，复判 `results/verifier_interceptions_300_latest.md`。
+3. 运行 QLoRA smoke run。

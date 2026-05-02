@@ -134,7 +134,9 @@ def _saved_model_failure_cases(max_cases: int = 3) -> list[dict]:
 
 def _best_model_output_path(mode: str) -> Path:
     candidates = [
+        Path(f"results/model_service_qwen35_4b_300_latest_{mode}.jsonl"),
         Path(f"results/model_service_qwen35_4b_300_{mode}.jsonl"),
+        Path(f"results/model_service_qwen35_4b_150_latest_{mode}.jsonl"),
         Path(f"results/model_service_qwen35_4b_150_{mode}.jsonl"),
         Path(f"results/model_service_qwen35_4b_{mode}.jsonl"),
     ]
@@ -146,7 +148,9 @@ def _best_model_output_path(mode: str) -> Path:
 
 def _best_verified_model_output_path() -> Path:
     candidates = [
+        Path("results/model_service_qwen35_4b_300_latest_rag_verified.jsonl"),
         Path("results/model_service_qwen35_4b_300_rag_verified.jsonl"),
+        Path("results/model_service_qwen35_4b_150_latest_rag_verified.jsonl"),
         Path("results/model_service_qwen35_4b_150_rag_verified.jsonl"),
     ]
     for path in candidates:

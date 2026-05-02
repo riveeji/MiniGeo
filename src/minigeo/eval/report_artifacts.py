@@ -83,7 +83,8 @@ def format_main_results(
             "- Qwen3.5-2B + 模型 RAG。",
             "- MiniGeo-2B-SFT。",
             "- MiniGeo-2B-SFT + RAG + Verifier。",
-            "- Qwen3.5-4B + RAG 的 300 题全量模型服务结果。",
+            "- 真实 Qwen3-Embedding / Qwen3-Reranker 服务消融结果。",
+            "- 模型辅助 Verifier 复判结果。",
             "",
         ]
     )
