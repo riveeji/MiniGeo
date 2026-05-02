@@ -37,6 +37,7 @@ def format_verified_model_report(
     model_summary: dict[str, Any],
     verifier_summary: dict[str, Any],
     output_path: str,
+    verifier_mode: str = "heuristic",
 ) -> str:
     return "\n".join(
         [
@@ -45,6 +46,7 @@ def format_verified_model_report(
             "本报告基于已保存的模型 RAG 输出离线生成，不会再次调用模型服务。",
             "",
             f"- output：`{output_path}`",
+            f"- verifier_mode：{verifier_mode}",
             f"- items：{model_summary.get('items', 0)}",
             f"- citation_hit_rate：{model_summary.get('citation_hit_rate', 0.0):.3f}",
             f"- abstention_accuracy：{model_summary.get('abstention_accuracy', 0.0):.3f}",

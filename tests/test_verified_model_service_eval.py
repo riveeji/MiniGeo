@@ -51,6 +51,7 @@ def test_format_verified_model_report_includes_model_and_verifier_metrics() -> N
     )
 
     assert "MiniGeo RAG + Verifier 离线评测" in report
+    assert "verifier_mode" in report
     assert "citation_hit_rate" in report
     assert "unsupported_claim_rate" in report
     assert "results/out.jsonl" in report

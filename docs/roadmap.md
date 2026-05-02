@@ -354,9 +354,9 @@ sql_exec_accuracy=1.0
 - Qwen3.5-4B 的 300 题 RAG/no-RAG 已保存，并完成输出质量审计、citation miss 归因、人工抽检导出。
 - RAG + Verifier 的 300 题离线后处理已接入主结果表。
 - Verifier 拦截样例已导出，当前 300 题剩余 5 条拦截样例。
+- 模型辅助 Verifier 已完成 300 题复判并接入主结果表；当前结果显示其可作为对照，但存在误判样例，不能直接替代本地 heuristic Verifier。
 
 下一批必须依赖 A100 或外部模型服务的任务：
 
 1. 运行真实 Qwen3-Embedding-0.6B / Qwen3-Reranker-0.6B 服务消融。
-2. 运行模型辅助 Verifier，复判 `results/verifier_interceptions_300_latest.md`。
-3. 运行 QLoRA smoke run。
+2. 运行 QLoRA smoke run。

@@ -77,25 +77,15 @@ def _saved_model_rows(bench: list[dict]) -> list[tuple]:
         )
     verified_path = _best_verified_model_output_path()
     if verified_path.exists():
-        records = read_jsonl(verified_path)
-        outputs = {record["id"]: record.get("result", {}) for record in records}
-        matched_bench = [benchmark_by_id[record["id"]] for record in records if record["id"] in benchmark_by_id]
-        model_summary = summarize_model_rag_outputs(matched_bench, outputs)
-        verifier_summary = summarize_verification_reports(
-            [
-                record.get("result", {}).get("verification", {"verdict": "missing", "claims": []})
-                for record in records
-            ]
-        )
+        rows.append(_verified_model_row("Qwen3.5-4B + BM25 RAG + Verifier", verified_path, benchmark_by_id))
+    model_verified_path = _best_model_verified_output_path()
+    if model_verified_path.exists():
         rows.append(
-            (
-                "Qwen3.5-4B + BM25 RAG + Verifier",
-                "",
-                model_summary.get("citation_hit_rate"),
-                verifier_summary.get("unsupported_claim_rate"),
-                model_summary.get("abstention_accuracy"),
-                "-",
-                "见 model_service_verified_eval",
+            _verified_model_row(
+                "Qwen3.5-4B + BM25 RAG + Model Verifier",
+                model_verified_path,
+                benchmark_by_id,
+                "见 model_service_model_verified_eval",
             )
         )
     if Path("results/model_service_eval.md").exists():
@@ -157,6 +147,44 @@ def _best_verified_model_output_path() -> Path:
         if path.exists():
             return path
     return candidates[-1]
+
+
+def _best_model_verified_output_path() -> Path:
+    candidates = [
+        Path("results/model_service_qwen35_4b_300_latest_rag_model_verified.jsonl"),
+        Path("results/model_service_qwen35_4b_150_latest_rag_model_verified.jsonl"),
+    ]
+    for path in candidates:
+        if path.exists():
+            return path
+    return candidates[-1]
+
+
+def _verified_model_row(
+    label: str,
+    path: Path,
+    benchmark_by_id: dict[str, dict],
+    latency_note: str = "见 model_service_verified_eval",
+) -> tuple:
+    records = read_jsonl(path)
+    outputs = {record["id"]: record.get("result", {}) for record in records}
+    matched_bench = [benchmark_by_id[record["id"]] for record in records if record["id"] in benchmark_by_id]
+    model_summary = summarize_model_rag_outputs(matched_bench, outputs)
+    verifier_summary = summarize_verification_reports(
+        [
+            record.get("result", {}).get("verification", {"verdict": "missing", "claims": []})
+            for record in records
+        ]
+    )
+    return (
+        label,
+        "",
+        model_summary.get("citation_hit_rate"),
+        verifier_summary.get("unsupported_claim_rate"),
+        model_summary.get("abstention_accuracy"),
+        "-",
+        latency_note,
+    )
 
 
 def main() -> None:

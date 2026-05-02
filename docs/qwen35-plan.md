@@ -29,7 +29,7 @@ Qwen3.5-2B 适合作为第一阶段主模型：
 2. 已完成 Qwen3.5-4B 150 题模型服务结果、输出质量审计和 RAG + Verifier 离线后处理。
 3. 已完成最新 prompt / Verifier 链路下的 Qwen3.5-4B 300 题模型服务评测。
 4. 下一步启动真实 Qwen3-Embedding-0.6B 与 Qwen3-Reranker-0.6B，运行服务化检索消融。
-5. 使用模型辅助 claim extraction 和 support classification 复判 Verifier 拦截样例。
+5. 已完成模型辅助 claim extraction 和 support classification 复判；结果作为对照保留，不替代本地 heuristic Verifier。
 6. 使用 LoRA / QLoRA 微调 Qwen3.5-2B。
 7. 扩展 Agent 工具评测和最终 demo。
 
@@ -76,6 +76,7 @@ Qwen3.5-2B 适合作为第一阶段主模型：
 | MiniGeo-2B-SFT + RAG + Verifier | | | | | - | |
 | Qwen3.5-4B + RAG | | 0.689 | | 0.763 | - | |
 | Qwen3.5-4B + RAG + Verifier | | 0.679 | 0.023 | 0.747 | - | |
+| Qwen3.5-4B + RAG + Model Verifier | | 0.665 | 0.022 | 0.740 | - | |
 | MiniGeo-Agent | | | | | | |
 
 ## 简历表述

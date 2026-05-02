@@ -30,9 +30,10 @@ def build_verifier_from_env(
         model=values.get("MINIGEO_VERIFIER_MODEL", values.get("MINIGEO_MODEL", "Qwen/Qwen3.5-2B")),
         timeout=float(values.get("MINIGEO_VERIFIER_TIMEOUT", values.get("MINIGEO_LLM_TIMEOUT", "60"))),
         transport=transport,
+        retries=int(values.get("MINIGEO_VERIFIER_RETRIES", values.get("MINIGEO_LLM_RETRIES", "2"))),
+        disable_thinking=_enabled(values.get("MINIGEO_DISABLE_THINKING")),
     )
     return MiniGeoVerifier(
         claim_extractor=ModelClaimExtractor(client, fallback=LocalClaimExtractor()),
         support_classifier=ModelSupportClassifier(client, fallback=HeuristicSupportClassifier()),
     )
-

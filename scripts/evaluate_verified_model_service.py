@@ -45,7 +45,12 @@ def main() -> None:
     report = Path(args.report)
     report.parent.mkdir(parents=True, exist_ok=True)
     report.write_text(
-        format_verified_model_report(summary["model"], summary["verifier"], str(output)),
+        format_verified_model_report(
+            summary["model"],
+            summary["verifier"],
+            str(output),
+            verifier_mode="model" if args.use_model else "heuristic",
+        ),
         encoding="utf-8",
         newline="\n",
     )
