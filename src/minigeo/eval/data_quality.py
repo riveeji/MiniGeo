@@ -33,6 +33,7 @@ def audit_data_quality(
         "missing_evidence_refs": missing_evidence_refs,
         "reference_answer_leaks": find_reference_answer_leaks(sft_rows, benchmark_rows),
         "metadata_missing": metadata_missing,
+        "placeholder_source_urls": _placeholder_source_urls(corpus_rows),
         "duplicate_chunk_ids": _duplicates([row["chunk_id"] for row in corpus_rows]),
         "duplicate_benchmark_ids": _duplicates([row["id"] for row in benchmark_rows]),
         "duplicate_sft_ids": _duplicates([row["id"] for row in sft_rows]),
@@ -47,6 +48,17 @@ def _duplicates(values: list[str]) -> list[str]:
             dupes.append(value)
         seen.add(value)
     return dupes
+
+
+def _placeholder_source_urls(corpus_rows: list[dict[str, Any]]) -> list[str]:
+    placeholders = []
+    for row in corpus_rows:
+        if row.get("topic") == "system":
+            continue
+        url = str(row.get("url", ""))
+        if "example.org/minigeo" in url:
+            placeholders.append(f"{row.get('chunk_id', '<unknown>')}:{url}")
+    return placeholders
 
 
 def _list_or_ok(values: list[str]) -> str:
@@ -79,6 +91,10 @@ def format_data_quality_report(report: dict[str, Any]) -> str:
             "## Corpus Metadata 缺失",
             "",
             _list_or_ok(report["metadata_missing"]),
+            "",
+            "## Corpus 占位来源 URL",
+            "",
+            _list_or_ok(report.get("placeholder_source_urls", [])),
             "",
             "## 重复 ID",
             "",

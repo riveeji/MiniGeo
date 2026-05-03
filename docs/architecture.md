@@ -69,12 +69,12 @@ Chunk schema：
   "chunk_id": "doc_quartz#chunk_001",
   "doc_id": "doc_quartz",
   "text": "石英是常见的硅酸盐矿物，主要化学成分是二氧化硅 SiO2。",
-  "source": "MiniGeo curated mineral notes",
-  "url": "https://example.org/minigeo/quartz",
+  "source": "PubChem Quartz",
+  "url": "https://pubchem.ncbi.nlm.nih.gov/compound/Quartz",
   "page": null,
   "topic": "concept",
   "mineral": "quartz",
-  "license": "public"
+  "license": "source_metadata_only"
 }
 ```
 

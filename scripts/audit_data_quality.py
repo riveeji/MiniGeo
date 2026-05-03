@@ -21,6 +21,7 @@ def main() -> None:
             "missing_evidence_refs",
             "reference_answer_leaks",
             "metadata_missing",
+            "placeholder_source_urls",
             "duplicate_chunk_ids",
             "duplicate_benchmark_ids",
             "duplicate_sft_ids",

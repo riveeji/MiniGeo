@@ -16,6 +16,20 @@ def _latency(metrics: dict[str, float]) -> str:
     return f"{value:.3f} ms/q"
 
 
+def _pending_model_result_lines(extra_rows: list[tuple[Any, ...]] | None) -> list[str]:
+    completed_labels = {str(row[0]) for row in (extra_rows or []) if row}
+    pending = [
+        "- Qwen3.5-2B no-RAG。",
+        "- Qwen3.5-2B + 模型 RAG。",
+        "- MiniGeo-2B-SFT。",
+        "- MiniGeo-2B-SFT + RAG + Verifier。",
+        "- 真实 Qwen3-Embedding / Qwen3-Reranker 服务消融结果。",
+    ]
+    if not any("Model Verifier" in label for label in completed_labels):
+        pending.append("- 模型辅助 Verifier 复判结果。")
+    return pending
+
+
 def format_main_results(
     retrieval: dict[str, dict[str, float]],
     verifier: dict[str, Any],
@@ -74,20 +88,7 @@ def format_main_results(
     ]
     for row in rows:
         lines.append("| " + " | ".join(_fmt(value) for value in row) + " |")
-    lines.extend(
-        [
-            "",
-            "## 待补充模型结果",
-            "",
-            "- Qwen3.5-2B no-RAG。",
-            "- Qwen3.5-2B + 模型 RAG。",
-            "- MiniGeo-2B-SFT。",
-            "- MiniGeo-2B-SFT + RAG + Verifier。",
-            "- 真实 Qwen3-Embedding / Qwen3-Reranker 服务消融结果。",
-            "- 模型辅助 Verifier 复判结果。",
-            "",
-        ]
-    )
+    lines.extend(["", "## 待补充模型结果", "", *_pending_model_result_lines(extra_rows), ""])
     return "\n".join(lines)
 
 

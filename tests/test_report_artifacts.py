@@ -30,6 +30,33 @@ def test_format_main_results_includes_local_baselines() -> None:
     assert "Qwen3.5-4B + BM25 RAG" in markdown
 
 
+def test_format_main_results_omits_completed_model_verifier_from_pending_list() -> None:
+    markdown = format_main_results(
+        retrieval={},
+        verifier={},
+        sql={},
+        abstention={},
+        planner={},
+        agent_demo_passed=True,
+        extra_rows=[
+            (
+                "Qwen3.5-4B + BM25 RAG + Model Verifier",
+                "",
+                0.665,
+                0.022,
+                0.740,
+                "-",
+                "见 model_service_model_verified_eval",
+            )
+        ],
+    )
+
+    pending_section = markdown.split("## 待补充模型结果", 1)[1]
+
+    assert "Qwen3.5-4B + BM25 RAG + Model Verifier" in markdown
+    assert "模型辅助 Verifier 复判结果" not in pending_section
+
+
 def test_format_failure_cases_limits_cases_and_keeps_schema() -> None:
     markdown = format_failure_cases(
         [
