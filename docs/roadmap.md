@@ -303,11 +303,11 @@ python scripts/evaluate_verifier.py --use-model
 当前规则型 SQL baseline：
 
 ```text
-sql_items=30
+sql_items=60
 sql_exec_accuracy=1.0
 ```
 
-已支持 `python scripts/evaluate_sql.py --use-model` 接入模型 SQL generator。后续应运行模型 SQL generator，并与规则型 baseline 对比。
+已支持 `python scripts/evaluate_sql.py --use-model` 接入模型 SQL generator。2026-05-04 已在 Colab A100 + `Qwen/Qwen3.5-4B` 上完成 60 条 SQL 题评测，`sql_exec_accuracy=1.0`，与规则型 baseline 一致；详见 `results/sql_eval.md`。
 
 ## Phase 8：可选 MiniGeo-Tiny
 

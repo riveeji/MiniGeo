@@ -110,5 +110,5 @@ python scripts/audit_project.py
 
 1. 增加 planner：判断问题是否需要文档检索、SQL 或二者混合。
 2. 将 SQL 结果也转换成 verifier 可检查的 evidence。
-3. 加入模型 SQL generator 与规则 baseline 对比。
+3. 扩展模型 SQL generator 题集，目前 60 条 SQL 题上 Qwen3.5-4B 与规则 baseline 均为 `sql_exec_accuracy=1.0`。
 4. 扩展 Agent benchmark，单独记录 final answer quality。
