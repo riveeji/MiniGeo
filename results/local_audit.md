@@ -30,9 +30,9 @@
 **stdout**
 
 ```text
-........................................................................ [ 60%]
-................................................                         [100%]
-120 passed in 1.68s
+........................................................................ [ 59%]
+.................................................                        [100%]
+121 passed in 1.50s
 ```
 
 ### Benchmark 分布
@@ -60,10 +60,10 @@ evidence_labeled=209
 **stdout**
 
 ```text
-bm25: recall@5=0.976 recall@10=1.000 mrr=0.774 citation_hit_rate=1.000 latency_ms=2.298
-dense: recall@5=0.550 recall@10=0.828 mrr=0.393 citation_hit_rate=0.828 latency_ms=1.715
-hybrid: recall@5=0.914 recall@10=0.995 mrr=0.636 citation_hit_rate=0.995 latency_ms=38.933
-hybrid_rerank: recall@5=0.608 recall@10=0.880 mrr=0.476 citation_hit_rate=0.880 latency_ms=45.803
+bm25: recall@5=0.976 recall@10=1.000 mrr=0.774 citation_hit_rate=1.000 latency_ms=2.313
+dense: recall@5=0.550 recall@10=0.828 mrr=0.393 citation_hit_rate=0.828 latency_ms=1.870
+hybrid: recall@5=0.914 recall@10=0.995 mrr=0.636 citation_hit_rate=0.995 latency_ms=40.771
+hybrid_rerank: recall@5=0.608 recall@10=0.880 mrr=0.476 citation_hit_rate=0.880 latency_ms=49.734
 ```
 
 ### 拒答评测
@@ -80,7 +80,7 @@ correct_abstain=33
 missed_abstain=0
 false_abstain=0
 correct_answer=267
-latency_ms=15.432672666671957
+latency_ms=19.729051000006923
 ```
 
 ### Verifier 评测
@@ -96,7 +96,7 @@ claims=314
 verdicts={'supported': 113, 'insufficient_evidence': 179, 'partially_supported': 8}
 statuses={'supported': 122, 'insufficient': 192}
 unsupported_claim_rate=0.6114649681528662
-latency_ms=0.6274043333299536
+latency_ms=0.7588493333363052
 ```
 
 ### SQL 评测
@@ -110,7 +110,7 @@ latency_ms=0.6274043333299536
 sql_items=60
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.2540033333085982
+latency_ms=0.29537999998865416
 ```
 
 ### Agent Planner 评测
@@ -124,7 +124,7 @@ latency_ms=0.2540033333085982
 items=300
 sql_routing_accuracy=1.0
 modes={'docs': 240, 'hybrid': 3, 'sql': 57}
-latency_ms=0.003518666659753459
+latency_ms=0.00341833333853477
 ```
 
 ### SFT 数据构建

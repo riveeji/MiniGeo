@@ -169,7 +169,7 @@ Hybrid RAG baseline citation_hit@10=0.995
 - 每个回答包含 source chunk id。
 - RAG 的 citation hit rate 高于 no-RAG。
 - BM25、dense、hybrid、hybrid+rerank 可以在同一 benchmark 上做消融评测。
-- 加 `--use-services` 后可以接入真实 embedding 和 reranker 服务。
+- 加 `--use-embedding-service` / `--use-reranker-service` 后可以分阶段接入真实 embedding 或 reranker 服务；如果两个服务可同时访问，也可以用 `--use-services`。
 
 ## Phase 4：MiniGeo-Verifier
 
@@ -358,5 +358,5 @@ sql_exec_accuracy=1.0
 
 下一批必须依赖 A100 或外部模型服务的任务：
 
-1. 运行真实 Qwen3-Embedding-0.6B / Qwen3-Reranker-0.6B 服务消融。
+1. 运行真实 Qwen3-Embedding-0.6B / Qwen3-Reranker-0.6B 服务消融；单 A100 可先跑 `--use-embedding-service`，再切换服务跑 `--use-reranker-service`。
 2. 运行 QLoRA smoke run。

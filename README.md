@@ -132,7 +132,12 @@ $env:MINIGEO_RERANKER_MODEL="Qwen/Qwen3-Reranker-0.6B"
 python scripts/evaluate_retrieval_ablation.py --use-services
 ```
 
-默认不加 `--use-services` 时，脚本使用本地 deterministic baseline，方便无模型服务时做回归测试。
+默认不加 `--use-services` 时，脚本使用本地 deterministic baseline，方便无模型服务时做回归测试。单 A100 不能同时跑 embedding 与 reranker 服务时，可以分阶段运行：
+
+```powershell
+python scripts/evaluate_retrieval_ablation.py --use-embedding-service
+python scripts/evaluate_retrieval_ablation.py --use-reranker-service
+```
 
 如果要启用模型辅助 Verifier：
 
@@ -200,7 +205,7 @@ Verifier 报告：
 
 ## 路线图
 
-1. 启动真实 Qwen3-Embedding-0.6B 和 Qwen3-Reranker-0.6B 服务，运行 `--use-services` 消融评测。
+1. 启动真实 Qwen3-Embedding-0.6B 和 Qwen3-Reranker-0.6B 服务，运行 `--use-embedding-service` / `--use-reranker-service` 或 `--use-services` 消融评测。
 2. 在 Colab Pro 中基于 `configs/qwen35_2b_lora.yaml` 运行 QLoRA SFT smoke run。
 3. 扩展 SQL 评测和 MiniGeo-Agent 的复杂问题集。
 

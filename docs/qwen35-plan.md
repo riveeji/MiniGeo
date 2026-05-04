@@ -28,7 +28,7 @@ Qwen3.5-2B 适合作为第一阶段主模型：
 1. 已完成 MiniGeo-Bench、BM25 RAG baseline、模型 RAG 生成链路和本地 Verifier。
 2. 已完成 Qwen3.5-4B 150 题模型服务结果、输出质量审计和 RAG + Verifier 离线后处理。
 3. 已完成最新 prompt / Verifier 链路下的 Qwen3.5-4B 300 题模型服务评测。
-4. 下一步启动真实 Qwen3-Embedding-0.6B 与 Qwen3-Reranker-0.6B，运行服务化检索消融。
+4. 下一步启动真实 Qwen3-Embedding-0.6B 与 Qwen3-Reranker-0.6B，运行服务化检索消融；单 A100 分阶段使用 `--use-embedding-service` 和 `--use-reranker-service`。
 5. 已完成模型辅助 claim extraction 和 support classification 复判；结果作为对照保留，不替代本地 heuristic Verifier。
 6. 使用 LoRA / QLoRA 微调 Qwen3.5-2B。
 7. 扩展 Agent 工具评测和最终 demo。
