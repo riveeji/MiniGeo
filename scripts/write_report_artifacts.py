@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from time import perf_counter
 
@@ -90,6 +91,37 @@ def _saved_model_rows(bench: list[dict]) -> list[tuple]:
         )
     if Path("results/model_service_eval.md").exists():
         rows.append(("Qwen3.5-4B SQL generator", "", "", "", "", 1.0, "见 model_service_eval"))
+    rows.extend(_saved_retrieval_service_rows())
+    return rows
+
+
+def _saved_retrieval_service_rows() -> list[tuple]:
+    path = Path("results/retrieval_service_eval.json")
+    if not path.exists():
+        return []
+    data = json.loads(path.read_text(encoding="utf-8"))
+    metrics = data.get("metrics", {})
+    model = str(data.get("model", "Qwen3-Embedding-0.6B")).split("/")[-1]
+    rows = []
+    labels = {
+        "dense": f"{model} dense retrieval",
+        "hybrid": f"{model} hybrid retrieval",
+        "hybrid_rerank": f"{model} hybrid + lexical rerank",
+    }
+    for key, label in labels.items():
+        if key not in metrics:
+            continue
+        rows.append(
+            (
+                label,
+                "",
+                metrics[key].get("citation_hit_rate"),
+                "",
+                "",
+                "-",
+                "见 retrieval_service_eval",
+            )
+        )
     return rows
 
 

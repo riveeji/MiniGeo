@@ -34,6 +34,27 @@ def test_run_retrieval_ablation_returns_all_systems() -> None:
     assert results["hybrid_rerank"]["latency_ms"] > 0.0
 
 
+def test_run_retrieval_ablation_reuses_dense_document_vectors() -> None:
+    class CountingEmbedder:
+        def __init__(self) -> None:
+            self.calls: list[str] = []
+
+        def embed(self, text: str) -> list[float]:
+            self.calls.append(text)
+            return [1.0 if "quartz" in text.lower() else 0.0, 1.0]
+
+    bench = [{"id": "q1", "question": "quartz Raman", "evidence": ["quartz"]}]
+    corpus = [
+        {"chunk_id": "quartz", "text": "quartz Raman 464 cm-1"},
+        {"chunk_id": "calcite", "text": "calcite carbonate 1085 cm-1"},
+    ]
+    embedder = CountingEmbedder()
+
+    run_retrieval_ablation(bench, corpus, top_k=2, embedder=embedder)
+
+    assert len(embedder.calls) == len(corpus) + 3 * len(bench)
+
+
 def test_run_retrieval_ablation_accepts_custom_reranker() -> None:
     class ReverseReranker:
         def rerank(self, query, candidates, top_k=5):

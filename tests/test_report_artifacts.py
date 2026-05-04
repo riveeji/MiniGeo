@@ -57,6 +57,23 @@ def test_format_main_results_omits_completed_model_verifier_from_pending_list() 
     assert "模型辅助 Verifier 复判结果" not in pending_section
 
 
+def test_format_main_results_marks_embedding_service_as_completed() -> None:
+    markdown = format_main_results(
+        retrieval={},
+        verifier={},
+        sql={},
+        abstention={},
+        planner={},
+        agent_demo_passed=True,
+        extra_rows=[("Qwen3-Embedding-0.6B dense retrieval", "", 0.957, "", "", "-", "见 retrieval_service_eval")],
+    )
+
+    pending_section = markdown.split("## 待补充模型结果", 1)[1]
+
+    assert "真实 Qwen3-Embedding / Qwen3-Reranker 服务消融结果" not in pending_section
+    assert "真实 Qwen3-Reranker 服务消融结果" in pending_section
+
+
 def test_format_failure_cases_limits_cases_and_keeps_schema() -> None:
     markdown = format_failure_cases(
         [

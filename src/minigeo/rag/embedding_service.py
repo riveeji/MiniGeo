@@ -18,14 +18,30 @@ class EmbeddingServiceEmbedder:
         self.model = model
         self.timeout = timeout
         self.transport = transport or post_json
+        self._cache: dict[str, list[float]] = {}
 
     def embed(self, text: str) -> list[float]:
         return self.embed_batch([text])[0]
 
     def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        if not texts:
+            return []
+        vectors: list[list[float] | None] = [None] * len(texts)
+        missing_positions: dict[str, list[int]] = {}
+        for index, text in enumerate(texts):
+            cached = self._cache.get(text)
+            if cached is None:
+                missing_positions.setdefault(text, []).append(index)
+            else:
+                vectors[index] = list(cached)
+
+        if not missing_positions:
+            return [list(vector) for vector in vectors if vector is not None]
+
+        missing_texts = list(missing_positions)
         payload: dict[str, Any] = {
             "model": self.model,
-            "input": texts[0] if len(texts) == 1 else texts,
+            "input": missing_texts[0] if len(missing_texts) == 1 else missing_texts,
         }
         headers = {
             "Authorization": f"Bearer {self.api_key}",
@@ -35,12 +51,21 @@ class EmbeddingServiceEmbedder:
             self.transport(f"{self.base_url}/embeddings", headers, payload, self.timeout)
         )
         try:
-            return [
+            embedded = [
                 [float(value) for value in item["embedding"]]
                 for item in response["data"]
             ]
         except (KeyError, TypeError) as exc:
             raise ValueError(f"Unexpected embedding response: {response}") from exc
+        if len(embedded) != len(missing_texts):
+            raise ValueError(f"Unexpected embedding response: {response}")
+        for text, vector in zip(missing_texts, embedded):
+            self._cache[text] = list(vector)
+            for index in missing_positions[text]:
+                vectors[index] = list(vector)
+        if any(vector is None for vector in vectors):
+            raise ValueError(f"Unexpected embedding response: {response}")
+        return [list(vector) for vector in vectors if vector is not None]
 
 
 def embedding_embedder_from_env(
@@ -59,4 +84,3 @@ def embedding_embedder_from_env(
         timeout=float(values.get("MINIGEO_EMBEDDING_TIMEOUT", values.get("MINIGEO_LLM_TIMEOUT", "60"))),
         transport=transport,
     )
-

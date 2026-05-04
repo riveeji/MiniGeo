@@ -144,6 +144,17 @@ BM25 + query expansion citation_hit@10=1.000
 Hybrid RAG baseline citation_hit@10=0.995
 ```
 
+当前真实 embedding 服务状态：
+
+```text
+service=Colab A100 + vLLM + Cloudflare quick tunnel
+model=Qwen/Qwen3-Embedding-0.6B
+mode=--use-embedding-service
+dense citation_hit_rate=0.957
+hybrid citation_hit_rate=1.000
+hybrid+local_lexical_rerank citation_hit_rate=0.900
+```
+
 说明：该结果基于确定性种子 benchmark 和领域 query expansion。用于正式研究结论前，应继续扩展公开资料和人工复核 failure cases，避免只对当前 gold evidence 过拟合。
 
 当前产出：
@@ -170,6 +181,7 @@ Hybrid RAG baseline citation_hit@10=0.995
 - RAG 的 citation hit rate 高于 no-RAG。
 - BM25、dense、hybrid、hybrid+rerank 可以在同一 benchmark 上做消融评测。
 - 加 `--use-embedding-service` / `--use-reranker-service` 后可以分阶段接入真实 embedding 或 reranker 服务；如果两个服务可同时访问，也可以用 `--use-services`。
+- `--use-embedding-service` 已跑通并写入 `results/retrieval_service_eval.md`；下一步需要切换 A100 服务到 `Qwen/Qwen3-Reranker-0.6B`，运行 `--use-reranker-service`。
 
 ## Phase 4：MiniGeo-Verifier
 

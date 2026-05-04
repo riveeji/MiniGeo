@@ -6,7 +6,7 @@
 
 | 步骤 | 状态 | 退出码 | 命令 |
 |---|---|---:|---|
-| 单元测试 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe -m pytest -q` |
+| 单元测试 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe -m pytest -q --basetemp .pytest_tmp\basetemp-5604 -p no:cacheprovider` |
 | Benchmark 分布 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_bench.py` |
 | 检索消融 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_retrieval_ablation.py` |
 | 拒答评测 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_abstention.py` |
@@ -30,9 +30,9 @@
 **stdout**
 
 ```text
-........................................................................ [ 59%]
-.................................................                        [100%]
-121 passed in 1.50s
+........................................................................ [ 56%]
+........................................................                 [100%]
+128 passed in 2.74s
 ```
 
 ### Benchmark 分布
@@ -60,10 +60,10 @@ evidence_labeled=209
 **stdout**
 
 ```text
-bm25: recall@5=0.976 recall@10=1.000 mrr=0.774 citation_hit_rate=1.000 latency_ms=2.313
-dense: recall@5=0.550 recall@10=0.828 mrr=0.393 citation_hit_rate=0.828 latency_ms=1.870
-hybrid: recall@5=0.914 recall@10=0.995 mrr=0.636 citation_hit_rate=0.995 latency_ms=40.771
-hybrid_rerank: recall@5=0.608 recall@10=0.880 mrr=0.476 citation_hit_rate=0.880 latency_ms=49.734
+bm25: recall@5=0.976 recall@10=1.000 mrr=0.774 citation_hit_rate=1.000 latency_ms=3.870
+dense: recall@5=0.550 recall@10=0.828 mrr=0.393 citation_hit_rate=0.828 latency_ms=1.967
+hybrid: recall@5=0.914 recall@10=0.995 mrr=0.636 citation_hit_rate=0.995 latency_ms=5.917
+hybrid_rerank: recall@5=0.608 recall@10=0.880 mrr=0.476 citation_hit_rate=0.880 latency_ms=19.311
 ```
 
 ### 拒答评测
@@ -80,7 +80,7 @@ correct_abstain=33
 missed_abstain=0
 false_abstain=0
 correct_answer=267
-latency_ms=19.729051000006923
+latency_ms=30.846828333342273
 ```
 
 ### Verifier 评测
@@ -96,7 +96,7 @@ claims=314
 verdicts={'supported': 113, 'insufficient_evidence': 179, 'partially_supported': 8}
 statuses={'supported': 122, 'insufficient': 192}
 unsupported_claim_rate=0.6114649681528662
-latency_ms=0.7588493333363052
+latency_ms=1.3334926666599738
 ```
 
 ### SQL 评测
@@ -110,7 +110,7 @@ latency_ms=0.7588493333363052
 sql_items=60
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.29537999998865416
+latency_ms=0.382753333299964
 ```
 
 ### Agent Planner 评测
@@ -124,7 +124,7 @@ latency_ms=0.29537999998865416
 items=300
 sql_routing_accuracy=1.0
 modes={'docs': 240, 'hybrid': 3, 'sql': 57}
-latency_ms=0.00341833333853477
+latency_ms=0.0033023333404950486
 ```
 
 ### SFT 数据构建

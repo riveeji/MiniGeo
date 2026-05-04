@@ -201,6 +201,7 @@ CSV 中的 `review_decision` 建议使用 `correct_reject`、`false_reject`、`c
 - `results/model_failure_review_150.md`
 - `results/model_service_verified_eval_150.md`
 - `results/verifier_interceptions_150.md`
+- `results/retrieval_service_eval.md`
 - `results/failure_cases.md`
 
 主表至少记录：
@@ -211,6 +212,13 @@ CSV 中的 `review_decision` 建议使用 `correct_reject`、`false_reject`、`c
 - Abstention
 - Latency
 - Request Errors
+
+检索服务消融完成后，额外记录：
+
+- `Qwen3-Embedding dense retrieval`
+- `Qwen3-Embedding hybrid retrieval`
+- `Qwen3-Embedding hybrid + lexical rerank`
+- `Qwen3-Reranker` staged 或 combined 消融结果
 
 ## 当前注意事项
 

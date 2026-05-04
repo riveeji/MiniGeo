@@ -23,8 +23,15 @@ def _pending_model_result_lines(extra_rows: list[tuple[Any, ...]] | None) -> lis
         "- Qwen3.5-2B + 模型 RAG。",
         "- MiniGeo-2B-SFT。",
         "- MiniGeo-2B-SFT + RAG + Verifier。",
-        "- 真实 Qwen3-Embedding / Qwen3-Reranker 服务消融结果。",
     ]
+    has_embedding = any("Qwen3-Embedding" in label for label in completed_labels)
+    has_reranker = any("Qwen3-Reranker" in label for label in completed_labels)
+    if has_embedding and not has_reranker:
+        pending.append("- 真实 Qwen3-Reranker 服务消融结果。")
+    elif has_reranker and not has_embedding:
+        pending.append("- 真实 Qwen3-Embedding 服务消融结果。")
+    elif not has_embedding and not has_reranker:
+        pending.append("- 真实 Qwen3-Embedding / Qwen3-Reranker 服务消融结果。")
     if not any("Model Verifier" in label for label in completed_labels):
         pending.append("- 模型辅助 Verifier 复判结果。")
     return pending

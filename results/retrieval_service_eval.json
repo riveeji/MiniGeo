@@ -1,0 +1,41 @@
+{
+  "date": "2026-05-04",
+  "service": "Colab A100 + vLLM OpenAI-compatible API + Cloudflare quick tunnel",
+  "mode": "embedding_service",
+  "model": "Qwen/Qwen3-Embedding-0.6B",
+  "command": "python scripts/evaluate_retrieval_ablation.py --use-embedding-service",
+  "notes": [
+    "This run uses the real embedding service and the local lexical reranker.",
+    "Embedding requests are cached by text in the client; hybrid and rerank latency values are warm-cache values in this staged run."
+  ],
+  "metrics": {
+    "bm25": {
+      "recall@5": 0.976,
+      "recall@10": 1.0,
+      "mrr": 0.774,
+      "citation_hit_rate": 1.0,
+      "latency_ms": 2.594
+    },
+    "dense": {
+      "recall@5": 0.885,
+      "recall@10": 0.957,
+      "mrr": 0.644,
+      "citation_hit_rate": 0.957,
+      "latency_ms": 1683.67
+    },
+    "hybrid": {
+      "recall@5": 0.962,
+      "recall@10": 1.0,
+      "mrr": 0.738,
+      "citation_hit_rate": 1.0,
+      "latency_ms": 5.773
+    },
+    "hybrid_rerank": {
+      "recall@5": 0.617,
+      "recall@10": 0.9,
+      "mrr": 0.474,
+      "citation_hit_rate": 0.9,
+      "latency_ms": 12.393
+    }
+  }
+}

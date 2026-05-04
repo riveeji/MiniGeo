@@ -44,9 +44,12 @@ def hybrid_search(
     top_k: int = 5,
     candidate_k: int | None = None,
     embedder: Embedder | None = None,
+    bm25_retriever: BM25Retriever | None = None,
+    dense_retriever: DenseRetriever | None = None,
 ) -> list[dict[str, Any]]:
     candidate_k = candidate_k or max(top_k * 3, top_k)
-    bm25_results = BM25Retriever(docs).search(query, top_k=candidate_k)
-    dense_results = DenseRetriever(docs, embedder=embedder).search(query, top_k=candidate_k)
+    bm25 = bm25_retriever or BM25Retriever(docs)
+    dense = dense_retriever or DenseRetriever(docs, embedder=embedder)
+    bm25_results = bm25.search(query, top_k=candidate_k)
+    dense_results = dense.search(query, top_k=candidate_k)
     return merge_ranked_results(bm25_results, dense_results, top_k=top_k)
-

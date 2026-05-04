@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -5,8 +6,8 @@ import sys
 from minigeo.eval.audit import AuditStepResult, format_audit_report, overall_success
 
 
-def _run_step(name: str, command: list[str]) -> AuditStepResult:
-    completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace")
+def _run_step(name: str, command: list[str], env: dict[str, str] | None = None) -> AuditStepResult:
+    completed = subprocess.run(command, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env)
     return AuditStepResult(
         name=name,
         command=command,
@@ -16,10 +17,33 @@ def _run_step(name: str, command: list[str]) -> AuditStepResult:
     )
 
 
+def _workspace_temp_env(temp_dir: Path) -> dict[str, str]:
+    temp_dir.mkdir(parents=True, exist_ok=True)
+    env = os.environ.copy()
+    resolved = str(temp_dir.resolve())
+    env["TMP"] = resolved
+    env["TEMP"] = resolved
+    return env
+
+
+def _pytest_command(python: str) -> list[str]:
+    basetemp = Path(".pytest_tmp") / f"basetemp-{os.getpid()}"
+    return [
+        python,
+        "-m",
+        "pytest",
+        "-q",
+        "--basetemp",
+        str(basetemp),
+        "-p",
+        "no:cacheprovider",
+    ]
+
+
 def main() -> None:
     python = sys.executable
     steps = [
-        ("单元测试", [python, "-m", "pytest", "-q"]),
+        ("单元测试", _pytest_command(python), _workspace_temp_env(Path(".pytest_tmp"))),
         ("Benchmark 分布", [python, "scripts/evaluate_bench.py"]),
         ("检索消融", [python, "scripts/evaluate_retrieval_ablation.py"]),
         ("拒答评测", [python, "scripts/evaluate_abstention.py"]),
@@ -34,7 +58,14 @@ def main() -> None:
         ("本地结果摘要", [python, "scripts/write_local_results.py"]),
     ]
 
-    results = [_run_step(name, command) for name, command in steps]
+    results = []
+    for step in steps:
+        if len(step) == 3:
+            name, command, env = step
+            results.append(_run_step(name, command, env=env))
+        else:
+            name, command = step
+            results.append(_run_step(name, command))
     output = Path("results/local_audit.md")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(format_audit_report(results), encoding="utf-8", newline="\n")

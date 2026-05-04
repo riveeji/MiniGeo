@@ -54,7 +54,14 @@ def run_retrieval_ablation(
             "hybrid",
             *_ids_by_query(
                 benchmark_rows,
-                lambda query: hybrid_search(query, corpus_rows, top_k=top_k, embedder=embedder),
+                lambda query: hybrid_search(
+                    query,
+                    corpus_rows,
+                    top_k=top_k,
+                    embedder=embedder,
+                    bm25_retriever=bm25,
+                    dense_retriever=dense,
+                ),
             ),
         ),
         (
@@ -63,7 +70,14 @@ def run_retrieval_ablation(
                 benchmark_rows,
                 lambda query: reranker.rerank(
                     query,
-                    hybrid_search(query, corpus_rows, top_k=max(top_k * 2, top_k), embedder=embedder),
+                    hybrid_search(
+                        query,
+                        corpus_rows,
+                        top_k=max(top_k * 2, top_k),
+                        embedder=embedder,
+                        bm25_retriever=bm25,
+                        dense_retriever=dense,
+                    ),
                     top_k=top_k,
                 ),
             ),
