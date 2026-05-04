@@ -74,9 +74,9 @@ Analyze which mineral categories are most frequently misclassified in samples co
 
 ## 剩余任务
 
-不需要 A100 的任务已经基本收敛，真实 reranker staged 消融和 QLoRA smoke run 也已完成。后续主要剩余正式训练与评测任务：
+不需要 A100 的任务已经基本收敛，真实 reranker staged 消融、QLoRA smoke run 和 SFT corpus 扩充也已完成。后续主要剩余正式训练与评测任务：
 
-1. 决定是否扩充 SFT corpus 的任务类型和真实答案样本。
+1. 使用已扩充的 553 条 SFT corpus 先重跑 5-step QLoRA smoke。
 2. 运行更长的 1 epoch 小规模 SFT。
 3. 比较 base / SFT / RAG / Verifier。
 

@@ -6,7 +6,7 @@
 
 - benchmark_items：300
 - corpus_chunks：42
-- sft_items：135
+- sft_items：553
 
 ## Evidence 引用缺失
 

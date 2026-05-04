@@ -11,7 +11,7 @@
 | `data/benchmark/minigeo_bench.jsonl` | 300 条 MiniGeo-Bench 种子评测集 |
 | `data/processed/rag_corpus.jsonl` | 42 个本地 RAG 测试用证据 chunk |
 | `data/processed/source_manifest.jsonl` | 28 条公开来源 URL、用途和 license 备注 |
-| `data/processed/sft_corpus.jsonl` | 135 条 SFT 草案样本 |
+| `data/processed/sft_corpus.jsonl` | 553 条 SFT 草案样本 |
 | `data/processed/minigeo_demo.sqlite` | 由 `scripts/init_demo_db.py` 生成的演示数据库，属于运行产物，不提交 |
 
 当前 corpus 是用于管线验证的种子语料。非 system chunk 已替换为可追踪公开来源 URL，正文仍是人工整理的短证据摘要，不提交未确认再分发权限的原文。报告最终研究结论前，仍应继续扩展更多公开资料，并人工复核来源和内容对应关系。
@@ -46,11 +46,23 @@
 
 ## SFT 样本策略
 
-当前 `scripts/build_sft_corpus.py` 只生成草案样本：
+当前 `scripts/build_sft_corpus.py` 生成 553 条草案样本：
 
 - `evidence_summary`：基于 RAG chunk 生成引用格式训练样本。
+- `evidence_qa`：基于 benchmark question 和对应 evidence chunk 生成带 citation 的简短证据回答。
+- `verification_rewrite`：基于不可靠回答和 evidence chunk 生成受证据约束的保守改写。
 - `refusal`：基于不可回答 benchmark 问题生成通用拒答样本。
 - `sql_format`：基于 SQL benchmark 生成 SQL intent 格式样本。
+
+当前 task_type 分布：
+
+| task_type | samples |
+|---|---:|
+| `evidence_summary` | 42 |
+| `evidence_qa` | 209 |
+| `verification_rewrite` | 209 |
+| `refusal` | 33 |
+| `sql_format` | 60 |
 
 泄漏控制：
 

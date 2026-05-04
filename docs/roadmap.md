@@ -377,6 +377,7 @@ sql_exec_accuracy=1.0
 - 本地总验收 `scripts/audit_project.py` 已接入检索失败分析、QLoRA 配置检查和展示结果生成。
 - 真实 `Qwen/Qwen3-Embedding-0.6B` 和 `Qwen/Qwen3-Reranker-0.6B` staged 服务消融已完成并写入 `results/retrieval_service_eval.md`。
 - QLoRA smoke run 已在 Colab A100 上完成 5 个训练 step，并写入 `results/qlora_smoke.md`。
+- SFT corpus 已扩充到 553 条，新增 `evidence_qa` 和 `verification_rewrite`，且 `reference_answer_leaks=[]`。
 - Qwen3.5-4B 的 300 题 RAG/no-RAG 已保存，并完成输出质量审计、citation miss 归因、人工抽检导出。
 - RAG + Verifier 的 300 题离线后处理已接入主结果表。
 - Verifier 拦截样例已导出，当前 300 题剩余 5 条拦截样例。
@@ -384,5 +385,5 @@ sql_exec_accuracy=1.0
 
 下一批必须依赖 A100 或外部模型服务的任务：
 
-1. 扩充 SFT corpus 的任务类型和真实答案样本。
+1. 使用已扩充的 553 条 SFT corpus 先重跑 5-step QLoRA smoke。
 2. 运行更长的 1 epoch 小规模 SFT。
