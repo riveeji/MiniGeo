@@ -137,8 +137,8 @@ python scripts/evaluate_retrieval_ablation.py --use-services
 默认不加 `--use-services` 时，脚本使用本地 deterministic baseline，方便无模型服务时做回归测试。单 A100 不能同时跑 embedding 与 reranker 服务时，可以分阶段运行：
 
 ```powershell
-python scripts/evaluate_retrieval_ablation.py --use-embedding-service
-python scripts/evaluate_retrieval_ablation.py --use-reranker-service
+python scripts/evaluate_retrieval_ablation.py --use-embedding-service --json-output results/retrieval_service_eval.json --markdown-output results/retrieval_service_eval.md
+python scripts/evaluate_retrieval_ablation.py --use-reranker-service --json-output results/retrieval_service_eval.json --markdown-output results/retrieval_service_eval.md
 ```
 
 当前已保存的真实 embedding 服务结果见 `results/retrieval_service_eval.md`。在 42 条 seed corpus 上，`Qwen3-Embedding dense` 的 `citation_hit_rate=0.957`，`BM25 + Qwen3-Embedding hybrid` 的 `citation_hit_rate=1.000`；本地 lexical reranker 会拉低结果，后续需要接入真实 `Qwen/Qwen3-Reranker-0.6B` 复测。

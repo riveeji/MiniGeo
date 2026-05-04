@@ -3,7 +3,26 @@
   "service": "Colab A100 + vLLM OpenAI-compatible API + Cloudflare quick tunnel",
   "mode": "embedding_service",
   "model": "Qwen/Qwen3-Embedding-0.6B",
+  "embedding_model": "Qwen/Qwen3-Embedding-0.6B",
+  "reranker_model": "Qwen/Qwen3-Reranker-0.6B",
   "command": "python scripts/evaluate_retrieval_ablation.py --use-embedding-service",
+  "main_result_rows": [
+    {
+      "system": "Qwen3-Embedding-0.6B dense retrieval",
+      "citation_hit_rate": 0.957,
+      "latency": "见 retrieval_service_eval"
+    },
+    {
+      "system": "Qwen3-Embedding-0.6B hybrid retrieval",
+      "citation_hit_rate": 1.0,
+      "latency": "见 retrieval_service_eval"
+    },
+    {
+      "system": "Qwen3-Embedding-0.6B hybrid + lexical rerank",
+      "citation_hit_rate": 0.9,
+      "latency": "见 retrieval_service_eval"
+    }
+  ],
   "notes": [
     "This run uses the real embedding service and the local lexical reranker.",
     "Embedding requests are cached by text in the client; hybrid and rerank latency values are warm-cache values in this staged run."

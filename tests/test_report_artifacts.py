@@ -1,4 +1,5 @@
 from minigeo.eval.report_artifacts import abstention_failure_cases, format_failure_cases, format_main_results
+from scripts.write_report_artifacts import _saved_retrieval_service_rows
 
 
 def test_format_main_results_includes_local_baselines() -> None:
@@ -72,6 +73,31 @@ def test_format_main_results_marks_embedding_service_as_completed() -> None:
 
     assert "真实 Qwen3-Embedding / Qwen3-Reranker 服务消融结果" not in pending_section
     assert "真实 Qwen3-Reranker 服务消融结果" in pending_section
+
+
+def test_saved_retrieval_service_rows_prefers_explicit_report_rows(tmp_path) -> None:
+    path = tmp_path / "retrieval_service_eval.json"
+    path.write_text(
+        """
+{
+  "main_result_rows": [
+    {
+      "system": "Qwen3-Reranker-0.6B hybrid rerank",
+      "citation_hit_rate": 0.93,
+      "latency": "见 retrieval_service_eval"
+    }
+  ],
+  "metrics": {
+    "dense": {"citation_hit_rate": 0.1}
+  }
+}
+""",
+        encoding="utf-8",
+    )
+
+    rows = _saved_retrieval_service_rows(path)
+
+    assert rows == [("Qwen3-Reranker-0.6B hybrid rerank", "", 0.93, "", "", "-", "见 retrieval_service_eval")]
 
 
 def test_format_failure_cases_limits_cases_and_keeps_schema() -> None:

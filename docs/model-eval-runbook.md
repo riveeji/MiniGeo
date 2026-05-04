@@ -220,6 +220,13 @@ CSV 中的 `review_decision` 建议使用 `correct_reject`、`false_reject`、`c
 - `Qwen3-Embedding hybrid + lexical rerank`
 - `Qwen3-Reranker` staged 或 combined 消融结果
 
+推荐运行时直接写报告文件：
+
+```powershell
+python scripts/evaluate_retrieval_ablation.py --use-embedding-service --json-output results/retrieval_service_eval.json --markdown-output results/retrieval_service_eval.md
+python scripts/evaluate_retrieval_ablation.py --use-reranker-service --json-output results/retrieval_service_eval.json --markdown-output results/retrieval_service_eval.md
+```
+
 ## 当前注意事项
 
 - 当前 parser 会归一化 `"[doc_id#chunk_id]"` 形式的 citation。

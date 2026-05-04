@@ -95,11 +95,23 @@ def _saved_model_rows(bench: list[dict]) -> list[tuple]:
     return rows
 
 
-def _saved_retrieval_service_rows() -> list[tuple]:
-    path = Path("results/retrieval_service_eval.json")
+def _saved_retrieval_service_rows(path: Path = Path("results/retrieval_service_eval.json")) -> list[tuple]:
     if not path.exists():
         return []
     data = json.loads(path.read_text(encoding="utf-8"))
+    if "main_result_rows" in data:
+        return [
+            (
+                row.get("system", ""),
+                "",
+                row.get("citation_hit_rate"),
+                "",
+                "",
+                "-",
+                row.get("latency", "见 retrieval_service_eval"),
+            )
+            for row in data["main_result_rows"]
+        ]
     metrics = data.get("metrics", {})
     model = str(data.get("model", "Qwen3-Embedding-0.6B")).split("/")[-1]
     rows = []
