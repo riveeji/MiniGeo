@@ -38,6 +38,7 @@ flowchart TD
 | Qwen3-Reranker-0.6B hybrid rerank | citation_hit_rate=0.995 | 真实 reranker staged run |
 | Qwen3.5-4B + BM25 RAG | citation_hit_rate=0.689 | 真实模型服务输出 |
 | Qwen3.5-4B SQL generator | sql_exec_accuracy=1.000 | 60 条 SQL benchmark |
+| QLoRA smoke run | 5 steps completed | Colab A100，adapter 已本地归档 |
 | Planner baseline | routing_accuracy=1.000 | 规则型 planner |
 
 完整表见 `results/main_results.md`。
@@ -73,12 +74,12 @@ Analyze which mineral categories are most frequently misclassified in samples co
 
 ## 剩余任务
 
-不需要 A100 的任务已经基本收敛，真实 reranker staged 消融也已完成。后续主要剩余 GPU 训练任务：
+不需要 A100 的任务已经基本收敛，真实 reranker staged 消融和 QLoRA smoke run 也已完成。后续主要剩余正式训练与评测任务：
 
-1. 运行 QLoRA smoke run：`python scripts/run_qlora_smoke.py --sample-size 32 --max-steps 5`，验证 `configs/qwen35_2b_lora.yaml`、显存和数据格式。
-2. 如 smoke run 成功，再决定是否跑完整 SFT。
+1. 决定是否扩充 SFT corpus 的任务类型和真实答案样本。
+2. 运行更长的 1 epoch 小规模 SFT。
 3. 比较 base / SFT / RAG / Verifier。
 
 ## 简历表述
 
-MiniGeo：构建基于 Qwen3.5 的地学可信问答与数据分析 Agent 系统，包含 300 条领域 benchmark、可追踪 RAG corpus、BM25/embedding/hybrid/reranker 检索消融、证据 Verifier、Text-to-SQL 工具和混合文档 + 数据库 Agent demo；在真实 Qwen3-Embedding 与 Qwen3-Reranker 服务上完成 staged retrieval evaluation，并通过 citation hit、unsupported claim、abstention、SQL execution accuracy 和 latency 形成可复现实验闭环。
+MiniGeo：构建基于 Qwen3.5 的地学可信问答与数据分析 Agent 系统，包含 300 条领域 benchmark、可追踪 RAG corpus、BM25/embedding/hybrid/reranker 检索消融、证据 Verifier、Text-to-SQL 工具和混合文档 + 数据库 Agent demo；在真实 Qwen3-Embedding 与 Qwen3-Reranker 服务上完成 staged retrieval evaluation，并跑通 Qwen3.5-2B QLoRA smoke training，通过 citation hit、unsupported claim、abstention、SQL execution accuracy 和 latency 形成可复现实验闭环。

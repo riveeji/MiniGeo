@@ -252,3 +252,5 @@ python scripts/run_qlora_smoke.py --sample-size 32 --max-steps 5 --output-dir ch
 - 能读取 `data/processed/sft_corpus.jsonl`。
 - 能完成 5 个训练 step。
 - 能写出 `checkpoints/qlora-smoke/adapter`。
+
+2026-05-04 该 smoke run 已完成，结果见 `results/qlora_smoke.md`。
