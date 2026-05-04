@@ -1,60 +1,104 @@
 {
-  "date": "2026-05-04",
-  "service": "Colab A100 + vLLM OpenAI-compatible API + Cloudflare quick tunnel",
-  "mode": "embedding_service",
-  "model": "Qwen/Qwen3-Embedding-0.6B",
-  "embedding_model": "Qwen/Qwen3-Embedding-0.6B",
-  "reranker_model": "Qwen/Qwen3-Reranker-0.6B",
-  "command": "python scripts/evaluate_retrieval_ablation.py --use-embedding-service",
-  "main_result_rows": [
-    {
-      "system": "Qwen3-Embedding-0.6B dense retrieval",
-      "citation_hit_rate": 0.957,
-      "latency": "见 retrieval_service_eval"
-    },
-    {
-      "system": "Qwen3-Embedding-0.6B hybrid retrieval",
-      "citation_hit_rate": 1.0,
-      "latency": "见 retrieval_service_eval"
-    },
-    {
-      "system": "Qwen3-Embedding-0.6B hybrid + lexical rerank",
-      "citation_hit_rate": 0.9,
-      "latency": "见 retrieval_service_eval"
-    }
-  ],
-  "notes": [
-    "This run uses the real embedding service and the local lexical reranker.",
-    "Embedding requests are cached by text in the client; hybrid and rerank latency values are warm-cache values in this staged run."
-  ],
-  "metrics": {
-    "bm25": {
-      "recall@5": 0.976,
-      "recall@10": 1.0,
-      "mrr": 0.774,
-      "citation_hit_rate": 1.0,
-      "latency_ms": 2.594
-    },
-    "dense": {
-      "recall@5": 0.885,
-      "recall@10": 0.957,
-      "mrr": 0.644,
-      "citation_hit_rate": 0.957,
-      "latency_ms": 1683.67
-    },
-    "hybrid": {
-      "recall@5": 0.962,
-      "recall@10": 1.0,
-      "mrr": 0.738,
-      "citation_hit_rate": 1.0,
-      "latency_ms": 5.773
-    },
-    "hybrid_rerank": {
-      "recall@5": 0.617,
-      "recall@10": 0.9,
-      "mrr": 0.474,
-      "citation_hit_rate": 0.9,
-      "latency_ms": 12.393
-    }
-  }
+    "date":  "2026-05-04",
+    "service":  "Colab A100 staged retrieval services",
+    "mode":  "embedding_and_reranker_staged",
+    "embedding_model":  "Qwen/Qwen3-Embedding-0.6B",
+    "reranker_model":  "Qwen/Qwen3-Reranker-0.6B",
+    "commands":  [
+                     "python scripts/evaluate_retrieval_ablation.py --use-embedding-service",
+                     "python scripts/evaluate_retrieval_ablation.py --use-reranker-service --json-output results/retrieval_service_eval_reranker.json --markdown-output results/retrieval_service_eval_reranker.md"
+                 ],
+    "main_result_rows":  [
+                             {
+                                 "system":  "Qwen3-Embedding-0.6B dense retrieval",
+                                 "citation_hit_rate":  0.957,
+                                 "latency":  "见 retrieval_service_eval"
+                             },
+                             {
+                                 "system":  "Qwen3-Embedding-0.6B hybrid retrieval",
+                                 "citation_hit_rate":  1.0,
+                                 "latency":  "见 retrieval_service_eval"
+                             },
+                             {
+                                 "system":  "Qwen3-Embedding-0.6B hybrid + lexical rerank",
+                                 "citation_hit_rate":  0.9,
+                                 "latency":  "见 retrieval_service_eval"
+                             },
+                             {
+                                 "system":  "Qwen3-Reranker-0.6B hybrid rerank",
+                                 "citation_hit_rate":  0.9952153110047847,
+                                 "latency":  "见 retrieval_service_eval"
+                             }
+                         ],
+    "metrics":  {
+                    "embedding_service":  {
+                                              "bm25":  {
+                                                           "recall@5":  0.976,
+                                                           "recall@10":  1.0,
+                                                           "mrr":  0.774,
+                                                           "citation_hit_rate":  1.0,
+                                                           "latency_ms":  2.594
+                                                       },
+                                              "dense":  {
+                                                            "recall@5":  0.885,
+                                                            "recall@10":  0.957,
+                                                            "mrr":  0.644,
+                                                            "citation_hit_rate":  0.957,
+                                                            "latency_ms":  1683.67
+                                                        },
+                                              "hybrid":  {
+                                                             "recall@5":  0.962,
+                                                             "recall@10":  1.0,
+                                                             "mrr":  0.738,
+                                                             "citation_hit_rate":  1.0,
+                                                             "latency_ms":  5.773
+                                                         },
+                                              "hybrid_rerank":  {
+                                                                    "recall@5":  0.617,
+                                                                    "recall@10":  0.9,
+                                                                    "mrr":  0.474,
+                                                                    "citation_hit_rate":  0.9,
+                                                                    "latency_ms":  12.393
+                                                                }
+                                          },
+                    "reranker_service":  {
+                                             "bm25":  {
+                                                          "recall@5":  1.0,
+                                                          "recall@10":  1.0,
+                                                          "mrr":  0.814354066985646,
+                                                          "citation_hit_rate":  1.0,
+                                                          "latency_ms":  0.3263351833334127
+                                                      },
+                                             "dense":  {
+                                                           "recall@5":  0.6076555023923444,
+                                                           "recall@10":  0.8803827751196173,
+                                                           "mrr":  0.43586238323080456,
+                                                           "citation_hit_rate":  0.8803827751196173,
+                                                           "latency_ms":  1.7832070399996762
+                                                       },
+                                             "hybrid":  {
+                                                            "recall@5":  0.9521531100478469,
+                                                            "recall@10":  1.0,
+                                                            "mrr":  0.679739120528594,
+                                                            "citation_hit_rate":  1.0,
+                                                            "latency_ms":  2.187163239999942
+                                                        },
+                                             "hybrid_rerank":  {
+                                                                   "recall@5":  0.8755980861244019,
+                                                                   "recall@10":  0.9952153110047847,
+                                                                   "mrr":  0.5449646844383685,
+                                                                   "citation_hit_rate":  0.9952153110047847,
+                                                                   "latency_ms":  45.06790594666654
+                                                               }
+                                         }
+                },
+    "notes":  [
+                  "Embedding staged run uses the real Qwen3-Embedding service and local lexical reranker.",
+                  "Reranker staged run uses the real Qwen3-Reranker service and local deterministic dense retriever.",
+                  "Use the reranker row to judge whether the local lexical reranker demotion issue is resolved."
+              ],
+    "source_reports":  [
+                           "results/retrieval_service_eval_embedding.md",
+                           "results/retrieval_service_eval_reranker.md"
+                       ]
 }

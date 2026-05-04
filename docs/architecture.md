@@ -160,3 +160,12 @@ MiniGeo 必须评测语言质量和系统可靠性。
 - SQL execution accuracy。
 - SQL repair success rate。
 - Latency。
+
+当前本地评测入口：
+
+- `scripts/audit_project.py`：总验收。
+- `scripts/evaluate_retrieval_ablation.py`：BM25、dense、hybrid、hybrid+rerank 消融。
+- `scripts/analyze_retrieval_failures.py`：检索失败分类和样例导出。
+- `scripts/evaluate_verified_model_service.py`：已保存模型输出的 Verifier 后处理。
+- `scripts/evaluate_sql.py`：SQL execution accuracy。
+- `scripts/agent_demo.py`：混合 SQL + 文档证据 demo。

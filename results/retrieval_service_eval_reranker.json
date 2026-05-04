@@ -1,0 +1,45 @@
+{
+  "date": "2026-05-04",
+  "service": "OpenAI-compatible retrieval service",
+  "mode": "reranker_service",
+  "embedding_model": "Qwen/Qwen3-Embedding-0.6B",
+  "reranker_model": "Qwen/Qwen3-Reranker-0.6B",
+  "command": "python scripts/evaluate_retrieval_ablation.py --use-reranker-service --json-output results/retrieval_service_eval_reranker.json --markdown-output results/retrieval_service_eval_reranker.md",
+  "main_result_rows": [
+    {
+      "system": "Qwen3-Reranker-0.6B hybrid rerank",
+      "citation_hit_rate": 0.9952153110047847,
+      "latency": "见 retrieval_service_eval"
+    }
+  ],
+  "metrics": {
+    "bm25": {
+      "recall@5": 1.0,
+      "recall@10": 1.0,
+      "mrr": 0.814354066985646,
+      "citation_hit_rate": 1.0,
+      "latency_ms": 0.3263351833334127
+    },
+    "dense": {
+      "recall@5": 0.6076555023923444,
+      "recall@10": 0.8803827751196173,
+      "mrr": 0.43586238323080456,
+      "citation_hit_rate": 0.8803827751196173,
+      "latency_ms": 1.7832070399996762
+    },
+    "hybrid": {
+      "recall@5": 0.9521531100478469,
+      "recall@10": 1.0,
+      "mrr": 0.679739120528594,
+      "citation_hit_rate": 1.0,
+      "latency_ms": 2.187163239999942
+    },
+    "hybrid_rerank": {
+      "recall@5": 0.8755980861244019,
+      "recall@10": 0.9952153110047847,
+      "mrr": 0.5449646844383685,
+      "citation_hit_rate": 0.9952153110047847,
+      "latency_ms": 45.06790594666654
+    }
+  }
+}

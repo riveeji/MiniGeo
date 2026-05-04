@@ -153,6 +153,16 @@ mode=--use-embedding-service
 dense citation_hit_rate=0.957
 hybrid citation_hit_rate=1.000
 hybrid+local_lexical_rerank citation_hit_rate=0.900
+Qwen3-Reranker-0.6B hybrid_rerank citation_hit_rate=0.995
+```
+
+当前检索失败分析：
+
+```text
+bm25 top10 misses=0
+hybrid top10 misses=0
+dense misses=36，主要为 evidence_label_narrow 和 same_topic_wrong_chunk
+hybrid_rerank misses=25，全部为 reranker_demoted_gold
 ```
 
 说明：该结果基于确定性种子 benchmark 和领域 query expansion。用于正式研究结论前，应继续扩展公开资料和人工复核 failure cases，避免只对当前 gold evidence 过拟合。
@@ -172,6 +182,7 @@ hybrid+local_lexical_rerank citation_hit_rate=0.900
 - `scripts/rag_demo.py`
 - `scripts/model_rag_demo.py`
 - `scripts/evaluate_retrieval_ablation.py`
+- `scripts/analyze_retrieval_failures.py`
 - `scripts/evaluate_verified_model_service.py`
 
 成功标准：
@@ -181,7 +192,7 @@ hybrid+local_lexical_rerank citation_hit_rate=0.900
 - RAG 的 citation hit rate 高于 no-RAG。
 - BM25、dense、hybrid、hybrid+rerank 可以在同一 benchmark 上做消融评测。
 - 加 `--use-embedding-service` / `--use-reranker-service` 后可以分阶段接入真实 embedding 或 reranker 服务；如果两个服务可同时访问，也可以用 `--use-services`。
-- `--use-embedding-service` 已跑通并写入 `results/retrieval_service_eval.md`；下一步需要切换 A100 服务到 `Qwen/Qwen3-Reranker-0.6B`，运行 `--use-reranker-service`。
+- `--use-embedding-service` 和 `--use-reranker-service` 均已跑通并写入 `results/retrieval_service_eval.md`；真实 reranker staged run 基本修复了本地 lexical reranker 的降排问题。
 
 ## Phase 4：MiniGeo-Verifier
 
@@ -363,6 +374,8 @@ sql_exec_accuracy=1.0
 
 - MiniGeo-Bench 已扩展到 300 条。
 - BM25、dense/hybrid/reranker 本地 deterministic 消融接口已实现。
+- 本地总验收 `scripts/audit_project.py` 已接入检索失败分析、QLoRA 配置检查和展示结果生成。
+- 真实 `Qwen/Qwen3-Embedding-0.6B` 和 `Qwen/Qwen3-Reranker-0.6B` staged 服务消融已完成并写入 `results/retrieval_service_eval.md`。
 - Qwen3.5-4B 的 300 题 RAG/no-RAG 已保存，并完成输出质量审计、citation miss 归因、人工抽检导出。
 - RAG + Verifier 的 300 题离线后处理已接入主结果表。
 - Verifier 拦截样例已导出，当前 300 题剩余 5 条拦截样例。
@@ -370,5 +383,5 @@ sql_exec_accuracy=1.0
 
 下一批必须依赖 A100 或外部模型服务的任务：
 
-1. 运行真实 Qwen3-Embedding-0.6B / Qwen3-Reranker-0.6B 服务消融；单 A100 可先跑 `--use-embedding-service`，再切换服务跑 `--use-reranker-service`。
-2. 运行 QLoRA smoke run。
+1. 运行 QLoRA smoke run。
+2. 如 smoke run 成功，再决定是否跑完整 SFT。

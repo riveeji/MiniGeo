@@ -220,7 +220,7 @@ CSV 中的 `review_decision` 建议使用 `correct_reject`、`false_reject`、`c
 - `Qwen3-Embedding hybrid + lexical rerank`
 - `Qwen3-Reranker` staged 或 combined 消融结果
 
-推荐运行时直接写报告文件：
+当前真实 embedding 与 reranker staged 结果已经写入 `results/retrieval_service_eval.md`。如需刷新检索服务结果，可按下面两条命令分别重跑。
 
 ```powershell
 python scripts/evaluate_retrieval_ablation.py --use-embedding-service --json-output results/retrieval_service_eval.json --markdown-output results/retrieval_service_eval.md
@@ -233,3 +233,22 @@ python scripts/evaluate_retrieval_ablation.py --use-reranker-service --json-outp
 - 当前 prompt 已加入 `/no_think` 和 JSON API system message；本地 client 还会在 `MINIGEO_DISABLE_THINKING=1` 时向 vLLM 发送 `chat_template_kwargs={"enable_thinking": false}`。
 - 当前 RAG prompt 要求 citation 必须直接支撑答案；非系统类问题如果模型引用泛化 `doc_system` chunk，本地后处理会过滤这类系统引用，或在只引用系统 chunk 时改为与答案文本更匹配的领域 evidence chunk。
 - 150 题正式评测必须在 10 题 smoke test 达标后再跑，避免浪费 A100。
+
+## Step 10：QLoRA smoke run
+
+真实检索服务消融完成后，重启 Colab runtime 释放 GPU，再运行最小 QLoRA smoke：
+
+```bash
+python -m pip install -r requirements-dev.txt
+python -m pip install -U transformers accelerate peft bitsandbytes datasets sentencepiece
+python scripts/build_sft_corpus.py
+python scripts/train_lora.py --check-only
+python scripts/run_qlora_smoke.py --sample-size 32 --max-steps 5 --output-dir checkpoints/qlora-smoke
+```
+
+成功标准：
+
+- 能加载 `Qwen/Qwen3.5-2B`。
+- 能读取 `data/processed/sft_corpus.jsonl`。
+- 能完成 5 个训练 step。
+- 能写出 `checkpoints/qlora-smoke/adapter`。

@@ -9,3 +9,20 @@ def test_agent_design_doc_covers_tools_demo_and_metrics() -> None:
     assert "verify_answer" in text
     assert "Qinhuangdao" in text
     assert "sql_exec_accuracy" in text
+
+
+def test_architecture_doc_lists_local_evaluation_entrypoints() -> None:
+    text = Path("docs/architecture.md").read_text(encoding="utf-8")
+
+    assert "scripts/audit_project.py" in text
+    assert "scripts/analyze_retrieval_failures.py" in text
+
+
+def test_showcase_doc_summarizes_results_and_remaining_a100_tasks() -> None:
+    text = Path("docs/project-showcase.md").read_text(encoding="utf-8")
+
+    assert "Qwen3-Embedding-0.6B hybrid retrieval" in text
+    assert "检索失败分析" in text
+    assert "Qwen3-Reranker-0.6B" in text
+    assert "QLoRA smoke run" in text
+    assert "简历表述" in text

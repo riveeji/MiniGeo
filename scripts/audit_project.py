@@ -46,6 +46,7 @@ def main() -> None:
         ("单元测试", _pytest_command(python), _workspace_temp_env(Path(".pytest_tmp"))),
         ("Benchmark 分布", [python, "scripts/evaluate_bench.py"]),
         ("检索消融", [python, "scripts/evaluate_retrieval_ablation.py"]),
+        ("检索失败分析", [python, "scripts/analyze_retrieval_failures.py"]),
         ("拒答评测", [python, "scripts/evaluate_abstention.py"]),
         ("Verifier 评测", [python, "scripts/evaluate_verifier.py"]),
         ("SQL 评测", [python, "scripts/evaluate_sql.py"]),
