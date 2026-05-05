@@ -1,6 +1,6 @@
 # MiniGeo SFT Adapter 评测 Runbook
 
-本文件用于在 Colab A100 上加载 `MiniGeo-Qwen3.5-2B-SFT-128step` LoRA adapter，并运行小规模推理 smoke test。
+本文件用于在 Colab A100 上加载 `MiniGeo-Qwen3.5-2B-SFT-128step` LoRA adapter，并运行小规模推理 smoke test。同时运行同一 10 题的 `Qwen/Qwen3.5-2B` base 对照。
 
 ## 前提
 
@@ -104,7 +104,39 @@ python scripts/evaluate_sft_adapter.py \
   --report results/sft_adapter_128step_smoke10.md
 ```
 
-### Cell 7：打包评测输出
+### Cell 7：真实加载 base 2B 跑同 10 题 smoke
+
+```bash
+%%bash
+set -e
+
+cd /content/MiniGeo
+export PYTHONPATH=/content/MiniGeo/src
+
+python scripts/evaluate_base_model.py \
+  --base-model Qwen/Qwen3.5-2B \
+  --limit 10 \
+  --max-new-tokens 256 \
+  --output results/base_qwen35_2b_smoke10.jsonl \
+  --report results/base_qwen35_2b_smoke10.md
+```
+
+### Cell 8：离线重解析 SFT adapter 输出
+
+```bash
+%%bash
+set -e
+
+cd /content/MiniGeo
+export PYTHONPATH=/content/MiniGeo/src
+
+python scripts/reparse_sft_adapter_outputs.py \
+  --input results/sft_adapter_128step_smoke10.jsonl \
+  --output results/sft_adapter_128step_smoke10_reparsed.jsonl \
+  --report results/sft_adapter_128step_smoke10_reparsed.md
+```
+
+### Cell 9：打包评测输出
 
 ```bash
 %%bash
@@ -114,19 +146,27 @@ cd /content/MiniGeo
 
 test -f results/sft_adapter_128step_smoke10.jsonl
 test -f results/sft_adapter_128step_smoke10.md
+test -f results/sft_adapter_128step_smoke10_reparsed.jsonl
+test -f results/sft_adapter_128step_smoke10_reparsed.md
 test -f results/sft_adapter_128step_dryrun.jsonl
 test -f results/sft_adapter_128step_dryrun.md
+test -f results/base_qwen35_2b_smoke10.jsonl
+test -f results/base_qwen35_2b_smoke10.md
 
 zip -r /content/minigeo_sft_adapter_eval_128step.zip \
   results/sft_adapter_128step_smoke10.jsonl \
   results/sft_adapter_128step_smoke10.md \
+  results/sft_adapter_128step_smoke10_reparsed.jsonl \
+  results/sft_adapter_128step_smoke10_reparsed.md \
   results/sft_adapter_128step_dryrun.jsonl \
-  results/sft_adapter_128step_dryrun.md
+  results/sft_adapter_128step_dryrun.md \
+  results/base_qwen35_2b_smoke10.jsonl \
+  results/base_qwen35_2b_smoke10.md
 
 ls -lh /content/minigeo_sft_adapter_eval_128step.zip
 ```
 
-### Cell 8：下载结果
+### Cell 10：下载结果
 
 ```python
 from google.colab import files
@@ -137,6 +177,7 @@ files.download("/content/minigeo_sft_adapter_eval_128step.zip")
 
 - `--check-only` 没有 adapter 文件缺失。
 - 打包 cell 必须先通过 `test -f results/sft_adapter_128step_smoke10.jsonl` 和 `test -f results/sft_adapter_128step_smoke10.md`。
+- 打包 cell 必须同时包含 `results/base_qwen35_2b_smoke10.jsonl` 和 `results/base_qwen35_2b_smoke10.md`。
 - `results/sft_adapter_128step_smoke10.md` 中 `request_errors=0`。
 - `non_empty_answer_rate` 不为 0。
 - 输出 JSON 中没有大段 thinking process。

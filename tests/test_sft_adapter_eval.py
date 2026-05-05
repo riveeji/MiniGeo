@@ -107,3 +107,46 @@ def test_reparse_adapter_records_preserves_raw_and_updates_result() -> None:
     assert reparsed[0]["result"]["answer"] == "石英的主要化学成分是二氧化硅 SiO2。"
     assert reparsed[0]["result"]["citations"] == ["doc_quartz#chunk_001"]
     assert reparsed[0]["result"]["raw_model_output"] == records[0]["result"]["raw_model_output"]
+
+
+def test_base_smoke_dry_run_uses_same_benchmark_subset(tmp_path: Path) -> None:
+    from minigeo.finetune.adapter_eval import run_base_smoke
+
+    output = tmp_path / "base.jsonl"
+    summary = run_base_smoke(
+        base_model="Qwen/Qwen3.5-2B",
+        benchmark_path=Path("data/benchmark/minigeo_bench.jsonl"),
+        output_path=output,
+        limit=3,
+        max_new_tokens=64,
+        dry_run=True,
+    )
+
+    assert summary["items"] == 3
+    assert summary["dry_run"] is True
+    text = output.read_text(encoding="utf-8")
+    assert "Qwen/Qwen3.5-2B" in text
+    assert "Output only one JSON object" in text
+
+
+def test_format_base_model_report_includes_records_and_summary() -> None:
+    from minigeo.finetune.adapter_eval import format_base_model_report
+
+    markdown = format_base_model_report(
+        base_model="Qwen/Qwen3.5-2B",
+        summary={
+            "items": 10,
+            "non_empty_answer_rate": 1.0,
+            "citation_hit_rate": 0.25,
+            "abstention_accuracy": 0.8,
+            "request_errors": 0,
+            "latency_ms": 100.0,
+        },
+        records_path=Path("results/base_qwen35_2b_smoke10.jsonl"),
+        dry_run=False,
+    )
+
+    assert "# MiniGeo Base Model Smoke Evaluation" in markdown
+    assert "Qwen/Qwen3.5-2B" in markdown
+    assert "citation_hit_rate=0.250" in markdown
+    assert "results/base_qwen35_2b_smoke10.jsonl" in markdown

@@ -93,6 +93,7 @@ def _saved_model_rows(bench: list[dict]) -> list[tuple]:
     if Path("results/model_service_eval.md").exists():
         rows.append(("Qwen3.5-4B SQL generator", "", "", "", "", 1.0, "见 model_service_eval"))
     rows.extend(_saved_retrieval_service_rows())
+    rows.extend(_saved_base_model_rows())
     rows.extend(_saved_sft_adapter_rows())
     return rows
 
@@ -166,6 +167,40 @@ def _saved_sft_adapter_rows(
     return [
         (
             "MiniGeo-2B-SFT 128step smoke",
+            "",
+            summary.get("citation_hit_rate"),
+            "",
+            summary.get("abstention_accuracy"),
+            "-",
+            latency_text,
+        )
+    ]
+
+
+def _saved_base_model_rows(
+    output_path: Path = Path("results/base_qwen35_2b_smoke10.jsonl"),
+    report_path: Path = Path("results/base_qwen35_2b_smoke10.md"),
+) -> list[tuple]:
+    if not output_path.exists():
+        return []
+    records = read_jsonl(output_path)
+    rows = [
+        {
+            "id": record["id"],
+            "evidence": record.get("gold_evidence", []),
+            "answerable": bool(record.get("gold_evidence", [])),
+        }
+        for record in records
+    ]
+    outputs = {record["id"]: record.get("result", {}) for record in records}
+    summary = summarize_model_rag_outputs(rows, outputs)
+    latency = _extract_report_metric(report_path, "latency_ms")
+    latency_text = "见 base_qwen35_2b_smoke10"
+    if latency is not None:
+        latency_text = f"{latency:.3f} ms/q"
+    return [
+        (
+            "Qwen3.5-2B base smoke",
             "",
             summary.get("citation_hit_rate"),
             "",

@@ -85,6 +85,7 @@ python scripts/rag_demo.py
 python scripts/model_rag_demo.py
 python scripts/evaluate_model_service.py --limit 3 --selection evidence
 python scripts/evaluate_model_service.py --limit 300 --selection all --mode both --dry-run
+python scripts/evaluate_base_model.py --dry-run
 python scripts/audit_model_outputs.py
 python scripts/analyze_model_failures.py
 python scripts/export_failure_review.py
@@ -168,7 +169,7 @@ $env:MINIGEO_SQL_MODEL="Qwen/Qwen3.5-2B"
 python scripts/evaluate_sql.py --use-model
 ```
 
-如果要在 Colab A100 上加载 128step SFT adapter 做推理 smoke test，见 `docs/sft-adapter-eval-runbook.md`。当前 `minigeo_sft_adapter_eval_128step (1).zip` 已包含真实 smoke10 结果；记录见 `results/sft_adapter_eval_128step.md`。如果只想离线重解析已有 raw output，运行 `python scripts/reparse_sft_adapter_outputs.py`。
+如果要在 Colab A100 上加载 128step SFT adapter 做推理 smoke test，并同时跑 `Qwen/Qwen3.5-2B` base 对照，见 `docs/sft-adapter-eval-runbook.md`。当前 `minigeo_sft_adapter_eval_128step (1).zip` 已包含真实 SFT smoke10 结果；记录见 `results/sft_adapter_eval_128step.md`。如果只想离线重解析已有 raw output，运行 `python scripts/reparse_sft_adapter_outputs.py`。
 
 ## 核心接口
 

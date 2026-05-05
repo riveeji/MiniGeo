@@ -171,6 +171,27 @@ def dry_run_records(rows: list[dict[str, Any]], adapter_dir: Path) -> list[dict[
     ]
 
 
+def dry_run_base_records(rows: list[dict[str, Any]], base_model: str) -> list[dict[str, Any]]:
+    return [
+        {
+            "id": row["id"],
+            "question": row["question"],
+            "gold_evidence": row.get("evidence", []),
+            "base_model": base_model,
+            "prompt": build_sft_prompt(row["question"]),
+            "result": {
+                "answer": "",
+                "citations": [],
+                "abstained": True,
+                "confidence": 0.0,
+                "raw_model_output": "",
+                "dry_run": True,
+            },
+        }
+        for row in rows
+    ]
+
+
 def reparse_adapter_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     reparsed_records = []
     for record in records:
@@ -185,6 +206,49 @@ def reparse_adapter_records(records: list[dict[str, Any]]) -> list[dict[str, Any
         updated["reparsed"] = True
         reparsed_records.append(updated)
     return reparsed_records
+
+
+def run_base_smoke(
+    base_model: str,
+    benchmark_path: Path,
+    output_path: Path,
+    limit: int,
+    max_new_tokens: int,
+    dry_run: bool = False,
+) -> dict[str, Any]:
+    rows = select_adapter_smoke_rows(benchmark_path, limit=limit)
+    if dry_run:
+        records = dry_run_base_records(rows, base_model)
+        write_jsonl(output_path, records)
+        summary = summarize_model_rag_outputs(rows, {row["id"]: record["result"] for row, record in zip(rows, records)})
+        summary["dry_run"] = True
+        return summary
+
+    generator = _BaseModelGenerator(base_model=base_model, max_new_tokens=max_new_tokens)
+    records = []
+    outputs = {}
+    started = perf_counter()
+    for row in rows:
+        prompt = build_sft_prompt(row["question"])
+        raw = generator.generate(prompt)
+        parsed = parse_adapter_answer(raw, allowed_citations=set(row.get("evidence", [])))
+        parsed["raw_model_output"] = raw
+        outputs[row["id"]] = parsed
+        records.append(
+            {
+                "id": row["id"],
+                "question": row["question"],
+                "gold_evidence": row.get("evidence", []),
+                "base_model": base_model,
+                "prompt": prompt,
+                "result": parsed,
+            }
+        )
+        write_jsonl(output_path, records)
+    latency_ms = (perf_counter() - started) * 1000.0 / max(len(rows), 1)
+    summary = summarize_model_rag_outputs(rows, outputs, latency_ms=latency_ms)
+    summary["dry_run"] = False
+    return summary
 
 
 def run_adapter_smoke(
@@ -236,6 +300,33 @@ def run_adapter_smoke(
     return summary
 
 
+class _BaseModelGenerator:
+    def __init__(self, base_model: str, max_new_tokens: int):
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+
+        self.tokenizer = AutoTokenizer.from_pretrained(base_model, trust_remote_code=True)
+        if self.tokenizer.pad_token is None:
+            self.tokenizer.pad_token = self.tokenizer.eos_token
+        quantization = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.bfloat16,
+            bnb_4bit_use_double_quant=True,
+        )
+        self.model = AutoModelForCausalLM.from_pretrained(
+            base_model,
+            quantization_config=quantization,
+            device_map="auto",
+            trust_remote_code=True,
+        )
+        self.model.eval()
+        self.max_new_tokens = max_new_tokens
+
+    def generate(self, prompt: str) -> str:
+        return _generate_with_chat_template(self.model, self.tokenizer, prompt, self.max_new_tokens)
+
+
 class _PeftAdapterGenerator:
     def __init__(self, adapter_dir: Path, base_model: str, max_new_tokens: int):
         import torch
@@ -262,23 +353,27 @@ class _PeftAdapterGenerator:
         self.max_new_tokens = max_new_tokens
 
     def generate(self, prompt: str) -> str:
-        import torch
+        return _generate_with_chat_template(self.model, self.tokenizer, prompt, self.max_new_tokens)
 
-        messages = [
-            {"role": "system", "content": SFT_JSON_SYSTEM},
-            {"role": "user", "content": prompt},
-        ]
-        text = self.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
-        inputs = self.tokenizer(text, return_tensors="pt").to(self.model.device)
-        with torch.no_grad():
-            generated = self.model.generate(
-                **inputs,
-                max_new_tokens=self.max_new_tokens,
-                do_sample=False,
-                pad_token_id=self.tokenizer.pad_token_id,
-            )
-        output_ids = generated[0][inputs["input_ids"].shape[-1]:]
-        return self.tokenizer.decode(output_ids, skip_special_tokens=True).strip()
+
+def _generate_with_chat_template(model: Any, tokenizer: Any, prompt: str, max_new_tokens: int) -> str:
+    import torch
+
+    messages = [
+        {"role": "system", "content": SFT_JSON_SYSTEM},
+        {"role": "user", "content": prompt},
+    ]
+    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    inputs = tokenizer(text, return_tensors="pt").to(model.device)
+    with torch.no_grad():
+        generated = model.generate(
+            **inputs,
+            max_new_tokens=max_new_tokens,
+            do_sample=False,
+            pad_token_id=tokenizer.pad_token_id,
+        )
+    output_ids = generated[0][inputs["input_ids"].shape[-1]:]
+    return tokenizer.decode(output_ids, skip_special_tokens=True).strip()
 
 
 def format_sft_adapter_report(
@@ -316,4 +411,35 @@ def format_sft_adapter_report(
             "",
         ]
     )
+    return "\n".join(lines)
+
+
+def format_base_model_report(
+    base_model: str,
+    summary: dict[str, Any],
+    records_path: Path,
+    dry_run: bool,
+) -> str:
+    lines = [
+        "# MiniGeo Base Model Smoke Evaluation",
+        "",
+        f"- Base model: `{base_model}`",
+        f"- Records: `{records_path.as_posix()}`",
+        f"- Dry run: `{dry_run}`",
+        "",
+        "## Summary",
+        "",
+        f"- items={summary.get('items', 0)}",
+        f"- non_empty_answer_rate={summary.get('non_empty_answer_rate', 0.0):.3f}",
+        f"- citation_hit_rate={summary.get('citation_hit_rate', 0.0):.3f}",
+        f"- abstention_accuracy={summary.get('abstention_accuracy', 0.0):.3f}",
+        f"- request_errors={summary.get('request_errors', 0)}",
+        f"- latency_ms={summary.get('latency_ms', 0.0):.3f}",
+        "",
+        "## Interpretation",
+        "",
+        "- 该 smoke test 用作 128step SFT adapter 的同题 base model 对照。",
+        "- 质量结论需要与 SFT adapter、RAG 和 Verifier 在同一题集上比较。",
+        "",
+    ]
     return "\n".join(lines)

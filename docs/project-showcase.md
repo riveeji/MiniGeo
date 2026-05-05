@@ -89,7 +89,7 @@ Analyze which mineral categories are most frequently misclassified in samples co
 不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。2026-05-05 下载的 128step Colab artifact 已确认包含 `adapter_model.safetensors`，并已完成 smoke10 推理；离线重解析把 citation hit 从 0.111 提升到 0.444，但 raw output 仍暴露出 `</think>` 泄漏、多 JSON 输出和 citation 格式不稳，1 epoch artifact 仍未生成。后续主要剩余任务：
 
 1. 改进 SFT 推理 prompt/parser，处理多 JSON 输出、`</think>` 泄漏和非标准 citation。
-2. 补 `Qwen/Qwen3.5-2B` base 模型同 10 题对照。
+2. 补 `Qwen/Qwen3.5-2B` base 对照，使用同 10 题评测 128step adapter 是否改善 answer format、refusal 或 citation behavior。
 3. 如果格式和引用行为改善，再重新运行并打包 553step 或 1 epoch 小规模 SFT。
 
 SFT adapter 评测流程见 `docs/sft-adapter-eval-runbook.md`。
