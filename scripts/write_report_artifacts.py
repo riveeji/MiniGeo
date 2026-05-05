@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+import re
 from time import perf_counter
 
 from minigeo.agent.simple_agent import MiniGeoAgent
@@ -92,6 +93,7 @@ def _saved_model_rows(bench: list[dict]) -> list[tuple]:
     if Path("results/model_service_eval.md").exists():
         rows.append(("Qwen3.5-4B SQL generator", "", "", "", "", 1.0, "见 model_service_eval"))
     rows.extend(_saved_retrieval_service_rows())
+    rows.extend(_saved_sft_adapter_rows())
     return rows
 
 
@@ -135,6 +137,47 @@ def _saved_retrieval_service_rows(path: Path = Path("results/retrieval_service_e
             )
         )
     return rows
+
+
+def _saved_sft_adapter_rows(
+    output_path: Path = Path("results/sft_adapter_128step_smoke10.jsonl"),
+    report_path: Path = Path("results/sft_adapter_128step_smoke10.md"),
+) -> list[tuple]:
+    if not output_path.exists():
+        return []
+    records = read_jsonl(output_path)
+    rows = [
+        {
+            "id": record["id"],
+            "evidence": record.get("gold_evidence", []),
+            "answerable": bool(record.get("gold_evidence", [])),
+        }
+        for record in records
+    ]
+    outputs = {record["id"]: record.get("result", {}) for record in records}
+    summary = summarize_model_rag_outputs(rows, outputs)
+    latency = _extract_report_metric(report_path, "latency_ms")
+    latency_text = "见 sft_adapter_128step_smoke10"
+    if latency is not None:
+        latency_text = f"{latency:.3f} ms/q"
+    return [
+        (
+            "MiniGeo-2B-SFT 128step smoke",
+            "",
+            summary.get("citation_hit_rate"),
+            "",
+            summary.get("abstention_accuracy"),
+            "-",
+            latency_text,
+        )
+    ]
+
+
+def _extract_report_metric(path: Path, name: str) -> float | None:
+    if not path.exists():
+        return None
+    match = re.search(rf"{re.escape(name)}=([0-9.]+)", path.read_text(encoding="utf-8"))
+    return float(match.group(1)) if match else None
 
 
 def _saved_agent_case_summary(path: Path = Path("results/agent_cases.json")) -> dict:

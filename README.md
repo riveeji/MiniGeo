@@ -167,7 +167,7 @@ $env:MINIGEO_SQL_MODEL="Qwen/Qwen3.5-2B"
 python scripts/evaluate_sql.py --use-model
 ```
 
-如果要在 Colab A100 上加载 128step SFT adapter 做推理 smoke test，见 `docs/sft-adapter-eval-runbook.md`。当前 `minigeo_sft_adapter_eval_128step.zip` 只包含 dry-run 输出，尚未包含真实 smoke10 结果。
+如果要在 Colab A100 上加载 128step SFT adapter 做推理 smoke test，见 `docs/sft-adapter-eval-runbook.md`。当前 `minigeo_sft_adapter_eval_128step (1).zip` 已包含真实 smoke10 结果；记录见 `results/sft_adapter_eval_128step.md`。
 
 ## 核心接口
 
@@ -217,11 +217,11 @@ Verifier 报告：
 
 ## 路线图
 
-本地不依赖 A100 的验收、检索失败分析和展示文档已经收敛；真实 embedding/reranker staged 服务消融、QLoRA smoke run 和 128step adapter artifact 也已完成。下一批仍需放到 A100 或 GPU 环境上执行：
+本地不依赖 A100 的验收、检索失败分析和展示文档已经收敛；真实 embedding/reranker staged 服务消融、QLoRA smoke run、128step adapter artifact 和 128step adapter smoke10 也已完成。下一批仍需放到 A100 或 GPU 环境上执行：
 
-1. 用 128step SFT adapter 做模型推理评测。
-2. 视评测结果决定是否继续运行 553step 或 1 epoch SFT。
-3. 更新 base / SFT / RAG / Verifier 主结果表。
+1. 改进 SFT 推理 prompt/parser，处理多 JSON 输出、`</think>` 泄漏和非标准 citation。
+2. 补 `Qwen/Qwen3.5-2B` base 模型同 10 题对照。
+3. 视评测结果决定是否继续运行 553step 或 1 epoch SFT。
 
 ## 项目定位
 

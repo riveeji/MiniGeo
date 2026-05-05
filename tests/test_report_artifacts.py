@@ -1,5 +1,5 @@
 from minigeo.eval.report_artifacts import abstention_failure_cases, format_failure_cases, format_main_results
-from scripts.write_report_artifacts import _saved_retrieval_service_rows
+from scripts.write_report_artifacts import _saved_retrieval_service_rows, _saved_sft_adapter_rows
 
 
 def test_format_main_results_includes_local_baselines() -> None:
@@ -101,6 +101,25 @@ def test_saved_retrieval_service_rows_prefers_explicit_report_rows(tmp_path) -> 
     rows = _saved_retrieval_service_rows(path)
 
     assert rows == [("Qwen3-Reranker-0.6B hybrid rerank", "", 0.93, "", "", "-", "见 retrieval_service_eval")]
+
+
+def test_saved_sft_adapter_rows_reads_smoke_jsonl_and_report(tmp_path) -> None:
+    output_path = tmp_path / "sft_adapter_128step_smoke10.jsonl"
+    report_path = tmp_path / "sft_adapter_128step_smoke10.md"
+    output_path.write_text(
+        "\n".join(
+            [
+                '{"id":"q1","gold_evidence":["doc_a#chunk_001"],"result":{"answer":"a","citations":["doc_a#chunk_001"],"abstained":false,"raw_model_output":"raw"}}',
+                '{"id":"q2","gold_evidence":[],"result":{"answer":"b","citations":[],"abstained":true,"raw_model_output":"raw"}}',
+            ]
+        ),
+        encoding="utf-8",
+    )
+    report_path.write_text("- latency_ms=12.500\n", encoding="utf-8")
+
+    rows = _saved_sft_adapter_rows(output_path, report_path)
+
+    assert rows == [("MiniGeo-2B-SFT 128step smoke", "", 1.0, "", 1.0, "-", "12.500 ms/q")]
 
 
 def test_format_failure_cases_limits_cases_and_keeps_schema() -> None:

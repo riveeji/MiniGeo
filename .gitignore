@@ -16,3 +16,5 @@ tmp/
 .pytest_tmp*/
 pytest-cache-files-*/
 minigeo_colab_upload.zip
+minigeo_qlora_outputs*.zip
+minigeo_sft_adapter_eval*.zip
