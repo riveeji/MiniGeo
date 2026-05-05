@@ -167,7 +167,7 @@ $env:MINIGEO_SQL_MODEL="Qwen/Qwen3.5-2B"
 python scripts/evaluate_sql.py --use-model
 ```
 
-如果要在 Colab A100 上加载 128step SFT adapter 做推理 smoke test，见 `docs/sft-adapter-eval-runbook.md`。
+如果要在 Colab A100 上加载 128step SFT adapter 做推理 smoke test，见 `docs/sft-adapter-eval-runbook.md`。当前 `minigeo_sft_adapter_eval_128step.zip` 只包含 dry-run 输出，尚未包含真实 smoke10 结果。
 
 ## 核心接口
 

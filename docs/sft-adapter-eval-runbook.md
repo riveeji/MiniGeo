@@ -112,6 +112,11 @@ set -e
 
 cd /content/MiniGeo
 
+test -f results/sft_adapter_128step_smoke10.jsonl
+test -f results/sft_adapter_128step_smoke10.md
+test -f results/sft_adapter_128step_dryrun.jsonl
+test -f results/sft_adapter_128step_dryrun.md
+
 zip -r /content/minigeo_sft_adapter_eval_128step.zip \
   results/sft_adapter_128step_smoke10.jsonl \
   results/sft_adapter_128step_smoke10.md \
@@ -131,6 +136,7 @@ files.download("/content/minigeo_sft_adapter_eval_128step.zip")
 ## 通过标准
 
 - `--check-only` 没有 adapter 文件缺失。
+- 打包 cell 必须先通过 `test -f results/sft_adapter_128step_smoke10.jsonl` 和 `test -f results/sft_adapter_128step_smoke10.md`。
 - `results/sft_adapter_128step_smoke10.md` 中 `request_errors=0`。
 - `non_empty_answer_rate` 不为 0。
 - 输出 JSON 中没有大段 thinking process。
