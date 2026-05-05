@@ -1,10 +1,15 @@
 # MiniGeo QLoRA 1 Epoch Artifact Audit
 
-本文件记录对 `F:\download-edge\minigeo_qlora_outputs.zip` 的本地检查结果。
+本文件记录对 Colab 下载的 QLoRA artifact zip 的本地检查结果。
 
 ## 结论
 
 当前压缩包不能证明 1 epoch SFT 已完成。
+
+已检查的两个压缩包都只包含 smoke adapter：
+
+- `F:\download-edge\minigeo_qlora_outputs.zip`
+- `F:\download-edge\minigeo_qlora_outputs (1).zip`
 
 压缩包中包含：
 
@@ -28,8 +33,10 @@
 
 | Field | Value |
 |---|---|
-| Zip path | `F:\download-edge\minigeo_qlora_outputs.zip` |
-| Zip SHA256 | `3C078DAB3A518D9FDB22A897482B788D63BA853CE635D01A06866201E6137DE8` |
+| First zip path | `F:\download-edge\minigeo_qlora_outputs.zip` |
+| First zip SHA256 | `3C078DAB3A518D9FDB22A897482B788D63BA853CE635D01A06866201E6137DE8` |
+| Second zip path | `F:\download-edge\minigeo_qlora_outputs (1).zip` |
+| Second zip SHA256 | `D5D68C08E568FD2017687A4B0694BFA0A74D3849E05992BD3CBB245C2AB41DDD` |
 | SFT rows | 553 |
 | SFT corpus SHA256 | `9D73A45D05B918F755E9F006C33DC4DAF586D1DB6C673EBB2C2E3452B0F131F1` |
 | Adapter found | `checkpoints/qlora-smoke/adapter` |
