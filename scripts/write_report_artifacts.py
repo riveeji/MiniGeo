@@ -137,6 +137,13 @@ def _saved_retrieval_service_rows(path: Path = Path("results/retrieval_service_e
     return rows
 
 
+def _saved_agent_case_summary(path: Path = Path("results/agent_cases.json")) -> dict:
+    if not path.exists():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return data.get("summary", {})
+
+
 def _saved_model_failure_cases(max_cases: int = 3) -> list[dict]:
     path = _best_model_output_path("rag")
     if not path.exists():
@@ -285,6 +292,7 @@ def main() -> None:
             planner=planner_summary,
             agent_demo_passed=agent_demo_passed,
             agent_latency_ms=agent_latency_ms,
+            agent_cases=_saved_agent_case_summary(),
             extra_rows=_saved_model_rows(bench),
         ),
         encoding="utf-8",

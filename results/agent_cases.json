@@ -1,0 +1,92 @@
+{
+  "summary": {
+    "items": 3,
+    "pass_rate": 1.0,
+    "plan_mode_accuracy": 1.0,
+    "sql_success_rate": 1.0,
+    "verification_report_rate": 1.0,
+    "evidence_rate": 1.0,
+    "latency_ms": 31.325
+  },
+  "reports": [
+    {
+      "case_id": "agent_hybrid_qhd_misclassification",
+      "question": "Analyze which mineral categories are most frequently misclassified in samples collected from Qinhuangdao, and explain possible causes using spectral evidence.",
+      "expected_mode": "hybrid",
+      "requires_sql": true,
+      "actual_mode": "hybrid",
+      "passed": true,
+      "checks": {
+        "plan_mode": true,
+        "sql_success": true,
+        "answer_present": true,
+        "evidence_present": true,
+        "verification_present": true,
+        "limitations_present": true,
+        "no_exception": true
+      },
+      "answer": "SQL 结果显示，秦皇岛样本中最常被误判为 feldspar，误判分布为 feldspar（2 次）, quartz（1 次）。可能原因包括：石英的 464 cm-1 附近拉曼峰是关键识别证据，长石与石英同属硅酸盐体系，Al-Si 骨架相关光谱特征可能增加混淆风险。相关证据见 [doc_feldspar#chunk_002] [doc_quartz#chunk_002]。",
+      "sql": "select predictions.predicted_mineral, count(*) as errors from predictions join samples on samples.sample_id = predictions.sample_id where samples.region = 'Qinhuangdao' and predictions.is_correct = 0 group by predicted_mineral order by errors desc",
+      "sql_error": null,
+      "evidence": [
+        "agent_sql#result",
+        "doc_feldspar#chunk_002",
+        "doc_quartz#chunk_002"
+      ],
+      "verification_verdict": "supported",
+      "error": null
+    },
+    {
+      "case_id": "agent_sql_region_errors",
+      "question": "每个地区有多少错误预测？",
+      "expected_mode": "sql",
+      "requires_sql": true,
+      "actual_mode": "sql",
+      "passed": true,
+      "checks": {
+        "plan_mode": true,
+        "sql_success": true,
+        "answer_present": true,
+        "evidence_present": true,
+        "verification_present": true,
+        "limitations_present": true,
+        "no_exception": true
+      },
+      "answer": "SQL 查询返回 1 行结果：region=Qinhuangdao, errors=3。",
+      "sql": "select samples.region, count(*) as errors from predictions join samples on samples.sample_id = predictions.sample_id where predictions.is_correct = 0 group by samples.region order by errors desc",
+      "sql_error": null,
+      "evidence": [
+        "agent_sql#result"
+      ],
+      "verification_verdict": "supported",
+      "error": null
+    },
+    {
+      "case_id": "agent_docs_quartz_spectrum",
+      "question": "石英的主要拉曼光谱证据是什么？",
+      "expected_mode": "docs",
+      "requires_sql": false,
+      "actual_mode": "docs",
+      "passed": true,
+      "checks": {
+        "plan_mode": true,
+        "sql_success": true,
+        "answer_present": true,
+        "evidence_present": true,
+        "verification_present": true,
+        "limitations_present": true,
+        "no_exception": true
+      },
+      "answer": "根据文档证据，石英常见强拉曼峰接近 464 cm-1，可作为识别石英的重要光谱证据。相关证据见 [doc_quartz#chunk_002]。",
+      "sql": null,
+      "sql_error": null,
+      "evidence": [
+        "doc_quartz#chunk_002",
+        "doc_quartz#chunk_001",
+        "doc_spectroscopy#chunk_001"
+      ],
+      "verification_verdict": "supported",
+      "error": null
+    }
+  ]
+}

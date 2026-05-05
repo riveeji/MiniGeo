@@ -9,6 +9,7 @@ def test_agent_design_doc_covers_tools_demo_and_metrics() -> None:
     assert "verify_answer" in text
     assert "Qinhuangdao" in text
     assert "sql_exec_accuracy" in text
+    assert "scripts/evaluate_agent_cases.py" in text
 
 
 def test_architecture_doc_lists_local_evaluation_entrypoints() -> None:
@@ -25,4 +26,5 @@ def test_showcase_doc_summarizes_results_and_remaining_a100_tasks() -> None:
     assert "检索失败分析" in text
     assert "Qwen3-Reranker-0.6B" in text
     assert "QLoRA smoke run" in text
+    assert "MiniGeo-Agent 多案例评测" in text
     assert "简历表述" in text

@@ -45,9 +45,11 @@ def format_main_results(
     agent_demo_passed: bool,
     planner: dict[str, Any] | None = None,
     agent_latency_ms: float | None = None,
+    agent_cases: dict[str, Any] | None = None,
     extra_rows: list[tuple[Any, ...]] | None = None,
 ) -> str:
     planner = planner or {}
+    agent_cases = agent_cases or {}
     rows = [
         ("Qwen3.5-0.8B", "", "", "", "", "-", "未测"),
         ("Qwen3.5-2B", "", "", "", "", "-", "未测"),
@@ -83,6 +85,15 @@ def format_main_results(
             "demo",
             "PASS" if agent_demo_passed else "FAIL",
             "未测" if agent_latency_ms is None else f"{agent_latency_ms:.3f} ms/q",
+        ),
+        (
+            "MiniGeo-Agent multi-case",
+            agent_cases.get("pass_rate"),
+            "case",
+            "见 agent_cases",
+            "case",
+            "PASS" if agent_cases.get("pass_rate") == 1.0 else ("FAIL" if agent_cases else "未测"),
+            _latency(agent_cases),
         ),
     ]
     lines = [

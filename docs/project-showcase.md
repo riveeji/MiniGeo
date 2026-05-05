@@ -40,6 +40,7 @@ flowchart TD
 | Qwen3.5-4B SQL generator | sql_exec_accuracy=1.000 | 60 条 SQL benchmark |
 | QLoRA smoke run | 5 steps completed | Colab A100，adapter 已本地归档 |
 | Planner baseline | routing_accuracy=1.000 | 规则型 planner |
+| MiniGeo-Agent 多案例评测 | pass_rate=1.000 | 覆盖 hybrid / sql / docs 三类本地回归 |
 
 完整表见 `results/main_results.md`。
 
@@ -54,7 +55,7 @@ flowchart TD
 - hybrid+local lexical rerank 的 25 个 miss 全部是 `reranker_demoted_gold`，说明当前本地 lexical reranker 不应作为最终主系统。
 - 真实 `Qwen3-Reranker-0.6B` staged run 已把 hybrid rerank 的 citation hit 提升到 0.995，基本解决 local reranker 的降排问题。
 
-## 当前可展示 Demo
+## 当前可展示 Demo 与回归
 
 最终 Agent demo 问题：
 
@@ -70,11 +71,19 @@ Analyze which mineral categories are most frequently misclassified in samples co
 - Verification report。
 - Limitations。
 
+多案例本地评测已经覆盖：
+
+- `hybrid`：秦皇岛误判类别统计 + 光谱证据解释。
+- `sql`：按地区统计错误预测数量。
+- `docs`：石英拉曼光谱证据问答。
+
+结果见 `results/agent_cases.md`。
+
 设计说明见 `docs/agent-design.md`。
 
 ## 剩余任务
 
-不需要 A100 的任务已经基本收敛，真实 reranker staged 消融、QLoRA smoke run 和 SFT corpus 扩充也已完成。后续主要剩余正式训练与评测任务：
+不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。后续主要剩余正式训练与评测任务：
 
 1. 使用已扩充的 553 条 SFT corpus 先重跑 5-step QLoRA smoke。
 2. 运行更长的 1 epoch 小规模 SFT。

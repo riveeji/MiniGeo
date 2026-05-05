@@ -90,6 +90,7 @@ Agent final report 必须包含：
 - `citation_hit_rate`：检索结果是否命中 evidence label。
 - `unsupported_claim_rate`：Verifier 中非 supported claim 占比。
 - `abstention_accuracy`：系统对 answerable / unanswerable 题的拒答行为是否正确。
+- Agent 多案例回归：固定覆盖 `hybrid`、`sql`、`docs` 三类路由，检查 final report 是否包含 answer、SQL、evidence、verification 和 limitations。
 - `latency_ms`：平均每题或每次 demo 的本地耗时。
 
 一键验收命令：
@@ -98,9 +99,20 @@ Agent final report 必须包含：
 python scripts/audit_project.py
 ```
 
+单独运行 Agent 多案例评测：
+
+```powershell
+python scripts/evaluate_agent_cases.py
+```
+
+输出写入：
+
+- `results/agent_cases.json`
+- `results/agent_cases.md`
+
 ## 当前限制
 
-- 当前 Agent 是确定性 MVP，不包含完整 planner。
+- 当前 Agent 是确定性 MVP，planner 仍是规则型 baseline。
 - SQL generator 默认是规则型 baseline；模型模式需要 OpenAI-compatible Qwen 服务。
 - demo database 很小，结果只用于验证工具链。
 - 当前 SQL 结果已被转换为 `agent_sql#result` 证据，能支持 SQL 统计类 claim；但它仍是 demo database 的执行结果，不等同于真实实验结论。
@@ -108,7 +120,7 @@ python scripts/audit_project.py
 
 ## 下一步
 
-1. 增加 planner：判断问题是否需要文档检索、SQL 或二者混合。
-2. 将 SQL 结果也转换成 verifier 可检查的 evidence。
+1. 扩展 Agent benchmark，加入更多真实混合问题并单独记录 final answer quality。
+2. 把规则 planner 替换或增强为模型 planner，但保留当前规则 baseline 作为回归对照。
 3. 扩展模型 SQL generator 题集，目前 60 条 SQL 题上 Qwen3.5-4B 与规则 baseline 均为 `sql_exec_accuracy=1.0`。
-4. 扩展 Agent benchmark，单独记录 final answer quality。
+4. 在真实 SFT 模型完成后，对比 base Agent 与 SFT Agent。

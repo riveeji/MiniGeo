@@ -50,3 +50,18 @@ def test_minigeo_agent_combines_sql_evidence_and_verification(tmp_path: Path) ->
         "contradicted",
         "insufficient_evidence",
     }
+
+
+def test_minigeo_agent_docs_mode_answers_from_document_evidence(tmp_path: Path) -> None:
+    db_path = tmp_path / "demo.sqlite"
+    init_demo_db(db_path)
+    corpus = load_corpus(Path("data/processed/rag_corpus.jsonl"))
+
+    report = MiniGeoAgent(db_path=db_path, corpus=corpus).run("石英的主要拉曼光谱证据是什么？")
+
+    assert report["plan"]["mode"] == "docs"
+    assert report["sql"] is None
+    assert report["sql_result"]["execution_result"] == []
+    assert "464 cm-1" in report["answer"]
+    assert "SQL 查询返回" not in report["answer"]
+    assert "doc_quartz#chunk_002" in report["evidence"]

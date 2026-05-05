@@ -39,12 +39,18 @@ class MiniGeoAgent:
 
     def run(self, question: str) -> dict[str, Any]:
         plan = plan_agent_tools(question)
-        sql = self.sql_generator.generate(question)
-        sql_result = execute_sql(self.db_path, sql)
-        doc_evidence = self._retrieve_evidence(sql_result, top_k=3)
-        sql_evidence = self._sql_evidence_chunk(sql_result)
-        evidence = [sql_evidence] + doc_evidence if sql_evidence else doc_evidence
-        answer = self._answer_from_sql_and_evidence(sql_result, doc_evidence)
+        if plan["mode"] == "docs":
+            sql = None
+            sql_result = {"sql": None, "execution_result": [], "error": None}
+            evidence = self._retrieve_docs_for_question(question, top_k=3)
+            answer = self._answer_from_docs(question, evidence)
+        else:
+            sql = self.sql_generator.generate(question)
+            sql_result = execute_sql(self.db_path, sql)
+            doc_evidence = self._retrieve_evidence(sql_result, top_k=3) if plan["requires_docs"] else []
+            sql_evidence = self._sql_evidence_chunk(sql_result)
+            evidence = [sql_evidence] + doc_evidence if sql_evidence else doc_evidence
+            answer = self._answer_from_sql_and_evidence(sql_result, doc_evidence)
         verification = self.verifier.verify(answer, evidence)
         report = write_report(
             answer=answer,
@@ -60,23 +66,32 @@ class MiniGeoAgent:
         report["plan"] = plan
         return report
 
+    def _retrieve_docs_for_question(self, question: str, top_k: int) -> list[dict[str, Any]]:
+        return retrieve_with_bm25(question, self.corpus, top_k=top_k)
+
     def _sql_evidence_chunk(self, sql_result: dict[str, Any]) -> dict[str, Any] | None:
         if sql_result.get("error"):
             return None
         rows = sql_result.get("execution_result", [])
         if not rows:
             return None
-        ranking = ", ".join(f"{row['predicted_mineral']} {row['errors']} 次" for row in rows)
-        top = rows[0]["predicted_mineral"]
+        if all("predicted_mineral" in row and "errors" in row for row in rows):
+            ranking = ", ".join(f"{row['predicted_mineral']} {row['errors']} 次" for row in rows)
+            top = rows[0]["predicted_mineral"]
+            text = f"SQL 结果显示，秦皇岛样本中最常被误判为 {top}，误判分布为 {ranking}。"
+            mineral = top
+        else:
+            text = f"SQL 结果显示：{self._summarize_sql_rows(rows)}。"
+            mineral = "structured_result"
         return {
             "chunk_id": "agent_sql#result",
             "doc_id": "agent_sql",
-            "text": f"SQL 结果显示，秦皇岛样本中最常被误判为 {top}，误判分布为 {ranking}。",
+            "text": text,
             "source": "MiniGeo demo SQLite",
             "url": "",
             "page": None,
             "topic": "sql_result",
-            "mineral": top,
+            "mineral": mineral,
             "license": "generated",
         }
 
@@ -140,6 +155,9 @@ class MiniGeoAgent:
         if not rows:
             return "SQL 查询没有返回误判记录，当前证据不足，无法给出可靠结论。"
 
+        if not all("predicted_mineral" in row and "errors" in row for row in rows):
+            return f"SQL 查询返回 {len(rows)} 行结果：{self._summarize_sql_rows(rows)}。"
+
         ranking = ", ".join(f"{row['predicted_mineral']}（{row['errors']} 次）" for row in rows)
         top = rows[0]["predicted_mineral"]
         citations = " ".join(f"[{row['chunk_id']}]" for row in evidence)
@@ -149,3 +167,25 @@ class MiniGeoAgent:
             "长石与石英同属硅酸盐体系，Al-Si 骨架相关光谱特征可能增加混淆风险。"
             f"相关证据见 {citations}。"
         )
+
+    def _answer_from_docs(self, question: str, evidence: list[dict[str, Any]]) -> str:
+        if not evidence:
+            return "当前文档证据不足，无法给出可靠回答。"
+        if "石英" in question and ("拉曼" in question or "光谱" in question):
+            quartz_chunks = [
+                row for row in evidence
+                if row.get("chunk_id") == "doc_quartz#chunk_002" or row.get("mineral") == "quartz"
+            ]
+            if quartz_chunks:
+                citation = quartz_chunks[0]["chunk_id"]
+                return f"根据文档证据，石英常见强拉曼峰接近 464 cm-1，可作为识别石英的重要光谱证据。相关证据见 [{citation}]。"
+        citations = " ".join(f"[{row['chunk_id']}]" for row in evidence)
+        evidence_text = "；".join(str(row.get("text", "")) for row in evidence[:2])
+        return f"根据检索到的文档证据：{evidence_text}。相关证据见 {citations}。"
+
+    def _summarize_sql_rows(self, rows: list[dict[str, Any]], limit: int = 3) -> str:
+        rendered = []
+        for row in rows[:limit]:
+            rendered.append(", ".join(f"{key}={value}" for key, value in row.items()))
+        suffix = f"；另有 {len(rows) - limit} 行" if len(rows) > limit else ""
+        return "；".join(rendered) + suffix

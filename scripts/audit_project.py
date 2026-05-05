@@ -51,6 +51,7 @@ def main() -> None:
         ("Verifier 评测", [python, "scripts/evaluate_verifier.py"]),
         ("SQL 评测", [python, "scripts/evaluate_sql.py"]),
         ("Agent Planner 评测", [python, "scripts/evaluate_agent_planner.py"]),
+        ("Agent 多案例评测", [python, "scripts/evaluate_agent_cases.py"]),
         ("SFT 数据构建", [python, "scripts/build_sft_corpus.py"]),
         ("数据质量审计", [python, "scripts/audit_data_quality.py"]),
         ("QLoRA 配置检查", [python, "scripts/train_lora.py", "--check-only"]),
