@@ -99,6 +99,7 @@ python scripts/build_sft_corpus.py
 python scripts/audit_data_quality.py
 python scripts/train_lora.py --check-only
 python scripts/run_qlora_smoke.py --dry-run
+python scripts/evaluate_sft_adapter.py --adapter-dir checkpoints/MiniGeo-Qwen3.5-2B-SFT-128step/adapter --dry-run
 python scripts/write_report_artifacts.py
 python scripts/sql_demo.py
 python scripts/agent_demo.py
@@ -165,6 +166,8 @@ $env:MINIGEO_SQL_API_KEY="EMPTY"
 $env:MINIGEO_SQL_MODEL="Qwen/Qwen3.5-2B"
 python scripts/evaluate_sql.py --use-model
 ```
+
+如果要在 Colab A100 上加载 128step SFT adapter 做推理 smoke test，见 `docs/sft-adapter-eval-runbook.md`。
 
 ## 核心接口
 

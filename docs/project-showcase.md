@@ -87,7 +87,7 @@ Analyze which mineral categories are most frequently misclassified in samples co
 
 不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。2026-05-05 下载的 128step Colab artifact 已确认包含 `adapter_model.safetensors`；但 1 epoch artifact 仍未生成，因此 1 epoch SFT 暂不计入完成结果。后续主要剩余正式训练与评测任务：
 
-1. 用 128step adapter 做 SFT 模型推理 smoke test。
+1. 按 `docs/sft-adapter-eval-runbook.md` 用 128step adapter 做 SFT 模型推理 smoke test。
 2. 比较 base / 128step SFT / RAG / Verifier。
 3. 如果 128step 质量稳定，再重新运行并打包 553step 或 1 epoch 小规模 SFT。
 

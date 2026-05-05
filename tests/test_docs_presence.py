@@ -27,4 +27,5 @@ def test_showcase_doc_summarizes_results_and_remaining_a100_tasks() -> None:
     assert "Qwen3-Reranker-0.6B" in text
     assert "QLoRA smoke run" in text
     assert "MiniGeo-Agent 多案例评测" in text
+    assert "sft-adapter-eval-runbook" in text
     assert "简历表述" in text
