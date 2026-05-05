@@ -39,6 +39,7 @@ flowchart TD
 | Qwen3.5-4B + BM25 RAG | citation_hit_rate=0.689 | 真实模型服务输出 |
 | Qwen3.5-4B SQL generator | sql_exec_accuracy=1.000 | 60 条 SQL benchmark |
 | QLoRA smoke run | 5 steps completed | Colab A100，adapter 已本地归档 |
+| QLoRA 1 epoch artifact | not completed | 2026-05-05 下载包未包含 1 epoch adapter |
 | Planner baseline | routing_accuracy=1.000 | 规则型 planner |
 | MiniGeo-Agent 多案例评测 | pass_rate=1.000 | 覆盖 hybrid / sql / docs 三类本地回归 |
 
@@ -83,10 +84,10 @@ Analyze which mineral categories are most frequently misclassified in samples co
 
 ## 剩余任务
 
-不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。后续主要剩余正式训练与评测任务：
+不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。2026-05-05 下载的 Colab artifact 已确认包含 smoke adapter 和 553 行 SFT corpus，但未包含 1 epoch adapter，因此 1 epoch SFT 暂不计入完成结果。后续主要剩余正式训练与评测任务：
 
-1. 使用已扩充的 553 条 SFT corpus 先重跑 5-step QLoRA smoke。
-2. 运行更长的 1 epoch 小规模 SFT。
+1. 重新运行并打包 1 epoch 小规模 SFT，确认 `checkpoints/MiniGeo-Qwen3.5-2B-SFT-1epoch/adapter/adapter_model.safetensors` 存在。
+2. 用保存的 adapter 做 SFT 模型推理评测。
 3. 比较 base / SFT / RAG / Verifier。
 
 ## 简历表述
