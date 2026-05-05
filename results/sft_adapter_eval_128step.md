@@ -13,7 +13,7 @@
 - `results/sft_adapter_128step_smoke10.jsonl`
 - `results/sft_adapter_128step_smoke10.md`
 
-smoke10 指标：
+原始 smoke10 指标：
 
 | Metric | Value |
 |---|---:|
@@ -25,6 +25,17 @@ smoke10 指标：
 | latency_ms | 14435.206 |
 | raw outputs containing `</think>` | 7 |
 
+离线重解析后指标：
+
+| Metric | Value |
+|---|---:|
+| items | 10 |
+| non_empty_answer_rate | 1.000 |
+| citation_hit_rate | 0.444 |
+| abstention_accuracy | 1.000 |
+| request_errors | 0 |
+| thinking_raw_outputs | 7 |
+
 ## 主要观察
 
 - adapter 加载和生成链路已跑通，`request_errors=0`。
@@ -32,6 +43,8 @@ smoke10 指标：
 - `citation_hit_rate=0.111`，多数 citation 不是 benchmark 中的 `doc_id#chunk_id` 格式，或引用未被 parser 识别。
 - `abstention_accuracy=0.400`，拒答行为仍不稳。
 - 7 条 raw output 包含 `</think>`，并且多条输出是多个 JSON 对象串联，不满足“只输出一个 JSON 对象”的目标。
+- 本地 parser 改进后，离线重解析把 `citation_hit_rate` 提升到 0.444，并把 `abstention_accuracy` 修正到 1.000；这说明部分问题是解析失败，不全是模型内容错误。
+- `thinking_raw_outputs=7` 没有因离线重解析消失，说明下一次 A100 生成仍需要改 prompt、chat template 或训练样本格式。
 
 ## Artifact
 
@@ -46,6 +59,6 @@ smoke10 指标：
 
 ## 下一步
 
-1. 先把 128step 结果作为负/中性 smoke 结果保留：训练链路有效，但格式约束不足。
-2. 改进 SFT 推理 prompt 和 parser，优先处理多 JSON 输出、`</think>` 泄漏和非标准 citation。
-3. 在同一 10 题子集上补 base `Qwen/Qwen3.5-2B` 对照，判断 128step adapter 是否真的改善 answer format、refusal 或 citation behavior。
+1. 先把 128step 结果作为中性 smoke 结果保留：训练链路有效，离线解析可改善指标，但原始生成格式约束不足。
+2. 在同一 10 题子集上补 base `Qwen/Qwen3.5-2B` 对照，判断 128step adapter 是否真的改善 answer format、refusal 或 citation behavior。
+3. 下一次 A100 生成前继续收紧 prompt/chat template，重点减少 `</think>` 和多 JSON 串联。

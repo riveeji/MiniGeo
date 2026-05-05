@@ -40,7 +40,7 @@ flowchart TD
 | Qwen3.5-4B SQL generator | sql_exec_accuracy=1.000 | 60 条 SQL benchmark |
 | QLoRA smoke run | 5 steps completed | Colab A100，adapter 已本地归档 |
 | QLoRA 128 step run | adapter generated | Colab A100，128step adapter 已通过 artifact 检查 |
-| MiniGeo-2B-SFT 128step smoke | citation_hit_rate=0.111 | adapter 可加载但格式和引用仍不稳定 |
+| MiniGeo-2B-SFT 128step smoke | citation_hit_rate=0.444 | 离线重解析后；原始生成仍有 `</think>` 和多 JSON 问题 |
 | QLoRA 1 epoch artifact | not completed | 2026-05-05 下载包未包含 1 epoch adapter |
 | Planner baseline | routing_accuracy=1.000 | 规则型 planner |
 | MiniGeo-Agent 多案例评测 | pass_rate=1.000 | 覆盖 hybrid / sql / docs 三类本地回归 |
@@ -86,7 +86,7 @@ Analyze which mineral categories are most frequently misclassified in samples co
 
 ## 剩余任务
 
-不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。2026-05-05 下载的 128step Colab artifact 已确认包含 `adapter_model.safetensors`，并已完成 smoke10 推理；但 smoke10 暴露出 `</think>` 泄漏、多 JSON 输出和 citation 格式不稳，1 epoch artifact 仍未生成。后续主要剩余任务：
+不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。2026-05-05 下载的 128step Colab artifact 已确认包含 `adapter_model.safetensors`，并已完成 smoke10 推理；离线重解析把 citation hit 从 0.111 提升到 0.444，但 raw output 仍暴露出 `</think>` 泄漏、多 JSON 输出和 citation 格式不稳，1 epoch artifact 仍未生成。后续主要剩余任务：
 
 1. 改进 SFT 推理 prompt/parser，处理多 JSON 输出、`</think>` 泄漏和非标准 citation。
 2. 补 `Qwen/Qwen3.5-2B` base 模型同 10 题对照。

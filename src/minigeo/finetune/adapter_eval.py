@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
+import re
 from time import perf_counter
 from typing import Any
 
@@ -38,6 +40,107 @@ def build_sft_prompt(question: str) -> str:
     )
 
 
+def parse_adapter_answer(raw: str, allowed_citations: set[str]) -> dict[str, Any]:
+    merged = _merge_json_fragments(raw, allowed_citations)
+    fallback = parse_model_answer(raw, allowed_citations)
+    if not merged:
+        return fallback
+    return {
+        "answer": merged.get("answer") or fallback.get("answer", ""),
+        "citations": merged.get("citations") or fallback.get("citations", []),
+        "abstained": bool(merged.get("abstained", fallback.get("abstained", False))),
+        "confidence": float(merged.get("confidence", fallback.get("confidence", 0.0))),
+    }
+
+
+def _merge_json_fragments(raw: str, allowed_citations: set[str]) -> dict[str, Any]:
+    fragments = _extract_json_fragments(raw)
+    answer = ""
+    citations: list[str] = []
+    abstained: bool | None = None
+    confidence: float | None = None
+    for fragment in fragments:
+        if isinstance(fragment.get("answer"), str) and fragment["answer"].strip():
+            answer = fragment["answer"].strip()
+        citations.extend(_normalise_adapter_citations(fragment.get("citations"), allowed_citations))
+        citations.extend(_normalise_adapter_citations(fragment.get("source"), allowed_citations))
+        if "abstained" in fragment:
+            abstained = bool(fragment["abstained"])
+        if "confidence" in fragment:
+            try:
+                confidence = max(0.0, min(1.0, float(fragment["confidence"])))
+            except (TypeError, ValueError):
+                pass
+    citations.extend(_extract_allowed_citations_from_text(raw, allowed_citations))
+    unique_citations = []
+    for citation in citations:
+        if citation not in unique_citations:
+            unique_citations.append(citation)
+    if not answer and not unique_citations and abstained is None and confidence is None:
+        return {}
+    return {
+        "answer": answer,
+        "citations": unique_citations,
+        "abstained": abstained if abstained is not None else False,
+        "confidence": confidence if confidence is not None else (0.0 if abstained else 0.5),
+    }
+
+
+def _extract_json_fragments(raw: str) -> list[dict[str, Any]]:
+    decoder = json.JSONDecoder()
+    fragments = []
+    for match in re.finditer(r"\{", raw):
+        try:
+            data, _ = decoder.raw_decode(raw[match.start():])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(data, dict):
+            fragments.append(data)
+    return fragments
+
+
+def _normalise_adapter_citations(value: Any, allowed_citations: set[str]) -> list[str]:
+    if value is None:
+        return []
+    if isinstance(value, dict):
+        values = [value.get("id") or value.get("chunk_id") or value.get("source")]
+    elif isinstance(value, list):
+        values = []
+        for item in value:
+            if isinstance(item, dict):
+                values.append(item.get("id") or item.get("chunk_id") or item.get("source"))
+            else:
+                values.append(item)
+    else:
+        values = [value]
+    return [
+        citation for item in values
+        if (citation := _map_adapter_citation(str(item).strip().strip("[]").strip("\"'"), allowed_citations))
+    ]
+
+
+def _extract_allowed_citations_from_text(raw: str, allowed_citations: set[str]) -> list[str]:
+    citations = []
+    tokens = set(re.findall(r"[A-Za-z0-9_]+#chunk_\d+", raw))
+    tokens.update(re.findall(r"[A-Za-z]+#chunk_\d+", raw))
+    for token in tokens:
+        mapped = _map_adapter_citation(token, allowed_citations)
+        if mapped:
+            citations.append(mapped)
+    return citations
+
+
+def _map_adapter_citation(candidate: str, allowed_citations: set[str]) -> str | None:
+    if candidate in allowed_citations:
+        return candidate
+    if candidate and f"doc_{candidate}" in allowed_citations:
+        return f"doc_{candidate}"
+    for allowed in allowed_citations:
+        if candidate and allowed.endswith(candidate):
+            return allowed
+    return None
+
+
 def select_adapter_smoke_rows(benchmark_path: Path, limit: int) -> list[dict[str, Any]]:
     rows = load_benchmark(benchmark_path)
     preferred = [
@@ -68,6 +171,22 @@ def dry_run_records(rows: list[dict[str, Any]], adapter_dir: Path) -> list[dict[
     ]
 
 
+def reparse_adapter_records(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    reparsed_records = []
+    for record in records:
+        output = dict(record.get("result", {}))
+        raw = str(output.get("raw_model_output", ""))
+        reparsed = parse_adapter_answer(raw, allowed_citations=set(record.get("gold_evidence", [])))
+        reparsed["raw_model_output"] = raw
+        if output.get("error"):
+            reparsed["error"] = output["error"]
+        updated = dict(record)
+        updated["result"] = reparsed
+        updated["reparsed"] = True
+        reparsed_records.append(updated)
+    return reparsed_records
+
+
 def run_adapter_smoke(
     adapter_dir: Path,
     base_model: str,
@@ -96,7 +215,7 @@ def run_adapter_smoke(
     for row in rows:
         prompt = build_sft_prompt(row["question"])
         raw = generator.generate(prompt)
-        parsed = parse_model_answer(raw, allowed_citations=set(row.get("evidence", [])))
+        parsed = parse_adapter_answer(raw, allowed_citations=set(row.get("evidence", [])))
         parsed["raw_model_output"] = raw
         outputs[row["id"]] = parsed
         records.append(
