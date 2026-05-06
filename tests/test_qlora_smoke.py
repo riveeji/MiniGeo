@@ -37,6 +37,7 @@ def test_format_sft_example_contains_instruction_input_and_output() -> None:
     )
 
     assert "MiniGeo" in text
+    assert "禁止输出 <think>" in text
     assert "根据给定证据写摘要。" in text
     assert "[doc_quartz#chunk_001] 石英含 SiO2。" in text
     assert "石英主要成分是 SiO2。[doc_quartz#chunk_001]" in text

@@ -19,7 +19,8 @@ def format_sft_example(row: dict[str, Any]) -> str:
     input_text = str(row["input"])
     output = str(row["output"])
     return (
-        "System: 你是 MiniGeo，回答必须简短、可引用、基于证据。\n"
+        "System: 你是 MiniGeo，回答必须简短、可引用、基于证据。"
+        "只输出一个 JSON 对象，禁止输出 <think>、</think>、推理草稿或 Markdown。\n"
         f"User: {instruction}\n\n输入：{input_text}\n"
         f"Assistant: {output}"
     )

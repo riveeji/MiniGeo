@@ -1,3 +1,5 @@
+import json
+
 from minigeo.finetune.sft import build_sft_examples, find_reference_answer_leaks
 
 
@@ -47,6 +49,55 @@ def test_build_sft_examples_does_not_copy_benchmark_reference_answers() -> None:
     assert all({"id", "instruction", "input", "output", "task_type"} <= set(example) for example in examples)
     assert all("doc_q#chunk_1" in example["output"] for example in examples if example["task_type"] == "evidence_qa")
     assert all(example["output"] != row["answer"] for example in examples for row in benchmark)
+
+
+def test_build_sft_examples_outputs_single_json_contract_without_thinking_tags() -> None:
+    benchmark = [
+        {
+            "id": "q_evidence",
+            "question": "石英的证据是什么？",
+            "answer": "石英是二氧化硅矿物。",
+            "answerable": True,
+            "requires_sql": False,
+            "expected_sql_intent": None,
+            "evidence": ["doc_q#chunk_1"],
+        },
+        {
+            "id": "q_refusal",
+            "question": "不存在的矿物有什么拉曼峰？",
+            "answer": "不能确认。",
+            "answerable": False,
+            "requires_sql": False,
+            "expected_sql_intent": None,
+            "evidence": [],
+        },
+        {
+            "id": "q_sql",
+            "question": "查询错误预测。",
+            "answer": "使用 SQL 查询错误预测。",
+            "answerable": True,
+            "requires_sql": True,
+            "expected_sql_intent": "filter incorrect predictions",
+            "evidence": ["doc_q#chunk_1"],
+        },
+    ]
+    corpus = [{"chunk_id": "doc_q#chunk_1", "text": "石英是二氧化硅矿物。", "topic": "concept"}]
+
+    examples = build_sft_examples(benchmark, corpus)
+
+    assert examples
+    for example in examples:
+        output = example["output"]
+        assert "<think" not in output.lower()
+        assert "</think>" not in output.lower()
+        assert output.count("{") == 1
+        assert output.count("}") == 1
+        parsed = json.loads(output)
+        assert set(parsed) == {"answer", "citations", "abstained", "confidence"}
+        assert isinstance(parsed["answer"], str)
+        assert isinstance(parsed["citations"], list)
+        assert isinstance(parsed["abstained"], bool)
+        assert isinstance(parsed["confidence"], float | int)
 
 
 def test_build_sft_examples_keeps_task_type_distribution_balanced() -> None:

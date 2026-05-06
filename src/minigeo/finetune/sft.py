@@ -1,3 +1,4 @@
+import json
 from typing import Any
 
 
@@ -25,6 +26,19 @@ def _citation_answer(chunks: list[dict[str, Any]]) -> str:
     return f"根据证据，{text} [{citation}]。"
 
 
+def _json_output(answer: str, citations: list[str] | None = None, abstained: bool = False, confidence: float = 0.7) -> str:
+    return json.dumps(
+        {
+            "answer": _compact_text(answer),
+            "citations": citations or [],
+            "abstained": abstained,
+            "confidence": confidence,
+        },
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+
+
 def build_sft_examples(benchmark_rows: list[dict[str, Any]], corpus_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     examples: list[dict[str, Any]] = []
     corpus_by_id = {str(chunk["chunk_id"]): chunk for chunk in corpus_rows}
@@ -35,7 +49,12 @@ def build_sft_examples(benchmark_rows: list[dict[str, Any]], corpus_rows: list[d
                 "id": f"sft_evidence_{idx:04d}",
                 "instruction": "根据给定证据写一个简短、可引用的地学事实摘要。",
                 "input": f"[{chunk['chunk_id']}] {chunk['text']}",
-                "output": f"该证据 chunk 可用于支持与 {chunk.get('topic', '地学')} 相关的回答，引用为 [{chunk['chunk_id']}]。",
+                "output": _json_output(
+                    f"该证据 chunk 可用于支持与 {chunk.get('topic', '地学')} 相关的回答。",
+                    citations=[chunk["chunk_id"]],
+                    abstained=False,
+                    confidence=0.7,
+                ),
                 "task_type": "evidence_summary",
             }
         )
@@ -55,7 +74,12 @@ def build_sft_examples(benchmark_rows: list[dict[str, Any]], corpus_rows: list[d
                     "id": f"sft_evidence_qa_{qa_idx:04d}",
                     "instruction": "根据问题和证据，用一句中文回答；必须包含证据引用，不能添加证据外事实。",
                     "input": f"Question: {question}\nEvidence:\n{evidence_block}",
-                    "output": _citation_answer(selected_chunks),
+                    "output": _json_output(
+                        _citation_answer(selected_chunks),
+                        citations=[chunk["chunk_id"] for chunk in selected_chunks],
+                        abstained=False,
+                        confidence=0.8,
+                    ),
                     "task_type": "evidence_qa",
                 }
             )
@@ -69,7 +93,12 @@ def build_sft_examples(benchmark_rows: list[dict[str, Any]], corpus_rows: list[d
                         f"Unverified answer: 这个问题可以直接给出完整结论。\n"
                         f"Evidence:\n{evidence_block}"
                     ),
-                    "output": f"证据仅支持：{_citation_answer(selected_chunks)}除这些证据外，不应给出更多确定结论。",
+                    "output": _json_output(
+                        f"证据仅支持：{_citation_answer(selected_chunks)}除这些证据外，不应给出更多确定结论。",
+                        citations=[chunk["chunk_id"] for chunk in selected_chunks],
+                        abstained=False,
+                        confidence=0.75,
+                    ),
                     "task_type": "verification_rewrite",
                 }
             )
@@ -81,7 +110,12 @@ def build_sft_examples(benchmark_rows: list[dict[str, Any]], corpus_rows: list[d
                     "id": f"sft_refusal_{refusal_idx:04d}",
                     "instruction": "当证据不足时，用简短中文拒答，不要编造事实。",
                     "input": row["question"],
-                    "output": "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。",
+                    "output": _json_output(
+                        "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。",
+                        citations=[],
+                        abstained=True,
+                        confidence=0.0,
+                    ),
                     "task_type": "refusal",
                 }
             )
@@ -92,7 +126,12 @@ def build_sft_examples(benchmark_rows: list[dict[str, Any]], corpus_rows: list[d
                     "id": f"sft_sql_{sql_idx:04d}",
                     "instruction": "把地学数据库问题改写为 SQL 查询意图，不要输出自然语言结论。",
                     "input": row["question"],
-                    "output": f"SQL_INTENT: {row.get('expected_sql_intent') or '根据 schema 生成只读查询'}",
+                    "output": _json_output(
+                        f"SQL_INTENT: {row.get('expected_sql_intent') or '根据 schema 生成只读查询'}",
+                        citations=[],
+                        abstained=False,
+                        confidence=0.8,
+                    ),
                     "task_type": "sql_format",
                 }
             )

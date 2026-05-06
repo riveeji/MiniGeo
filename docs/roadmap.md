@@ -378,6 +378,7 @@ sql_exec_accuracy=1.0
 - 真实 `Qwen/Qwen3-Embedding-0.6B` 和 `Qwen/Qwen3-Reranker-0.6B` staged 服务消融已完成并写入 `results/retrieval_service_eval.md`。
 - QLoRA smoke run 已在 Colab A100 上完成 5 个训练 step，并写入 `results/qlora_smoke.md`。
 - SFT corpus 已扩充到 553 条，新增 `evidence_qa` 和 `verification_rewrite`，且 `reference_answer_leaks=[]`。
+- 2026-05-06 已根据 base/SFT smoke 对照把 SFT 输出改为 JSON-only 合同，字段固定为 `answer/citations/abstained/confidence`，并在训练和推理 prompt 中显式禁止 `<think>`、`</think>` 和多 JSON 输出。
 - Qwen3.5-4B 的 300 题 RAG/no-RAG 已保存，并完成输出质量审计、citation miss 归因、人工抽检导出。
 - RAG + Verifier 的 300 题离线后处理已接入主结果表。
 - Verifier 拦截样例已导出，当前 300 题剩余 5 条拦截样例。
@@ -385,5 +386,5 @@ sql_exec_accuracy=1.0
 
 下一批必须依赖 A100 或外部模型服务的任务：
 
-1. 使用已扩充的 553 条 SFT corpus 先重跑 5-step QLoRA smoke。
-2. 运行更长的 1 epoch 小规模 SFT。
+1. 使用 JSON-only SFT corpus 先重跑短 QLoRA smoke，检查 thinking 泄漏是否下降。
+2. 若短 smoke 同时改善 citation/refusal 和输出格式，再运行更长的 553step 或 1 epoch 小规模 SFT。

@@ -59,6 +59,15 @@
 
 ## 下一步
 
-1. 先把 128step 结果作为中性 smoke 结果保留：训练链路有效，离线解析可改善指标，但原始生成格式约束不足。
-2. 在同一 10 题子集上补 base `Qwen/Qwen3.5-2B` 对照，判断 128step adapter 是否真的改善 answer format、refusal 或 citation behavior。
-3. 下一次 A100 生成前继续收紧 prompt/chat template，重点减少 `</think>` 和多 JSON 串联。
+2026-05-06 已补跑同题 base `Qwen/Qwen3.5-2B` smoke10 对照，结果见 `results/base_vs_sft_128step_smoke10.md`。
+
+| System | citation_hit_rate | abstention_accuracy | thinking_raw_outputs |
+|---|---:|---:|---:|
+| Qwen3.5-2B base smoke10 | 0.000 | 0.900 | 1/10 |
+| MiniGeo-2B-SFT 128step smoke10 reparsed | 0.444 | 1.000 | 7/10 |
+
+结论：
+
+1. 128step SFT 相比 base 改善了 citation/refusal 指标，说明训练信号有效。
+2. SFT raw output 的 thinking 泄漏和多 JSON 问题仍然严重，不能直接进入长训。
+3. 下一步先修 SFT 输出模板、训练样本格式和 generation prompt，再做下一轮短训或 smoke。

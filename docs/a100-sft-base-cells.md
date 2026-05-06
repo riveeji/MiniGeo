@@ -1,5 +1,7 @@
 # MiniGeo 下一轮 A100 顺序执行 Cells
 
+> 该文档记录 base 2B vs SFT 128step 对照流程。该对照已经在 2026-05-06 跑完，结果见 `results/base_vs_sft_128step_smoke10.md`。如果要继续验证 JSON-only SFT 格式修复，请使用 `docs/a100-json-sft-smoke-cells.md`。
+
 本文档用于下一次开启 Colab A100 时，按顺序完成 `Qwen/Qwen3.5-2B` base 与 `MiniGeo-Qwen3.5-2B-SFT-128step` adapter 的同题 smoke 对照。Colab 不能并行执行两个长期 cell，因此下面所有步骤都设计为串行运行。
 
 ## 目标

@@ -8,10 +8,10 @@
 
 - items=10
 - non_empty_answer_rate=1.000
-- citation_hit_rate=0.111
-- abstention_accuracy=0.400
+- citation_hit_rate=0.444
+- abstention_accuracy=1.000
 - request_errors=0
-- latency_ms=14435.206
+- latency_ms=14822.808
 
 ## Interpretation
 

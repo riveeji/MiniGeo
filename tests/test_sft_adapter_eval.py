@@ -22,7 +22,29 @@ def test_build_sft_prompt_requests_json_only() -> None:
 
     assert "Output only one JSON object" in prompt
     assert "answer, citations, abstained, confidence" in prompt
+    assert "<think>" in prompt
+    assert "/no_think" in prompt
     assert "石英的主要成分是什么？" in prompt
+
+
+def test_render_sft_chat_template_disables_thinking_when_supported() -> None:
+    from minigeo.finetune.adapter_eval import render_sft_chat_template
+
+    class FakeTokenizer:
+        def __init__(self) -> None:
+            self.kwargs = None
+
+        def apply_chat_template(self, messages, **kwargs):
+            self.kwargs = kwargs
+            return str(messages)
+
+    tokenizer = FakeTokenizer()
+    rendered = render_sft_chat_template(tokenizer, "测试问题")
+
+    assert rendered
+    assert tokenizer.kwargs["tokenize"] is False
+    assert tokenizer.kwargs["add_generation_prompt"] is True
+    assert tokenizer.kwargs["enable_thinking"] is False
 
 
 def test_format_sft_adapter_report_marks_passed_artifact() -> None:

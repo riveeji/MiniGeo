@@ -15,6 +15,7 @@ from minigeo.rag.model_rag import parse_model_answer
 SFT_JSON_SYSTEM = (
     "你是 MiniGeo。请用中文回答地学问题。"
     "只输出最终 JSON，不输出思考过程、Markdown 或解释性前缀。"
+    "禁止输出 <think>、</think> 或任何推理草稿。"
 )
 
 
@@ -34,6 +35,7 @@ def build_sft_prompt(question: str) -> str:
         "System: 你是 MiniGeo，回答必须简短、可信，并遵守输出格式。\n"
         f"User: {question}\n\n"
         "Output only one JSON object. Do not output markdown, schema examples, or thinking process.\n"
+        "Do not output <think>, </think>, hidden reasoning, or multiple JSON objects. /no_think\n"
         "The JSON keys must be answer, citations, abstained, confidence.\n"
         "If evidence is not provided, citations should be an empty list.\n"
         "如果不能可靠回答，请将 abstained 设为 true。"
@@ -356,14 +358,27 @@ class _PeftAdapterGenerator:
         return _generate_with_chat_template(self.model, self.tokenizer, prompt, self.max_new_tokens)
 
 
-def _generate_with_chat_template(model: Any, tokenizer: Any, prompt: str, max_new_tokens: int) -> str:
-    import torch
-
+def render_sft_chat_template(tokenizer: Any, prompt: str) -> str:
     messages = [
         {"role": "system", "content": SFT_JSON_SYSTEM},
         {"role": "user", "content": prompt},
     ]
-    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    kwargs = {
+        "tokenize": False,
+        "add_generation_prompt": True,
+        "enable_thinking": False,
+    }
+    try:
+        return tokenizer.apply_chat_template(messages, **kwargs)
+    except TypeError:
+        kwargs.pop("enable_thinking")
+        return tokenizer.apply_chat_template(messages, **kwargs)
+
+
+def _generate_with_chat_template(model: Any, tokenizer: Any, prompt: str, max_new_tokens: int) -> str:
+    import torch
+
+    text = render_sft_chat_template(tokenizer, prompt)
     inputs = tokenizer(text, return_tensors="pt").to(model.device)
     with torch.no_grad():
         generated = model.generate(
