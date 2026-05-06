@@ -9,6 +9,7 @@ from typing import Any
 from minigeo.benchmark import load_benchmark
 from minigeo.eval.model_service import summarize_model_rag_outputs
 from minigeo.jsonl import write_jsonl
+from minigeo.rag.corpus import load_corpus
 from minigeo.rag.model_rag import parse_model_answer
 
 
@@ -30,10 +31,24 @@ def validate_adapter_dir(adapter_dir: Path) -> list[str]:
     return errors
 
 
-def build_sft_prompt(question: str) -> str:
+def build_sft_prompt(question: str, evidence_chunks: list[dict[str, Any]] | None = None) -> str:
+    evidence_chunks = evidence_chunks or []
+    evidence_block = ""
+    if evidence_chunks:
+        lines = [
+            f"[{chunk['chunk_id']}] {' '.join(str(chunk.get('text', '')).split())}"
+            for chunk in evidence_chunks
+        ]
+        allowed = ", ".join(str(chunk["chunk_id"]) for chunk in evidence_chunks)
+        evidence_block = (
+            "\nEvidence:\n"
+            + "\n".join(lines)
+            + f"\nWhen citing evidence, citations must use only these chunk_id values: {allowed}.\n"
+        )
     return (
         "System: 你是 MiniGeo，回答必须简短、可信，并遵守输出格式。\n"
         f"User: {question}\n\n"
+        f"{evidence_block}"
         "Output only one JSON object. Do not output markdown, schema examples, or thinking process.\n"
         "Do not output <think>, </think>, hidden reasoning, or multiple JSON objects. /no_think\n"
         "The JSON keys must be answer, citations, abstained, confidence.\n"
@@ -152,14 +167,29 @@ def select_adapter_smoke_rows(benchmark_path: Path, limit: int) -> list[dict[str
     return (preferred or rows)[:limit]
 
 
-def dry_run_records(rows: list[dict[str, Any]], adapter_dir: Path) -> list[dict[str, Any]]:
+def _corpus_by_chunk_id(corpus_path: Path) -> dict[str, dict[str, Any]]:
+    if not corpus_path.exists():
+        return {}
+    return {str(chunk["chunk_id"]): chunk for chunk in load_corpus(corpus_path)}
+
+
+def _evidence_chunks(row: dict[str, Any], corpus_by_id: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
+    return [corpus_by_id[chunk_id] for chunk_id in row.get("evidence", []) if chunk_id in corpus_by_id]
+
+
+def dry_run_records(
+    rows: list[dict[str, Any]],
+    adapter_dir: Path,
+    corpus_by_id: dict[str, dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    corpus_by_id = corpus_by_id or {}
     return [
         {
             "id": row["id"],
             "question": row["question"],
             "gold_evidence": row.get("evidence", []),
             "adapter_dir": str(adapter_dir),
-            "prompt": build_sft_prompt(row["question"]),
+            "prompt": build_sft_prompt(row["question"], _evidence_chunks(row, corpus_by_id)),
             "result": {
                 "answer": "",
                 "citations": [],
@@ -173,14 +203,19 @@ def dry_run_records(rows: list[dict[str, Any]], adapter_dir: Path) -> list[dict[
     ]
 
 
-def dry_run_base_records(rows: list[dict[str, Any]], base_model: str) -> list[dict[str, Any]]:
+def dry_run_base_records(
+    rows: list[dict[str, Any]],
+    base_model: str,
+    corpus_by_id: dict[str, dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    corpus_by_id = corpus_by_id or {}
     return [
         {
             "id": row["id"],
             "question": row["question"],
             "gold_evidence": row.get("evidence", []),
             "base_model": base_model,
-            "prompt": build_sft_prompt(row["question"]),
+            "prompt": build_sft_prompt(row["question"], _evidence_chunks(row, corpus_by_id)),
             "result": {
                 "answer": "",
                 "citations": [],
@@ -216,11 +251,13 @@ def run_base_smoke(
     output_path: Path,
     limit: int,
     max_new_tokens: int,
+    corpus_path: Path = Path("data/processed/rag_corpus.jsonl"),
     dry_run: bool = False,
 ) -> dict[str, Any]:
     rows = select_adapter_smoke_rows(benchmark_path, limit=limit)
+    corpus_by_id = _corpus_by_chunk_id(corpus_path)
     if dry_run:
-        records = dry_run_base_records(rows, base_model)
+        records = dry_run_base_records(rows, base_model, corpus_by_id)
         write_jsonl(output_path, records)
         summary = summarize_model_rag_outputs(rows, {row["id"]: record["result"] for row, record in zip(rows, records)})
         summary["dry_run"] = True
@@ -231,7 +268,7 @@ def run_base_smoke(
     outputs = {}
     started = perf_counter()
     for row in rows:
-        prompt = build_sft_prompt(row["question"])
+        prompt = build_sft_prompt(row["question"], _evidence_chunks(row, corpus_by_id))
         raw = generator.generate(prompt)
         parsed = parse_adapter_answer(raw, allowed_citations=set(row.get("evidence", [])))
         parsed["raw_model_output"] = raw
@@ -260,12 +297,14 @@ def run_adapter_smoke(
     output_path: Path,
     limit: int,
     max_new_tokens: int,
+    corpus_path: Path = Path("data/processed/rag_corpus.jsonl"),
     dry_run: bool = False,
 ) -> dict[str, Any]:
     errors = validate_adapter_dir(adapter_dir)
     rows = select_adapter_smoke_rows(benchmark_path, limit=limit)
+    corpus_by_id = _corpus_by_chunk_id(corpus_path)
     if dry_run:
-        records = dry_run_records(rows, adapter_dir)
+        records = dry_run_records(rows, adapter_dir, corpus_by_id)
         write_jsonl(output_path, records)
         summary = summarize_model_rag_outputs(rows, {row["id"]: record["result"] for row, record in zip(rows, records)})
         summary["adapter_errors"] = errors
@@ -279,7 +318,7 @@ def run_adapter_smoke(
     outputs = {}
     started = perf_counter()
     for row in rows:
-        prompt = build_sft_prompt(row["question"])
+        prompt = build_sft_prompt(row["question"], _evidence_chunks(row, corpus_by_id))
         raw = generator.generate(prompt)
         parsed = parse_adapter_answer(raw, allowed_citations=set(row.get("evidence", [])))
         parsed["raw_model_output"] = raw

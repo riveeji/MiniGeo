@@ -95,6 +95,7 @@ def _saved_model_rows(bench: list[dict]) -> list[tuple]:
     rows.extend(_saved_retrieval_service_rows())
     rows.extend(_saved_base_model_rows())
     rows.extend(_saved_sft_adapter_rows())
+    rows.extend(_saved_json64_sft_adapter_rows())
     return rows
 
 
@@ -177,9 +178,35 @@ def _saved_sft_adapter_rows(
     ]
 
 
+def _saved_json64_sft_adapter_rows(
+    output_path: Path = Path("results/sft_adapter_json64_smoke10_reparsed.jsonl"),
+    report_path: Path = Path("results/sft_adapter_json64_smoke10.md"),
+) -> list[tuple]:
+    return _saved_adapter_smoke_row(
+        label="MiniGeo-2B-SFT json64 smoke",
+        output_path=output_path,
+        report_path=report_path,
+        default_latency_note="见 sft_adapter_json64_smoke10",
+    )
+
+
 def _saved_base_model_rows(
     output_path: Path = Path("results/base_qwen35_2b_smoke10.jsonl"),
     report_path: Path = Path("results/base_qwen35_2b_smoke10.md"),
+) -> list[tuple]:
+    return _saved_adapter_smoke_row(
+        label="Qwen3.5-2B base smoke",
+        output_path=output_path,
+        report_path=report_path,
+        default_latency_note="见 base_qwen35_2b_smoke10",
+    )
+
+
+def _saved_adapter_smoke_row(
+    label: str,
+    output_path: Path,
+    report_path: Path,
+    default_latency_note: str,
 ) -> list[tuple]:
     if not output_path.exists():
         return []
@@ -195,12 +222,12 @@ def _saved_base_model_rows(
     outputs = {record["id"]: record.get("result", {}) for record in records}
     summary = summarize_model_rag_outputs(rows, outputs)
     latency = _extract_report_metric(report_path, "latency_ms")
-    latency_text = "见 base_qwen35_2b_smoke10"
+    latency_text = default_latency_note
     if latency is not None:
         latency_text = f"{latency:.3f} ms/q"
     return [
         (
-            "Qwen3.5-2B base smoke",
+            label,
             "",
             summary.get("citation_hit_rate"),
             "",
@@ -209,8 +236,6 @@ def _saved_base_model_rows(
             latency_text,
         )
     ]
-
-
 def _extract_report_metric(path: Path, name: str) -> float | None:
     if not path.exists():
         return None

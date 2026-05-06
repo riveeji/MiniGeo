@@ -42,6 +42,7 @@ flowchart TD
 | QLoRA 128 step run | adapter generated | Colab A100，128step adapter 已通过 artifact 检查 |
 | Qwen3.5-2B base smoke | citation_hit_rate=0.000 | 同 10 题 base 对照，abstention_accuracy=0.900 |
 | MiniGeo-2B-SFT 128step smoke | citation_hit_rate=0.444 | 离线重解析后；原始生成仍有 `</think>` 和多 JSON 问题 |
+| MiniGeo-2B-SFT json64 smoke | thinking_raw_outputs=0/10 | citation_hit_rate=0.000，abstention_accuracy=0.100，不能长训 |
 | QLoRA 1 epoch artifact | not completed | 2026-05-05 下载包未包含 1 epoch adapter |
 | Planner baseline | routing_accuracy=1.000 | 规则型 planner |
 | MiniGeo-Agent 多案例评测 | pass_rate=1.000 | 覆盖 hybrid / sql / docs 三类本地回归 |
@@ -87,14 +88,15 @@ Analyze which mineral categories are most frequently misclassified in samples co
 
 ## 剩余任务
 
-不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。2026-05-05 下载的 128step Colab artifact 已确认包含 `adapter_model.safetensors`，并已完成 smoke10 推理；离线重解析把 citation hit 从 0.111 提升到 0.444。2026-05-06 已补跑同题 base 对照：base `citation_hit_rate=0.000`、`abstention_accuracy=0.900`，SFT 重解析后为 `citation_hit_rate=0.444`、`abstention_accuracy=1.000`。但 raw output 仍暴露出 `</think>` 泄漏、多 JSON 输出和 citation 格式不稳，且 SFT thinking 泄漏为 7/10，高于 base 的 1/10；1 epoch artifact 仍未生成。后续主要剩余任务：
+不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。2026-05-05 下载的 128step Colab artifact 已确认包含 `adapter_model.safetensors`，并已完成 smoke10 推理；离线重解析把 citation hit 从 0.111 提升到 0.444。2026-05-06 已补跑同题 base 对照：base `citation_hit_rate=0.000`、`abstention_accuracy=0.900`，SFT 重解析后为 `citation_hit_rate=0.444`、`abstention_accuracy=1.000`。随后 JSON-only json64 短训把 `thinking_raw_outputs` 降到 0/10，但 citation/refusal 退化到 `0.000/0.100`，且 8/10 条 raw JSON 仍有语法问题；1 epoch artifact 仍未生成。后续主要剩余任务：
 
-1. SFT 输出模板、训练样本格式和 generation prompt 已本地修订为 JSON-only，重点降低 `</think>` 泄漏和多 JSON 串联。
-2. 下一步在 A100 上跑一轮短训或短 smoke，确认 citation/refusal 改善不以格式退化为代价。
-3. 如果短 smoke 同时改善 citation/refusal 和输出格式，再运行 553step 或 1 epoch 小规模 SFT。
+1. SFT adapter smoke prompt 已改为把 gold evidence block 放入 evidence-labeled 题目。
+2. 下一步用 `docs/a100-json64-evidence-eval-cells.md` 复测 json64 adapter 的 citation behavior。
+3. 如果 citation/refusal 和输出格式同时改善，再运行 553step 或 1 epoch 小规模 SFT。
 
 SFT adapter 评测流程见 `docs/sft-adapter-eval-runbook.md`。
 base/SFT 对照结果见 `results/base_vs_sft_128step_smoke10.md`。
+json64 结果见 `results/sft_adapter_json64_eval.md`。
 
 ## 简历表述
 

@@ -27,6 +27,24 @@ def test_build_sft_prompt_requests_json_only() -> None:
     assert "石英的主要成分是什么？" in prompt
 
 
+def test_build_sft_prompt_includes_evidence_chunks_when_available() -> None:
+    from minigeo.finetune.adapter_eval import build_sft_prompt
+
+    prompt = build_sft_prompt(
+        "石英的主要成分是什么？",
+        evidence_chunks=[
+            {
+                "chunk_id": "doc_quartz#chunk_001",
+                "text": "石英是常见的硅酸盐矿物，主要化学成分是二氧化硅 SiO2。",
+            }
+        ],
+    )
+
+    assert "Evidence:" in prompt
+    assert "doc_quartz#chunk_001" in prompt
+    assert "citations must use only these chunk_id values" in prompt
+
+
 def test_render_sft_chat_template_disables_thinking_when_supported() -> None:
     from minigeo.finetune.adapter_eval import render_sft_chat_template
 
@@ -149,6 +167,7 @@ def test_base_smoke_dry_run_uses_same_benchmark_subset(tmp_path: Path) -> None:
     text = output.read_text(encoding="utf-8")
     assert "Qwen/Qwen3.5-2B" in text
     assert "Output only one JSON object" in text
+    assert "Evidence:" in text
 
 
 def test_format_base_model_report_includes_records_and_summary() -> None:

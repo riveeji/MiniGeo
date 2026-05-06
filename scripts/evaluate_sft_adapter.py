@@ -14,6 +14,7 @@ def main() -> None:
     parser.add_argument("--adapter-dir", required=True)
     parser.add_argument("--base-model", default="Qwen/Qwen3.5-2B")
     parser.add_argument("--benchmark", default="data/benchmark/minigeo_bench.jsonl")
+    parser.add_argument("--corpus", default="data/processed/rag_corpus.jsonl")
     parser.add_argument("--limit", type=int, default=10)
     parser.add_argument("--max-new-tokens", type=int, default=256)
     parser.add_argument("--output", default="results/sft_adapter_smoke.jsonl")
@@ -37,6 +38,7 @@ def main() -> None:
         output_path=Path(args.output),
         limit=args.limit,
         max_new_tokens=args.max_new_tokens,
+        corpus_path=Path(args.corpus),
         dry_run=args.dry_run,
     )
     report = format_sft_adapter_report(
