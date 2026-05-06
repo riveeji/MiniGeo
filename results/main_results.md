@@ -16,15 +16,15 @@
 | Qwen3-Embedding-0.6B hybrid + lexical rerank |  | 0.900 |  |  | - | 见 retrieval_service_eval |
 | Qwen3-Reranker-0.6B hybrid rerank |  | 0.995 |  |  | - | 见 retrieval_service_eval |
 | MiniGeo-2B-SFT 128step smoke |  | 0.444 |  | 1.000 | - | 0.000 ms/q |
-| BM25 RAG baseline |  | 1.000 |  | 1.000 | - | 2.929 ms/q |
-| Dense baseline |  | 0.828 |  |  | - | 1.635 ms/q |
-| Hybrid RAG baseline |  | 0.995 |  |  | - | 5.021 ms/q |
-| Hybrid + rerank baseline |  | 0.880 |  |  | - | 19.086 ms/q |
-| Verifier baseline |  |  | 0.611 |  | - | 1.277 ms/q |
-| SQL rule baseline |  |  |  |  | 1.000 | 0.267 ms/q |
-| Planner baseline | 1.000 |  |  |  | - | 0.009 ms/q |
-| MiniGeo-Agent demo | demo | demo | 见 verifier | demo | PASS | 50.980 ms/q |
-| MiniGeo-Agent multi-case | 1.000 | case | 见 agent_cases | case | PASS | 31.325 ms/q |
+| BM25 RAG baseline |  | 1.000 |  | 1.000 | - | 3.709 ms/q |
+| Dense baseline |  | 0.828 |  |  | - | 2.078 ms/q |
+| Hybrid RAG baseline |  | 0.995 |  |  | - | 5.887 ms/q |
+| Hybrid + rerank baseline |  | 0.880 |  |  | - | 20.212 ms/q |
+| Verifier baseline |  |  | 0.611 |  | - | 1.255 ms/q |
+| SQL rule baseline |  |  |  |  | 1.000 | 0.330 ms/q |
+| Planner baseline | 1.000 |  |  |  | - | 0.008 ms/q |
+| MiniGeo-Agent demo | demo | demo | 见 verifier | demo | PASS | 58.598 ms/q |
+| MiniGeo-Agent multi-case | 1.000 | case | 见 agent_cases | case | PASS | 34.446 ms/q |
 
 ## 待补充模型结果
 

@@ -2,6 +2,8 @@
 
 本文件用于在 Colab A100 上加载 `MiniGeo-Qwen3.5-2B-SFT-128step` LoRA adapter，并运行小规模推理 smoke test。同时运行同一 10 题的 `Qwen/Qwen3.5-2B` base 对照。
 
+如果需要直接复制完整 Colab cells，优先使用 `docs/a100-sft-base-cells.md`。该版本已经包含干净 clone、`PYTHONPATH`、Transformers `qwen3_5` 兼容安装、base/SFT 对照和打包下载步骤。
+
 ## 前提
 
 - 已下载或保留 `minigeo_qlora_outputs_128step.zip`。

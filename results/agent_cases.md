@@ -7,7 +7,7 @@
 - Planner 模式准确率：100.00%
 - SQL 成功率：100.00%
 - Verification report 覆盖率：100.00%
-- 平均延迟：31.325 ms/case
+- 平均延迟：34.446 ms/case
 
 ## 案例明细
 
