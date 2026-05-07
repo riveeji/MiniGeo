@@ -58,6 +58,7 @@ def main() -> None:
         ("Agent Demo", [python, "scripts/agent_demo.py"]),
         ("结果文档生成", [python, "scripts/write_report_artifacts.py"]),
         ("本地结果摘要", [python, "scripts/write_local_results.py"]),
+        ("发布验收清单", [python, "scripts/write_release_checklist.py"]),
     ]
 
     results = []

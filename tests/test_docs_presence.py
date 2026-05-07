@@ -31,3 +31,4 @@ def test_showcase_doc_summarizes_results_and_remaining_a100_tasks() -> None:
     assert "sft-adapter-eval-runbook" in text
     assert "base 对照" in text
     assert "简历表述" in text
+    assert "release_checklist" in text

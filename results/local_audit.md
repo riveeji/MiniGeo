@@ -6,7 +6,7 @@
 
 | 步骤 | 状态 | 退出码 | 命令 |
 |---|---|---:|---|
-| 单元测试 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe -m pytest -q --basetemp .pytest_tmp\basetemp-14168 -p no:cacheprovider` |
+| 单元测试 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe -m pytest -q --basetemp .pytest_tmp\basetemp-2300 -p no:cacheprovider` |
 | Benchmark 分布 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_bench.py` |
 | 检索消融 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/evaluate_retrieval_ablation.py` |
 | 检索失败分析 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/analyze_retrieval_failures.py` |
@@ -21,6 +21,7 @@
 | Agent Demo | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/agent_demo.py` |
 | 结果文档生成 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/write_report_artifacts.py` |
 | 本地结果摘要 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/write_local_results.py` |
+| 发布验收清单 | PASS | 0 | `J:\MiniGeo\.venv\Scripts\python.exe scripts/write_release_checklist.py` |
 
 ## 详细输出
 
@@ -32,10 +33,10 @@
 **stdout**
 
 ```text
-........................................................................ [ 44%]
-........................................................................ [ 89%]
-.................                                                        [100%]
-161 passed in 3.16s
+........................................................................ [ 43%]
+........................................................................ [ 87%]
+.....................                                                    [100%]
+165 passed in 3.24s
 ```
 
 ### Benchmark 分布
@@ -63,10 +64,10 @@ evidence_labeled=209
 **stdout**
 
 ```text
-bm25: recall@5=0.976 recall@10=1.000 mrr=0.774 citation_hit_rate=1.000 latency_ms=3.859
-dense: recall@5=0.550 recall@10=0.828 mrr=0.393 citation_hit_rate=0.828 latency_ms=1.973
-hybrid: recall@5=0.914 recall@10=0.995 mrr=0.636 citation_hit_rate=0.995 latency_ms=5.691
-hybrid_rerank: recall@5=0.608 recall@10=0.880 mrr=0.476 citation_hit_rate=0.880 latency_ms=18.799
+bm25: recall@5=0.976 recall@10=1.000 mrr=0.774 citation_hit_rate=1.000 latency_ms=3.059
+dense: recall@5=0.550 recall@10=0.828 mrr=0.393 citation_hit_rate=0.828 latency_ms=1.630
+hybrid: recall@5=0.914 recall@10=0.995 mrr=0.636 citation_hit_rate=0.995 latency_ms=4.639
+hybrid_rerank: recall@5=0.608 recall@10=0.880 mrr=0.476 citation_hit_rate=0.880 latency_ms=16.226
 ```
 
 ### 检索失败分析
@@ -95,7 +96,7 @@ correct_abstain=33
 missed_abstain=0
 false_abstain=0
 correct_answer=267
-latency_ms=31.40460233333215
+latency_ms=26.486416999996436
 ```
 
 ### Verifier 评测
@@ -111,7 +112,7 @@ claims=314
 verdicts={'supported': 113, 'insufficient_evidence': 179, 'partially_supported': 8}
 statuses={'supported': 122, 'insufficient': 192}
 unsupported_claim_rate=0.6114649681528662
-latency_ms=1.316879666665045
+latency_ms=1.3323503333291835
 ```
 
 ### SQL 评测
@@ -125,7 +126,7 @@ latency_ms=1.316879666665045
 sql_items=60
 sql_exec_accuracy=1.0
 failures={}
-latency_ms=0.3159350000108437
+latency_ms=0.23265333332650093
 ```
 
 ### Agent Planner 评测
@@ -139,7 +140,7 @@ latency_ms=0.3159350000108437
 items=300
 sql_routing_accuracy=1.0
 modes={'docs': 240, 'hybrid': 3, 'sql': 57}
-latency_ms=0.0032869999995455146
+latency_ms=0.003301333332880555
 ```
 
 ### Agent 多案例评测
@@ -304,4 +305,16 @@ wrote=results/failure_cases.md
 
 ```text
 wrote=results\local_eval_summary.md
+```
+
+### 发布验收清单
+
+- 状态：PASS
+- 退出码：0
+
+**stdout**
+
+```text
+wrote=results\release_checklist.md
+release_checklist_ready=true
 ```

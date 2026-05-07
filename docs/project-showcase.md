@@ -49,6 +49,7 @@ flowchart TD
 | MiniGeo-Agent 多案例评测 | pass_rate=1.000 | 覆盖 hybrid / sql / docs 三类本地回归 |
 
 完整表见 `results/main_results.md`。
+发布验收清单见 `results/release_checklist.md`，用于检查 README、架构文档、Benchmark 文档、Data card、主结果表、失败案例、Agent 报告、Colab notebook 和 A100 runbook 是否齐全。
 
 ## 检索失败分析
 

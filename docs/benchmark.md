@@ -28,7 +28,7 @@ python scripts/evaluate_bench.py
 python scripts/expand_seed_data.py --target-items 300
 ```
 
-## 数据格式
+## Benchmark schema
 
 每条题目是一行 JSON Lines 记录：
 
@@ -60,7 +60,7 @@ python scripts/expand_seed_data.py --target-items 300
 | `false_premise` | 问题包含错误前提 |
 | `sql` | 需要结构化数据库查询的问题 |
 
-## 标注规则
+## 标注规则与泄漏控制
 
 - 参考答案应简洁。
 - 带证据题必须使用真实存在的 `chunk_id`。

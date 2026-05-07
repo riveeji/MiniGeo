@@ -12,6 +12,8 @@ def test_core_text_files_keep_readable_chinese_text() -> None:
         Path("src/minigeo/verifier/claim_extractor.py"),
         Path("src/minigeo/verifier/support_classifier.py"),
         Path("scripts/agent_demo.py"),
+        Path("src/minigeo/eval/release.py"),
+        Path("scripts/write_release_checklist.py"),
     ]
     mojibake_markers = ["зџ", "ж\xa0", "пј", "гЂ", "鏄", "鐨", "锛", "銆", "歿"]
     for path in files:
