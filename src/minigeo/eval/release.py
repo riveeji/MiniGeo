@@ -20,15 +20,15 @@ DEFAULT_RELEASE_ARTIFACTS = (
     ReleaseArtifact("失败案例分析", Path("results/failure_cases.md"), ("failure_type", "next_action"), "可复查失败样例"),
     ReleaseArtifact("Agent 多案例报告", Path("results/agent_cases.md"), ("通过率", "Verification", "Qinhuangdao"), "混合文档和 SQL demo"),
     ReleaseArtifact("Colab notebook 模板", Path("notebooks/minigeo_colab_template.ipynb"), (), "Colab 入口"),
-    ReleaseArtifact("A100 SFT runbook", Path("docs/a100-json-sft-smoke-cells.md"), ("A100", "json64", "download"), "下一次 GPU smoke 指令"),
-    ReleaseArtifact("A100 evidence eval runbook", Path("docs/a100-json64-evidence-eval-cells.md"), ("A100", "evidence", "raw_model_output_original"), "证据注入评测指令"),
+    ReleaseArtifact("A100 SFT runbook", Path("docs/a100-json-sft-smoke-cells.md"), ("A100", "json64", "download"), "封档后复现实验指令"),
+    ReleaseArtifact("A100 evidence eval runbook", Path("docs/a100-json64-evidence-eval-cells.md"), ("A100", "evidence", "raw_model_output_original"), "封档后证据注入复现实验指令"),
 )
 
 
 DEFAULT_REMAINING_GPU_TASKS = (
-    "只在必要时开 A100，先运行 json64 evidence adapter 的短 smoke，确认原始尾部污染是否减少。",
-    "如果短 smoke 同时保持 citation/refusal 指标且原始输出格式稳定，再考虑 553step 或 1 epoch 小规模 SFT。",
-    "长训前继续保持 `reference_answer_leaks=[]`，adapter/checkpoints 不进 git。",
+    "展示版已封档，不再安排 A100 或长训。",
+    "保留已完成的 json64 evidence final smoke 结果；后续只有在专门修复 malformed JSON 时才考虑重新开短 smoke。",
+    "继续保持 `reference_answer_leaks=[]`，adapter/checkpoints 不进 git。",
 )
 
 
@@ -78,7 +78,7 @@ def format_release_checklist(
     lines = [
         "# MiniGeo 发布验收清单",
         "",
-        "本文件由 `scripts/write_release_checklist.py` 生成，用于检查最终展示材料是否齐全。它只检查本地文件和关键文本，不代表外部 A100 结果已经重新跑完。",
+        "本文件由 `scripts/write_release_checklist.py` 生成，用于检查最终展示材料是否齐全。当前仓库已按展示版封档，A100 final smoke 结果已经接入本地 `results/`。",
         "",
         "## 汇总",
         "",
@@ -97,7 +97,7 @@ def format_release_checklist(
             f"| {row['name']} | {row['status']} | {row['path']} | {missing_terms} | {row.get('note', '')} |"
         )
 
-    lines.extend(["", "## 剩余 GPU 任务", ""])
+    lines.extend(["", "## 封档后续策略", ""])
     for task in remaining_gpu_tasks:
         lines.append(f"- {task}")
     lines.append("")
@@ -107,7 +107,7 @@ def format_release_checklist(
             [
                 "## 本地下一步",
                 "",
-                "优先补齐 `incomplete` 和 `missing` 项；全部 ready 后再安排下一次 A100 短验证。",
+                "优先补齐 `incomplete` 和 `missing` 项；全部 ready 后再封档。",
                 "",
             ]
         )
@@ -116,7 +116,7 @@ def format_release_checklist(
             [
                 "## 本地下一步",
                 "",
-                "本地展示材料已齐，可以进入最终人工通读和必要的 A100 短验证。",
+                "本地展示材料已齐，展示版可以保持冻结状态。",
                 "",
             ]
         )

@@ -6,7 +6,7 @@
     "sql_success_rate": 1.0,
     "verification_report_rate": 1.0,
     "evidence_rate": 1.0,
-    "latency_ms": 25.703
+    "latency_ms": 25.224
   },
   "reports": [
     {

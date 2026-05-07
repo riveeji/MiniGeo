@@ -66,3 +66,13 @@ def test_format_release_checklist_contains_summary_and_next_actions() -> None:
     assert "incomplete_items=1" in markdown
     assert "| README | ready | README.md |  | 项目入口 |" in markdown
     assert "短 smoke 验证 json64 evidence adapter" in markdown
+
+
+def test_default_release_checklist_uses_archive_language() -> None:
+    markdown = format_release_checklist(
+        [{"name": "README", "path": "README.md", "status": "ready", "missing_terms": [], "note": "项目入口"}]
+    )
+
+    assert "封档后续策略" in markdown
+    assert "展示版已封档" in markdown
+    assert "展示版可以保持冻结状态" in markdown
