@@ -144,7 +144,7 @@ def _saved_retrieval_service_rows(path: Path = Path("results/retrieval_service_e
 
 def _saved_sft_adapter_rows(
     output_path: Path = Path("results/sft_adapter_128step_smoke10_reparsed.jsonl"),
-    report_path: Path = Path("results/sft_adapter_128step_smoke10_reparsed.md"),
+    report_path: Path = Path("results/sft_adapter_128step_smoke10.md"),
 ) -> list[tuple]:
     if not output_path.exists():
         output_path = Path("results/sft_adapter_128step_smoke10.jsonl")
@@ -163,7 +163,7 @@ def _saved_sft_adapter_rows(
     outputs = {record["id"]: record.get("result", {}) for record in records}
     summary = summarize_model_rag_outputs(rows, outputs)
     latency = _extract_report_metric(report_path, "latency_ms")
-    latency_text = "见 sft_adapter_128step_smoke10_reparsed"
+    latency_text = "离线重解析；推理见 sft_adapter_128step_smoke10"
     if latency is not None:
         latency_text = f"{latency:.3f} ms/q"
     return [

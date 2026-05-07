@@ -32,6 +32,10 @@ DEFAULT_REMAINING_GPU_TASKS = (
 )
 
 
+def _display_path(path: Path) -> str:
+    return path.as_posix()
+
+
 def check_release_artifacts(
     artifacts: Iterable[ReleaseArtifact] = DEFAULT_RELEASE_ARTIFACTS,
 ) -> list[dict[str, Any]]:
@@ -41,7 +45,7 @@ def check_release_artifacts(
             rows.append(
                 {
                     "name": artifact.name,
-                    "path": str(artifact.path),
+                    "path": _display_path(artifact.path),
                     "status": "missing",
                     "missing_terms": list(artifact.required_terms),
                     "note": artifact.note,
@@ -54,7 +58,7 @@ def check_release_artifacts(
         rows.append(
             {
                 "name": artifact.name,
-                "path": str(artifact.path),
+                "path": _display_path(artifact.path),
                 "status": "ready" if not missing_terms else "incomplete",
                 "missing_terms": missing_terms,
                 "note": artifact.note,

@@ -21,7 +21,7 @@ def test_check_release_artifacts_marks_ready_when_required_terms_exist(tmp_path:
     assert rows == [
         {
             "name": "README",
-            "path": str(readme),
+            "path": readme.as_posix(),
             "status": "ready",
             "missing_terms": [],
             "note": "项目入口",
@@ -41,6 +41,7 @@ def test_check_release_artifacts_reports_missing_terms_and_files(tmp_path: Path)
     )
 
     assert rows[0]["status"] == "incomplete"
+    assert rows[0]["path"] == doc.as_posix()
     assert rows[0]["missing_terms"] == ["关键指标"]
     assert rows[1]["status"] == "missing"
 

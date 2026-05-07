@@ -38,6 +38,7 @@ def test_format_main_results_includes_local_baselines() -> None:
     assert "MiniGeo-Agent multi-case" in markdown
     assert "7.500 ms/q" in markdown
     assert "Qwen3.5-4B + BM25 RAG" in markdown
+    assert "完整 benchmark" in markdown
 
 
 def test_format_main_results_omits_completed_model_verifier_from_pending_list() -> None:

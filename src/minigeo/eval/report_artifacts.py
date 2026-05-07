@@ -19,10 +19,10 @@ def _latency(metrics: dict[str, float]) -> str:
 def _pending_model_result_lines(extra_rows: list[tuple[Any, ...]] | None) -> list[str]:
     completed_labels = {str(row[0]) for row in (extra_rows or []) if row}
     pending = [
-        "- Qwen3.5-2B no-RAG。",
-        "- Qwen3.5-2B + 模型 RAG。",
-        "- MiniGeo-2B-SFT。",
-        "- MiniGeo-2B-SFT + RAG + Verifier。",
+        "- Qwen3.5-2B no-RAG 完整 benchmark。",
+        "- Qwen3.5-2B + 模型 RAG 完整 benchmark。",
+        "- MiniGeo-2B-SFT 完整 benchmark。",
+        "- MiniGeo-2B-SFT + RAG + Verifier 完整 benchmark。",
     ]
     has_embedding = any("Qwen3-Embedding" in label for label in completed_labels)
     has_reranker = any("Qwen3-Reranker" in label for label in completed_labels)
