@@ -96,6 +96,7 @@ def _saved_model_rows(bench: list[dict]) -> list[tuple]:
     rows.extend(_saved_base_model_rows())
     rows.extend(_saved_sft_adapter_rows())
     rows.extend(_saved_json64_sft_adapter_rows())
+    rows.extend(_saved_json64_evidence_sft_adapter_rows())
     return rows
 
 
@@ -187,6 +188,18 @@ def _saved_json64_sft_adapter_rows(
         output_path=output_path,
         report_path=report_path,
         default_latency_note="见 sft_adapter_json64_smoke10",
+    )
+
+
+def _saved_json64_evidence_sft_adapter_rows(
+    output_path: Path = Path("results/sft_adapter_json64_evidence_smoke10_reparsed.jsonl"),
+    report_path: Path = Path("results/sft_adapter_json64_evidence_smoke10.md"),
+) -> list[tuple]:
+    return _saved_adapter_smoke_row(
+        label="MiniGeo-2B-SFT json64 evidence smoke",
+        output_path=output_path,
+        report_path=report_path,
+        default_latency_note="see sft_adapter_json64_evidence_smoke10",
     )
 
 

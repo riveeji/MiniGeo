@@ -1,5 +1,7 @@
 # MiniGeo json64 Adapter Evidence-conditioned 复评 Cells
 
+> 本流程已在 2026-05-07 跑完，下载包为 `F:\download-edge\minigeo_json64_evidence_eval_outputs.zip`，本地接入记录见 `results/sft_adapter_json64_evidence_eval.md`。后续除非需要复现实验，不需要重复开启 A100 跑本文件。
+
 本文档用于复评已经训练好的 `MiniGeo-Qwen3.5-2B-SFT-json64step` adapter。json64 短训已证明 `thinking_raw_outputs=0/10`，但之前的 smoke prompt 没有注入 evidence block，导致 citation 评测不公平。当前仓库已经修正 `evaluate_sft_adapter.py`：默认会把 gold evidence chunk 放入 prompt。
 
 本轮不训练，只重新加载 json64 adapter 做 evidence-conditioned smoke10。

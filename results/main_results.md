@@ -18,14 +18,15 @@
 | Qwen3.5-2B base smoke |  | 0.000 |  | 0.900 | - | 7899.095 ms/q |
 | MiniGeo-2B-SFT 128step smoke |  | 0.444 |  | 1.000 | - | 0.000 ms/q |
 | MiniGeo-2B-SFT json64 smoke |  | 0.000 |  | 0.100 | - | 6440.721 ms/q |
-| BM25 RAG baseline |  | 1.000 |  | 1.000 | - | 3.756 ms/q |
-| Dense baseline |  | 0.828 |  |  | - | 2.093 ms/q |
-| Hybrid RAG baseline |  | 0.995 |  |  | - | 5.821 ms/q |
-| Hybrid + rerank baseline |  | 0.880 |  |  | - | 20.250 ms/q |
-| Verifier baseline |  |  | 0.611 |  | - | 1.261 ms/q |
-| SQL rule baseline |  |  |  |  | 1.000 | 0.282 ms/q |
+| MiniGeo-2B-SFT json64 evidence smoke |  | 1.000 |  | 0.900 | - | 8505.253 ms/q |
+| BM25 RAG baseline |  | 1.000 |  | 1.000 | - | 3.080 ms/q |
+| Dense baseline |  | 0.828 |  |  | - | 1.609 ms/q |
+| Hybrid RAG baseline |  | 0.995 |  |  | - | 4.762 ms/q |
+| Hybrid + rerank baseline |  | 0.880 |  |  | - | 16.341 ms/q |
+| Verifier baseline |  |  | 0.611 |  | - | 1.036 ms/q |
+| SQL rule baseline |  |  |  |  | 1.000 | 0.257 ms/q |
 | Planner baseline | 1.000 |  |  |  | - | 0.007 ms/q |
-| MiniGeo-Agent demo | demo | demo | 见 verifier | demo | PASS | 60.245 ms/q |
+| MiniGeo-Agent demo | demo | demo | 见 verifier | demo | PASS | 44.921 ms/q |
 | MiniGeo-Agent multi-case | 1.000 | case | 见 agent_cases | case | PASS | 33.020 ms/q |
 
 ## 待补充模型结果
