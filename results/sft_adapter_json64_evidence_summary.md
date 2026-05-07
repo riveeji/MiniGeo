@@ -1,6 +1,6 @@
-# MiniGeo json64 Evidence-conditioned Smoke10
+# MiniGeo json64 Evidence-conditioned Final Smoke10
 
-# MiniGeo SFT Adapter Smoke Evaluation
+## Reparsed Smoke Evaluation
 
 - Adapter: `checkpoints/MiniGeo-Qwen3.5-2B-SFT-json64step/adapter`
 - Records: `results/sft_adapter_json64_evidence_smoke10_reparsed.jsonl`
@@ -24,15 +24,13 @@
 
 - 本报告由已有 raw_model_output 离线重解析生成，没有重新调用模型。
 - thinking_raw_outputs=0
-- postprocessed_raw_outputs=1
-- malformed_raw_json=0
-- parser_consistency_fix=insufficient_evidence_answer_sets_abstained_true
+- postprocessed_raw_outputs=0
+- malformed_raw_json=1
 
 
 ## Format Diagnostics
 
 - official_thinking_raw_outputs=0
-- official_malformed_raw_json=0
-- postprocessed_raw_outputs=1
-- original_tail_pollution_outputs=1
-- empty_citations_raw=1
+- official_malformed_raw_json=1
+- postprocessed_raw_outputs=0
+- original_tail_pollution_outputs=0

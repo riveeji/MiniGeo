@@ -43,7 +43,7 @@ flowchart TD
 | Qwen3.5-2B base smoke | citation_hit_rate=0.000 | 同 10 题 base 对照，abstention_accuracy=0.900 |
 | MiniGeo-2B-SFT 128step smoke | citation_hit_rate=0.444 | 离线重解析后；原始生成仍有 `</think>` 和多 JSON 问题 |
 | MiniGeo-2B-SFT json64 smoke | thinking_raw_outputs=0/10 | citation_hit_rate=0.000，abstention_accuracy=0.100，不能长训 |
-| MiniGeo-2B-SFT json64 evidence smoke | citation_hit_rate=1.000 | 离线一致性重解析后 abstention_accuracy=1.000；正式 raw 为单 JSON，原始输出仍有 1/10 尾部污染 |
+| MiniGeo-2B-SFT json64 evidence smoke | citation_hit_rate=1.000 | final smoke 中 abstention_accuracy=1.000、thinking=0/10、尾部污染=0/10；仍有 malformed raw JSON=1/10 |
 | QLoRA 1 epoch artifact | not completed | 2026-05-05 下载包未包含 1 epoch adapter |
 | Planner baseline | routing_accuracy=1.000 | 规则型 planner |
 | MiniGeo-Agent 多案例评测 | pass_rate=1.000 | 覆盖 hybrid / sql / docs 三类本地回归 |
@@ -90,11 +90,11 @@ Analyze which mineral categories are most frequently misclassified in samples co
 
 ## 剩余任务
 
-不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。2026-05-05 下载的 128step Colab artifact 已确认包含 `adapter_model.safetensors`，并已完成 smoke10 推理；离线重解析把 citation hit 从 0.111 提升到 0.444。2026-05-06 已补跑同题 base 对照：base `citation_hit_rate=0.000`、`abstention_accuracy=0.900`，SFT 重解析后为 `citation_hit_rate=0.444`、`abstention_accuracy=1.000`。随后 JSON-only json64 短训把 `thinking_raw_outputs` 降到 0/10，但闭卷 citation/refusal 退化到 `0.000/0.100`。evidence-conditioned 复评把 json64 的 `citation_hit_rate` 拉回 1.000，离线一致性重解析后 `abstention_accuracy` 为 1.000；当前正式 raw 已清理为单 JSON，但 `raw_model_output_original` 仍记录到 1/10 原始尾部污染；1 epoch artifact 仍未生成。后续主要剩余任务：
+不需要 A100 的核心工程链路已经基本收敛，真实 reranker staged 消融、QLoRA smoke run、SFT corpus 扩充和 Agent 多案例本地评测也已完成。2026-05-05 下载的 128step Colab artifact 已确认包含 `adapter_model.safetensors`，并已完成 smoke10 推理；离线重解析把 citation hit 从 0.111 提升到 0.444。2026-05-06 已补跑同题 base 对照：base `citation_hit_rate=0.000`、`abstention_accuracy=0.900`，SFT 重解析后为 `citation_hit_rate=0.444`、`abstention_accuracy=1.000`。随后 JSON-only json64 短训把 `thinking_raw_outputs` 降到 0/10，但闭卷 citation/refusal 退化到 `0.000/0.100`。evidence-conditioned final smoke 把 json64 的 `citation_hit_rate` 和 `abstention_accuracy` 都拉到 1.000，`thinking_raw_outputs=0/10`，原始尾部污染降到 0/10；但仍有 1/10 malformed raw JSON；1 epoch artifact 仍未生成。后续主要剩余任务：
 
 1. 继续加固 SFT prompt 和 JSON 输出数据模板。
-2. 下一次 A100 只跑短 smoke，检查 `raw_model_output_original` 是否还出现尾部污染。
-3. 如果短 smoke 的 citation/refusal 和原始格式都稳定，再决定是否运行 553step 或 1 epoch 小规模 SFT。
+2. 暂不继续长训；如果继续 SFT，优先补 malformed JSON 格式样本。
+3. 当前 final smoke 的 citation/refusal 稳定，但原始 JSON 格式仍有 1/10 malformed，因此暂不安排 553step 或 1 epoch 小规模 SFT。
 
 SFT adapter 评测流程见 `docs/sft-adapter-eval-runbook.md`。
 base/SFT 对照结果见 `results/base_vs_sft_128step_smoke10.md`。

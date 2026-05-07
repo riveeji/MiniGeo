@@ -22,5 +22,5 @@
 
 - 本报告由已有 raw_model_output 离线重解析生成，没有重新调用模型。
 - thinking_raw_outputs=0
-- postprocessed_raw_outputs=1
-- malformed_raw_json=0
+- postprocessed_raw_outputs=0
+- malformed_raw_json=1
