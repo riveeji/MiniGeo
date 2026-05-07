@@ -142,8 +142,9 @@ python - <<'PY'
 import json
 from pathlib import Path
 
-records = [json.loads(line) for line in Path("results/sft_adapter_json64_evidence_smoke10.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+records = [json.loads(line) for line in Path("results/sft_adapter_json64_evidence_smoke10_reparsed.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
 thinking = sum("</think>" in str(row.get("result", {}).get("raw_model_output", "")) for row in records)
+original_tail_pollution = sum("raw_model_output_original" in row.get("result", {}) for row in records)
 malformed = 0
 empty_citations = 0
 for row in records:
@@ -162,13 +163,16 @@ report = [
     "",
     "## Format Diagnostics",
     "",
-    f"- thinking_raw_outputs={thinking}",
-    f"- malformed_raw_json={malformed}",
+    f"- official_thinking_raw_outputs={thinking}",
+    f"- official_malformed_raw_json={malformed}",
+    f"- postprocessed_raw_outputs={original_tail_pollution}",
+    f"- original_tail_pollution_outputs={original_tail_pollution}",
     f"- empty_citations_raw={empty_citations}",
 ]
 Path("results/sft_adapter_json64_evidence_summary.md").write_text("\n".join(report), encoding="utf-8", newline="\n")
-print("thinking_raw_outputs=", thinking)
-print("malformed_raw_json=", malformed)
+print("official_thinking_raw_outputs=", thinking)
+print("official_malformed_raw_json=", malformed)
+print("postprocessed_raw_outputs=", original_tail_pollution)
 print("empty_citations_raw=", empty_citations)
 PY
 ```

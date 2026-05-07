@@ -142,6 +142,27 @@ def test_parse_adapter_answer_marks_insufficient_evidence_as_abstained() -> None
     assert parsed["confidence"] == 0.0
 
 
+def test_clean_adapter_raw_output_keeps_first_complete_json_object() -> None:
+    from minigeo.finetune.adapter_eval import clean_adapter_raw_output
+
+    raw = (
+        '{"answer":"根据证据，方解石的碳酸根特征带常接近 1085 cm-1。",'
+        '"citations":["doc_calcite#chunk_002"],"abstained":false,"confidence":0.8}'
+        ' </think> '
+        '{"answer":"重复答案","citations":[],"abstained":false,"confidence":0.5}'
+    )
+
+    cleaned = clean_adapter_raw_output(raw)
+
+    assert cleaned == (
+        '{"answer":"根据证据，方解石的碳酸根特征带常接近 1085 cm-1。",'
+        '"citations":["doc_calcite#chunk_002"],"abstained":false,"confidence":0.8}'
+    )
+    assert "</think>" not in cleaned
+    assert cleaned.count("{") == 1
+    assert cleaned.count("}") == 1
+
+
 def test_reparse_adapter_records_preserves_raw_and_updates_result() -> None:
     from minigeo.finetune.adapter_eval import reparse_adapter_records
 
@@ -163,7 +184,34 @@ def test_reparse_adapter_records_preserves_raw_and_updates_result() -> None:
 
     assert reparsed[0]["result"]["answer"] == "石英的主要化学成分是二氧化硅 SiO2。"
     assert reparsed[0]["result"]["citations"] == ["doc_quartz#chunk_001"]
-    assert reparsed[0]["result"]["raw_model_output"] == records[0]["result"]["raw_model_output"]
+    assert reparsed[0]["result"]["raw_model_output"].count("{") == 1
+    assert reparsed[0]["result"]["raw_model_output_original"] == records[0]["result"]["raw_model_output"]
+
+
+def test_reparse_adapter_records_sanitizes_tail_pollution_but_preserves_original() -> None:
+    from minigeo.finetune.adapter_eval import reparse_adapter_records
+
+    raw = (
+        '{"answer":"根据证据，方解石的碳酸根特征带常接近 1085 cm-1。",'
+        '"citations":["doc_calcite#chunk_002"],"abstained":false,"confidence":0.8}'
+        ' </think> '
+        '{"answer":"重复答案","citations":[],"abstained":false,"confidence":0.5}'
+    )
+    records = [
+        {
+            "id": "minigeo_007",
+            "gold_evidence": ["doc_calcite#chunk_002"],
+            "result": {"raw_model_output": raw},
+        }
+    ]
+
+    reparsed = reparse_adapter_records(records)
+    result = reparsed[0]["result"]
+
+    assert result["citations"] == ["doc_calcite#chunk_002"]
+    assert result["raw_model_output_original"] == raw
+    assert "</think>" not in result["raw_model_output"]
+    assert result["raw_model_output"].count("{") == 1
 
 
 def test_base_smoke_dry_run_uses_same_benchmark_subset(tmp_path: Path) -> None:

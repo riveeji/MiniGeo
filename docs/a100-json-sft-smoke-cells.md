@@ -170,9 +170,10 @@ python - <<'PY'
 import json
 from pathlib import Path
 
-records = [json.loads(line) for line in Path("results/sft_adapter_json64_smoke10.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
+records = [json.loads(line) for line in Path("results/sft_adapter_json64_smoke10_reparsed.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
 thinking = sum("</think>" in str(row.get("result", {}).get("raw_model_output", "")) for row in records)
 multi_json = sum(str(row.get("result", {}).get("raw_model_output", "")).count("{") > 1 for row in records)
+postprocessed = sum("raw_model_output_original" in row.get("result", {}) for row in records)
 
 summary = [
     "# MiniGeo JSON-only SFT json64 Smoke Summary",
@@ -183,6 +184,7 @@ summary = [
     "",
     f"- thinking_raw_outputs={thinking}",
     f"- multi_json_raw_outputs={multi_json}",
+    f"- postprocessed_raw_outputs={postprocessed}",
     "",
     "## Decision",
     "",
@@ -192,6 +194,7 @@ summary = [
 Path("results/sft_adapter_json64_summary.md").write_text("\n".join(summary), encoding="utf-8", newline="\n")
 print("thinking_raw_outputs=", thinking)
 print("multi_json_raw_outputs=", multi_json)
+print("postprocessed_raw_outputs=", postprocessed)
 print("wrote=results/sft_adapter_json64_summary.md")
 PY
 ```

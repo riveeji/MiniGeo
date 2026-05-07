@@ -23,12 +23,16 @@
 ## Reparse Notes
 
 - 本报告由已有 raw_model_output 离线重解析生成，没有重新调用模型。
-- thinking_raw_outputs=1
+- thinking_raw_outputs=0
+- postprocessed_raw_outputs=1
+- malformed_raw_json=0
 - parser_consistency_fix=insufficient_evidence_answer_sets_abstained_true
 
 
 ## Format Diagnostics
 
-- thinking_raw_outputs=1
-- malformed_raw_json=1
+- official_thinking_raw_outputs=0
+- official_malformed_raw_json=0
+- postprocessed_raw_outputs=1
+- original_tail_pollution_outputs=1
 - empty_citations_raw=1

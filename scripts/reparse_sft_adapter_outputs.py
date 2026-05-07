@@ -32,6 +32,14 @@ def main() -> None:
         if "</think>" in str(record.get("result", {}).get("raw_model_output", ""))
         or "<think>" in str(record.get("result", {}).get("raw_model_output", ""))
     )
+    summary["postprocessed_raw_outputs"] = sum(
+        1 for record in reparsed
+        if "raw_model_output_original" in record.get("result", {})
+    )
+    summary["malformed_raw_json"] = sum(
+        1 for record in reparsed
+        if _is_malformed_json(str(record.get("result", {}).get("raw_model_output", "")).strip())
+    )
     report = format_sft_adapter_report(
         adapter_dir=Path(reparsed[0].get("adapter_dir", "")) if reparsed else Path(""),
         summary=summary,
@@ -41,10 +49,22 @@ def main() -> None:
     report += "\n## Reparse Notes\n\n"
     report += "- 本报告由已有 raw_model_output 离线重解析生成，没有重新调用模型。\n"
     report += f"- thinking_raw_outputs={summary['thinking_raw_outputs']}\n"
+    report += f"- postprocessed_raw_outputs={summary['postprocessed_raw_outputs']}\n"
+    report += f"- malformed_raw_json={summary['malformed_raw_json']}\n"
     report_path.write_text(report, encoding="utf-8", newline="\n")
     print(json.dumps(summary, ensure_ascii=False, indent=2))
     print(f"wrote={output_path}")
     print(f"wrote={report_path}")
+
+
+def _is_malformed_json(raw: str) -> bool:
+    if not raw:
+        return False
+    try:
+        json.loads(raw)
+    except json.JSONDecodeError:
+        return True
+    return False
 
 
 if __name__ == "__main__":

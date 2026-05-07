@@ -71,6 +71,34 @@ def parse_adapter_answer(raw: str, allowed_citations: set[str]) -> dict[str, Any
     })
 
 
+def clean_adapter_raw_output(raw: str) -> str:
+    text = str(raw).strip()
+    first_json = _first_json_object_text(text)
+    return first_json if first_json else text
+
+
+def _attach_model_output(parsed: dict[str, Any], raw: str) -> dict[str, Any]:
+    cleaned = clean_adapter_raw_output(raw)
+    output = dict(parsed)
+    output["raw_model_output"] = cleaned
+    if cleaned != str(raw).strip():
+        output["raw_model_output_original"] = raw
+    return output
+
+
+def _first_json_object_text(raw: str) -> str:
+    decoder = json.JSONDecoder()
+    for match in re.finditer(r"\{", raw):
+        start = match.start()
+        try:
+            data, end = decoder.raw_decode(raw[start:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(data, dict):
+            return raw[start:start + end].strip()
+    return ""
+
+
 def _normalise_refusal_consistency(parsed: dict[str, Any]) -> dict[str, Any]:
     answer = str(parsed.get("answer", ""))
     citations = parsed.get("citations") or []
@@ -259,7 +287,7 @@ def reparse_adapter_records(records: list[dict[str, Any]]) -> list[dict[str, Any
         output = dict(record.get("result", {}))
         raw = str(output.get("raw_model_output", ""))
         reparsed = parse_adapter_answer(raw, allowed_citations=set(record.get("gold_evidence", [])))
-        reparsed["raw_model_output"] = raw
+        reparsed = _attach_model_output(reparsed, raw)
         if output.get("error"):
             reparsed["error"] = output["error"]
         updated = dict(record)
@@ -295,7 +323,7 @@ def run_base_smoke(
         prompt = build_sft_prompt(row["question"], _evidence_chunks(row, corpus_by_id))
         raw = generator.generate(prompt)
         parsed = parse_adapter_answer(raw, allowed_citations=set(row.get("evidence", [])))
-        parsed["raw_model_output"] = raw
+        parsed = _attach_model_output(parsed, raw)
         outputs[row["id"]] = parsed
         records.append(
             {
@@ -345,7 +373,7 @@ def run_adapter_smoke(
         prompt = build_sft_prompt(row["question"], _evidence_chunks(row, corpus_by_id))
         raw = generator.generate(prompt)
         parsed = parse_adapter_answer(raw, allowed_citations=set(row.get("evidence", [])))
-        parsed["raw_model_output"] = raw
+        parsed = _attach_model_output(parsed, raw)
         outputs[row["id"]] = parsed
         records.append(
             {
