@@ -24,6 +24,7 @@ def test_build_sft_prompt_requests_json_only() -> None:
     assert "answer, citations, abstained, confidence" in prompt
     assert "<think>" in prompt
     assert "/no_think" in prompt
+    assert "If the answer says evidence is insufficient, abstained must be true" in prompt
     assert "石英的主要成分是什么？" in prompt
 
 
@@ -123,6 +124,22 @@ def test_parse_adapter_answer_extracts_allowed_source_from_non_json_fragment() -
     assert parsed["citations"] == ["doc_hematite#chunk_001"]
     assert parsed["abstained"] is False
     assert parsed["confidence"] == 0.5
+
+
+def test_parse_adapter_answer_marks_insufficient_evidence_as_abstained() -> None:
+    from minigeo.finetune.adapter_eval import parse_adapter_answer
+
+    raw = (
+        '{"answer":"当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。",'
+        '"citations":[],"abstained":false,"confidence":0.0}'
+    )
+
+    parsed = parse_adapter_answer(raw, allowed_citations=set())
+
+    assert parsed["answer"] == "当前证据不足，无法给出可靠结论；需要补充可验证的来源或样本记录。"
+    assert parsed["citations"] == []
+    assert parsed["abstained"] is True
+    assert parsed["confidence"] == 0.0
 
 
 def test_reparse_adapter_records_preserves_raw_and_updates_result() -> None:

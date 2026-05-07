@@ -11,7 +11,7 @@
 - items=10
 - non_empty_answer_rate=1.000
 - citation_hit_rate=1.000
-- abstention_accuracy=0.900
+- abstention_accuracy=1.000
 - request_errors=0
 - latency_ms=0.000
 
@@ -24,6 +24,7 @@
 
 - 本报告由已有 raw_model_output 离线重解析生成，没有重新调用模型。
 - thinking_raw_outputs=1
+- parser_consistency_fix=insufficient_evidence_answer_sets_abstained_true
 
 
 ## Format Diagnostics

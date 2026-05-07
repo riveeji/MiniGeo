@@ -53,6 +53,7 @@ def build_sft_prompt(question: str, evidence_chunks: list[dict[str, Any]] | None
         "Do not output <think>, </think>, hidden reasoning, or multiple JSON objects. /no_think\n"
         "The JSON keys must be answer, citations, abstained, confidence.\n"
         "If evidence is not provided, citations should be an empty list.\n"
+        "If the answer says evidence is insufficient, abstained must be true and confidence must be 0.0.\n"
         "如果不能可靠回答，请将 abstained 设为 true。"
     )
 
@@ -61,13 +62,36 @@ def parse_adapter_answer(raw: str, allowed_citations: set[str]) -> dict[str, Any
     merged = _merge_json_fragments(raw, allowed_citations)
     fallback = parse_model_answer(raw, allowed_citations)
     if not merged:
-        return fallback
-    return {
+        return _normalise_refusal_consistency(fallback)
+    return _normalise_refusal_consistency({
         "answer": merged.get("answer") or fallback.get("answer", ""),
         "citations": merged.get("citations") or fallback.get("citations", []),
         "abstained": bool(merged.get("abstained", fallback.get("abstained", False))),
         "confidence": float(merged.get("confidence", fallback.get("confidence", 0.0))),
-    }
+    })
+
+
+def _normalise_refusal_consistency(parsed: dict[str, Any]) -> dict[str, Any]:
+    answer = str(parsed.get("answer", ""))
+    citations = parsed.get("citations") or []
+    if citations:
+        return parsed
+    refusal_markers = [
+        "证据不足",
+        "无法给出可靠结论",
+        "无法可靠回答",
+        "不能可靠回答",
+        "需要补充可验证",
+        "insufficient evidence",
+        "cannot provide a reliable answer",
+    ]
+    if any(marker.lower() in answer.lower() for marker in refusal_markers):
+        updated = dict(parsed)
+        updated["citations"] = []
+        updated["abstained"] = True
+        updated["confidence"] = 0.0
+        return updated
+    return parsed
 
 
 def _merge_json_fragments(raw: str, allowed_citations: set[str]) -> dict[str, Any]:

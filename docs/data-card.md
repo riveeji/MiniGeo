@@ -44,7 +44,7 @@
 }
 ```
 
-`output` 统一为单个 JSON 对象，字段固定为 `answer/citations/abstained/confidence`。SFT 样本不包含 `<think>`、`</think>`、Markdown 或多 JSON 串联，目的是把下一轮训练目标和推理评测的 JSON contract 对齐。
+`output` 统一为单个 JSON 对象，字段固定为 `answer/citations/abstained/confidence`。SFT 样本不包含 `<think>`、`</think>`、Markdown 或多 JSON 串联，目的是把下一轮训练目标和推理评测的 JSON contract 对齐。当前 `instruction` 也会显式要求只输出一个 JSON 后停止，并要求当答案表达“证据不足”时必须设置 `abstained=true`、`confidence=0.0`。
 
 ## SFT 样本策略
 
@@ -56,7 +56,7 @@
 - `refusal`：基于不可回答 benchmark 问题生成通用拒答样本。
 - `sql_format`：基于 SQL benchmark 生成 SQL intent 格式样本。
 
-2026-05-06 根据 base/SFT smoke 对照结果修订了 SFT 输出格式：128step SFT 相比 base 改善了 citation/refusal 指标，但 raw output 中 `</think>` 泄漏为 7/10。为降低下一轮短训的格式退化风险，SFT corpus 已改为 JSON-only 输出，并在 QLoRA 训练文本中显式禁止 thinking 标签和推理草稿。
+2026-05-06 根据 base/SFT smoke 对照结果修订了 SFT 输出格式：128step SFT 相比 base 改善了 citation/refusal 指标，但 raw output 中 `</think>` 泄漏为 7/10。为降低下一轮短训的格式退化风险，SFT corpus 已改为 JSON-only 输出，并在 QLoRA 训练文本中显式禁止 thinking 标签和推理草稿。2026-05-07 根据 json64 evidence smoke 的 `minigeo_007/minigeo_009` 问题样本继续收紧 instruction：要求单 JSON 后停止，并对“证据不足”文字拒答与 `abstained` 字段做一致性约束。
 
 当前 task_type 分布：
 

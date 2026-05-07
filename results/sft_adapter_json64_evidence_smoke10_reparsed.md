@@ -9,7 +9,7 @@
 - items=10
 - non_empty_answer_rate=1.000
 - citation_hit_rate=1.000
-- abstention_accuracy=0.900
+- abstention_accuracy=1.000
 - request_errors=0
 - latency_ms=0.000
 

@@ -98,6 +98,8 @@ def test_build_sft_examples_outputs_single_json_contract_without_thinking_tags()
         assert isinstance(parsed["citations"], list)
         assert isinstance(parsed["abstained"], bool)
         assert isinstance(parsed["confidence"], float | int)
+        assert "Output exactly one JSON object" in example["instruction"]
+        assert "If the answer says evidence is insufficient, abstained must be true" in example["instruction"]
 
 
 def test_build_sft_examples_keeps_task_type_distribution_balanced() -> None:

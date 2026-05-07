@@ -18,7 +18,7 @@
 | Qwen3.5-2B base smoke |  | 0.000 |  | 0.900 | - | 7899.095 ms/q |
 | MiniGeo-2B-SFT 128step smoke |  | 0.444 |  | 1.000 | - | 0.000 ms/q |
 | MiniGeo-2B-SFT json64 smoke |  | 0.000 |  | 0.100 | - | 6440.721 ms/q |
-| MiniGeo-2B-SFT json64 evidence smoke |  | 1.000 |  | 0.900 | - | 8505.253 ms/q |
+| MiniGeo-2B-SFT json64 evidence smoke |  | 1.000 |  | 1.000 | - | 8505.253 ms/q |
 | BM25 RAG baseline |  | 1.000 |  | 1.000 | - | 3.080 ms/q |
 | Dense baseline |  | 0.828 |  |  | - | 1.609 ms/q |
 | Hybrid RAG baseline |  | 0.995 |  |  | - | 4.762 ms/q |

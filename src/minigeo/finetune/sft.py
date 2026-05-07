@@ -39,6 +39,16 @@ def _json_output(answer: str, citations: list[str] | None = None, abstained: boo
     )
 
 
+def _instruction(base: str) -> str:
+    return (
+        f"{base}\n"
+        "Output exactly one JSON object and then stop. "
+        "Do not output markdown, schema examples, <think>, </think>, hidden reasoning, or multiple JSON objects. "
+        "The JSON keys must be answer, citations, abstained, confidence. "
+        "If the answer says evidence is insufficient, abstained must be true and confidence must be 0.0."
+    )
+
+
 def build_sft_examples(benchmark_rows: list[dict[str, Any]], corpus_rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     examples: list[dict[str, Any]] = []
     corpus_by_id = {str(chunk["chunk_id"]): chunk for chunk in corpus_rows}
@@ -136,6 +146,8 @@ def build_sft_examples(benchmark_rows: list[dict[str, Any]], corpus_rows: list[d
                 }
             )
             sql_idx += 1
+    for example in examples:
+        example["instruction"] = _instruction(str(example["instruction"]))
     return examples
 
 
